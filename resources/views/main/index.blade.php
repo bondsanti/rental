@@ -14,12 +14,12 @@
 
             #table tbody td {
                 font-size: 13px;
-                /* text-align: center; */
+
                 vertical-align: middle;
             }
             #badge {
                 font-size: 12px;
-                /* color: #000 !important; */
+
             }
         </style>
     @endpush
