@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\RentalController;
+use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,10 +40,20 @@ Route::middleware(['isLogin'])->group(function () {
 
     Route::get('/', [MainController::class, 'index'])->name('main');
 
-
-
     Route::get('/logout/auth',[CustomAuthController::class,'logoutUser'])->name('logoutUser');
 
+    Route::get('/rooms', [RoomController::class, 'index'])->name('room');
+    Route::post('/rooms/store', [RoomController::class, 'store'])->name('room.store');
+
+    Route::get('/rental',[RentalController::class,'index'])->name('rental');
+    Route::post('/rental/search',[RentalController::class,'search'])->name('rental.search');
+    Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
+    Route::get('/rental/edit/{id}',[RentalController::class,'edit'])->name('rental.edit');
+    Route::post('/rental/update', [RentalController::class, 'update'])->name('rental.update');
+    Route::post('/rental/print', [RentalController::class, 'print'])->name('rental.print');
+    Route::post('/rental/print/sub_apartment', [RentalController::class, 'print'])->name('rental.print.sub_apartment');
+    Route::post('/rental/print/furniture', [RentalController::class, 'print'])->name('rental.print.furniture');
+    Route::get('/rental/rent/{id}', [RentalController::class, 'rent'])->name('rental.rent');
 
 
 

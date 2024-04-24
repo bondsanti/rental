@@ -39,12 +39,20 @@
                           </a>
                       </li>
                       <li class="nav-item">
-                          <a href=""
-                              class="nav-link">
+                        <a href="{{ route('room') }}"
+                            class="nav-link {{ request()->routeIs('room') ? 'active' : '' }} {{ request()->routeIs('room.index') ? 'active' : '' }} ">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>
+                                เพิ่มห้องเช่า
+                            </p>
+                        </a>
+                    </li>
+                      <li class="nav-item">
+                          <a href="{{ route('rental') }}"
+                              class="nav-link {{ request()->routeIs('rental') ? 'active' : '' }} {{ request()->routeIs('rental.search') ? 'active' : '' }} {{ request()->routeIs('rental.detail') ? 'active' : '' }}">
                               <i class="nav-icon fas fa-building"></i>
                               <p>
                                   ห้องเช่า
-                                  {{-- <span class="right badge badge-danger">New</span> --}}
                               </p>
                           </a>
                       </li>

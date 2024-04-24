@@ -1,0 +1,34 @@
+{
+    "noto sans thai": {
+        "200": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/noto_sans_thai_200_bbec10649205a852e4b39819fe337312",
+        "300": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/noto_sans_thai_300_98fee5771072636863e966f024efd904",
+        "normal": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/noto_sans_thai_normal_be0dac6beb348956ae77235fa2f48dd1",
+        "500": "noto_sans_thai_500_b47656a5e6c72b7d124525c6599afb27"
+    },
+    "font awesome 6 brands": {
+        "normal": "font_awesome_6_brands_normal_36faa0e194d3288643f7144dedd8e1b1"
+    },
+    "font awesome 6 free": {
+        "normal": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/font_awesome_6_free_normal_cf2d7daaeabedac0226ae26fc7e4f075",
+        "900": "font_awesome_6_free_900_665c8d2ea728525da852b5cd3a1d51a5"
+    },
+    "font awesome 5 brands": {
+        "normal": "font_awesome_5_brands_normal_36faa0e194d3288643f7144dedd8e1b1"
+    },
+    "font awesome 5 free": {
+        "900": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/font_awesome_5_free_900_665c8d2ea728525da852b5cd3a1d51a5",
+        "normal": "font_awesome_5_free_normal_cf2d7daaeabedac0226ae26fc7e4f075"
+    },
+    "fontawesome": {
+        "normal": "fontawesome_normal_6aa5cc0b95be2651581a2d7ad4a9d038"
+    },
+    "ionicons": {
+        "normal": "ionicons_normal_1b2b773bb3197b577cecee8d68579952"
+    },
+    "thsarabunnew": {
+        "normal": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/thsarabunnew_normal_c71d2efe7d17dff7f87f3b75c4b1c46e",
+        "bold": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/thsarabunnew_bold_fd5e64f6e0579c99ae1ffcae67952962",
+        "italic": "C:\\xampp\\htdocs\\rental\\storage\\fonts\/thsarabunnew_italic_26db2446f9c46232614e6b9d06ba594c",
+        "bold_italic": "thsarabunnew_bold_italic_f0941a79b720c64685b5abb507495ca2"
+    }
+}

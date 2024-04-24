@@ -9,12 +9,17 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
+        "barryvdh/laravel-dompdf": "^2.1",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^3.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "illuminate/support": "^5.5|^6|^7|^8",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
         "maatwebsite/excel": "^3.1",
+        "nelisys/laravel-dompdf-thai-font": "^0.1.0",
+        "phattarachai/thaidate": "^12.1",
+        "phpoffice/phpspreadsheet": "^1.4",
         "psr/simple-cache": "^1.0",
         "realrashid/sweet-alert": "^7.1",
         "yajra/laravel-datatables-oracle": "^9.21"

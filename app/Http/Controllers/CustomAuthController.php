@@ -89,6 +89,7 @@ class CustomAuthController extends Controller
 
     public function logoutUser(Request $request)
     {
+        // dd($request->session()->has('loginId'));
 
         if ($request->session()->has('loginId')) {
 
