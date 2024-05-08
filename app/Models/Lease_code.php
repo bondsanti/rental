@@ -9,4 +9,5 @@ class Lease_code extends Model
 {
     use HasFactory;
     public $timestamps = false;
+    protected $primaryKey = 'lease_code_id';
 }
