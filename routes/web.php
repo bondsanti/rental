@@ -4,6 +4,8 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
+use App\http\Controllers\ContractController;
+use App\http\controllers\ReportRoomController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +62,26 @@ Route::middleware(['isLogin'])->group(function () {
 
 
 
+    //Route Contract สัญญา
+    Route::get('/contract',[ContractController::class,'index'])->name('contract');
+    Route::post('/contract/update',[ContractController::class,'update'])->name('contract.update');
+    Route::get('/out_contract',[ContractController::class,'out_index'])->name('out_contract');
+    Route::post('/out_contract/update',[ContractController::class,'out_update'])->name('out.update');
+    Route::get('/room/contract',[ContractController::class,'room_con'])->name('contract.room');
+    Route::post('/room/contract/search',[ContractController::class,'search'])->name('contract.search');
+    Route::get('/contract/list',[ContractController::class,'list_contracct'])->name('contract.list');
+    Route::post('/list/search',[ContractController::class,'list_search'])->name('list.search');
+
+
+
+
+    //Route ReportRoom รายงานสรุปห้องเช่า
+    Route::get('/report/room',[ReportRoomController::class,'index'])->name('report.room');
+    Route::get('/report/rental',[ReportRoomController::class,'report_rental'])->name('report.rental');
+    Route::post('/report/rental/serach',[ReportRoomController::class,'report_search'])->name('report.search');
+    Route::get('/report/rental/AvailableRoom',[ReportRoomController::class,'avaliableRoom'])->name('report.availble');
+    Route::get('/report/rental/Asset',[ReportRoomController::class,'listRoom'])->name('report.asset');
+    Route::post('/report/rental/asset/search',[ReportRoomController::class,'asset_search'])->name('report.asset.search');
 
 });
 
