@@ -61,8 +61,8 @@
                                     <div class="col-sm-3">
 
                                         <div class="form-group">
-                                            <label>โครงการ</label>
-                                            <select name="project_id" id="project_id" class="form-control">
+                                            <label><b class="text-danger">*</b> โครงการ</label>
+                                            <select name="project_id" id="project_id" class="form-control @error('project_id') is-invalid @enderror">
                                                 <option value="">-- เลือก --</option>
                                                 @foreach ($projects as $project)
                                                 <option value="{{ $project->pid }}"
@@ -70,32 +70,44 @@
                                                 {{ $project->Project_Name }}</option>
                                                 @endforeach
                                             </select>
+                                            @error('project_id')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>เลขที่บ้านเจ้าของห้อง</label>
-                                            <input class="form-control" name="numberhome" type="text"
+                                            <label><b class="text-danger">*</b> เลขที่บ้านเจ้าของห้อง</label>
+                                            <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text"
                                                 placeholder="เลขที่บ้านเจ้าของ">
+                                            @error('numberhome')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>ห้องเลขที่</label>
-                                            <input class="form-control" name="room_address" type="text"
+                                            <label><b class="text-danger">*</b> ห้องเลขที่</label>
+                                            <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text"
                                                 placeholder="ห้องเลขที่">
+                                            @error('RoomNo')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>บ้านเลขที่</label>
-                                            <input class="form-control" name="address" type="text"
+                                            <label><b class="text-danger">*</b> บ้านเลขที่</label>
+                                            <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text"
                                                 placeholder="บ้านเลขที่">
+                                            @error('HomeNo')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -104,17 +116,23 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>เจ้าของห้อง</label>
-                                            <input class="form-control" name="onwername" type="text"
+                                            <label><b class="text-danger">*</b> เจ้าของห้อง</label>
+                                            <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text"
                                                 placeholder="เจ้าของห้อง">
+                                            @error('onwername')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>บัตรประชาชน</label>
-                                            <input class="form-control" name="cardowner" type="text"
+                                            <label><b class="text-danger">*</b> บัตรประชาชน</label>
+                                            <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text"
                                                 placeholder="บัตรประชาชน">
+                                            @error('cardowner')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -151,27 +169,115 @@
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>แขวง/ตำบล</label>
-                                            <input class="form-control" name="owner_district" type="text"
+                                            <label><b class="text-danger">*</b> แขวง/ตำบล</label>
+                                            <input class="form-control @error('owner_district') is-invalid @enderror" name="owner_district" type="text"
                                                 placeholder="แขวง/ตำบล">
+                                            @error('owner_district')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>เขต/อำเภอ</label>
-                                            <input class="form-control" name="owner_khet" type="text"
+                                            <label><b class="text-danger">*</b> เขต/อำเภอ</label>
+                                            <input class="form-control @error('owner_khet') is-invalid @enderror" name="owner_khet" type="text"
                                                 placeholder="เขต/อำเภอ">
+                                            @error('owner_khet')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>จังหวัด</label>
-                                            <input class="form-control" name="owner_province" type="text"
-                                                placeholder="จังหวัด">
+                                            <label><b class="text-danger">*</b> จังหวัด</label>
+                                            {{-- <input class="form-control @error('owner_province') is-invalid @enderror" name="owner_province" type="text"
+                                                placeholder="จังหวัด"> --}}
+                                            <select class="form-control @error('owner_province') is-invalid @enderror" name="owner_province">
+                                                <option value="">-- เลือก --</option>
+                                                <option value="กรุงเทพมหานคร">กรุงเทพมหานคร</option>
+                                                <option value="กระบี่">กระบี่</option>
+                                                <option value="กาญจนบุรี">กาญจนบุรี</option>
+                                                <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+                                                <option value="กำแพงเพชร">กำแพงเพชร</option>
+                                                <option value="ขอนแก่น">ขอนแก่น</option>
+                                                <option value="จันทบุรี">จันทบุรี</option>
+                                                <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+                                                <option value="ชัยนาท">ชัยนาท</option>
+                                                <option value="ชัยภูมิ">ชัยภูมิ</option>
+                                                <option value="ชุมพร">ชุมพร</option>
+                                                <option value="ชลบุรี">ชลบุรี</option>
+                                                <option value="เชียงใหม่">เชียงใหม่</option>
+                                                <option value="เชียงราย">เชียงราย</option>
+                                                <option value="ตรัง">ตรัง</option>
+                                                <option value="ตราด">ตราด</option>
+                                                <option value="ตาก">ตาก</option>
+                                                <option value="นครนายก">นครนายก</option>
+                                                <option value="นครปฐม">นครปฐม</option>
+                                                <option value="นครพนม">นครพนม</option>
+                                                <option value="นครราชสีมา">นครราชสีมา</option>
+                                                <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                                <option value="นครสวรรค์">นครสวรรค์</option>
+                                                <option value="นราธิวาส">นราธิวาส</option>
+                                                <option value="น่าน">น่าน</option>
+                                                <option value="นนทบุรี">นนทบุรี</option>
+                                                <option value="บึงกาฬ">บึงกาฬ</option>
+                                                <option value="บุรีรัมย์">บุรีรัมย์</option>
+                                                <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+                                                <option value="ปทุมธานี">ปทุมธานี</option>
+                                                <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+                                                <option value="ปัตตานี">ปัตตานี</option>
+                                                <option value="พะเยา">พะเยา</option>
+                                                <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+                                                <option value="พังงา">พังงา</option>
+                                                <option value="พิจิตร">พิจิตร</option>
+                                                <option value="พิษณุโลก">พิษณุโลก</option>
+                                                <option value="เพชรบุรี">เพชรบุรี</option>
+                                                <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+                                                <option value="แพร่">แพร่</option>
+                                                <option value="พัทลุง">พัทลุง</option>
+                                                <option value="ภูเก็ต">ภูเก็ต</option>
+                                                <option value="มหาสารคาม">มหาสารคาม</option>
+                                                <option value="มุกดาหาร">มุกดาหาร</option>
+                                                <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+                                                <option value="ยโสธร">ยโสธร</option>
+                                                <option value="ยะลา">ยะลา</option>
+                                                <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+                                                <option value="ระนอง">ระนอง</option>
+                                                <option value="ระยอง">ระยอง</option>
+                                                <option value="ราชบุรี">ราชบุรี</option>
+                                                <option value="ลพบุรี">ลพบุรี</option>
+                                                <option value="ลำปาง">ลำปาง</option>
+                                                <option value="ลำพูน">ลำพูน</option>
+                                                <option value="เลย">เลย</option>
+                                                <option value="ศรีสะเกษ">ศรีสะเกษ</option>
+                                                <option value="สกลนคร">สกลนคร</option>
+                                                <option value="สงขลา">สงขลา</option>
+                                                <option value="สมุทรสาคร">สมุทรสาคร</option>
+                                                <option value="สมุทรปราการ">สมุทรปราการ</option>
+                                                <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+                                                <option value="สระแก้ว">สระแก้ว</option>
+                                                <option value="สระบุรี">สระบุรี</option>
+                                                <option value="สิงห์บุรี">สิงห์บุรี</option>
+                                                <option value="สุโขทัย">สุโขทัย</option>
+                                                <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+                                                <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                                <option value="สตูล">สตูล</option>
+                                                <option value="หนองคาย">หนองคาย</option>
+                                                <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+                                                <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+                                                <option value="อุดรธานี">อุดรธานี</option>
+                                                <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+                                                <option value="อุทัยธานี">อุทัยธานี</option>
+                                                <option value="อุบลราชธานี">อุบลราชธานี</option>
+                                                <option value="อ่างทอง">อ่างทอง</option>
+                                            </select>
+                                            @error('owner_province')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -179,9 +285,12 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>เบอร์ติดต่อ</label>
-                                            <input class="form-control" name="ownerphone" type="text"
+                                            <label><b class="text-danger">*</b> เบอร์ติดต่อ</label>
+                                            <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text"
                                                 placeholder="เบอร์ติดต่อ">
+                                            @error('ownerphone')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -366,7 +475,7 @@
                                                     <option value="ห้องตัวอย่าง">ห้องตัวอย่าง</option>
                                                     <option value="จอง">จอง</option>
                                                     <option value="สวัสดิการ">สวัสดิการ</option>
-                                                  </select>
+                                                </select>
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -471,30 +580,30 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Bed" type="number" value=""> เตียง
+                                        <input style="width: 15%" style="display: inline" name="room_Bed" type="number" value=""> <b class="ml-2">เตียง</b>
                                     </p>
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Beding" type="number" value=""> เครื่องนอน
-                                    </p>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Bedroom_Curtain" type="number" value=""> ม่านห้องนอน
+                                        <input style="width: 15%" style="display: inline" name="room_Beding" type="number" value=""> <b class="ml-2">เครื่องนอน</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Livingroom_Curtain" type="number" value=""> ม่านห้องรับแขก
+                                        <input style="width: 15%" style="display: inline" name="room_Bedroom_Curtain" type="number" value=""> <b class="ml-2">ม่านห้องนอน</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Wardrobe" type="number" value=""> ตู้เสื้อผ้า
+                                        <input style="width: 15%" style="display: inline" name="room_Livingroom_Curtain" type="number" value=""> <b class="ml-2">ม่านห้องรับแขก</b>
+                                    </p>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <p class="form-group">
+                                        <input style="width: 15%" style="display: inline" name="room_Wardrobe" type="number" value=""> <b class="ml-2">ตู้เสื้อผ้า</b>
                                     </p>
                                 </div>
                                 
@@ -504,30 +613,30 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Sofa" type="number" value=""> โซฟา
+                                        <input style="width: 15%" style="display: inline" name="room_Sofa" type="number" value=""> <b class="ml-2">โซฟา</b>
                                     </p>
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_TV_Table" type="number" value=""> โต๊ะวางโทรทัศน์
-                                    </p>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Dining_Table" type="number" value=""> โต๊ะกินข้าว
+                                        <input style="width: 15%" style="display: inline" name="room_TV_Table" type="number" value=""> <b class="ml-2">โต๊ะวางโทรทัศน์</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Center_Table" type="number" value=""> โต๊ะกลาง
+                                        <input style="width: 15%" style="display: inline" name="room_Dining_Table" type="number" value=""> <b class="ml-2">โต๊ะกินข้าว</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Chair" type="number" value=""> เก้าอี้
+                                        <input style="width: 15%" style="display: inline" name="room_Center_Table" type="number" value=""> <b class="ml-2">โต๊ะกลาง</b>
+                                    </p>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <p class="form-group">
+                                        <input style="width: 15%" style="display: inline" name="room_Chair" type="number" value=""> <b class="ml-2">เก้าอี้</b>
                                     </p>
                                 </div>
                             </div>
@@ -537,30 +646,30 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Bedroom_Air" type="number" value=""> แอร์ห้องนอน
+                                        <input style="width: 15%" style="display: inline" name="room_Bedroom_Air" type="number" value=""> <b class="ml-2">แอร์ห้องนอน</b>
                                     </p>
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Livingroom_Air" type="number" value=""> แอร์ห้องรับแขก
-                                    </p>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Water_Heater" type="number" value=""> เครื่องทำน้ำอุ่น
+                                        <input style="width: 15%" style="display: inline" name="room_Livingroom_Air" type="number" value=""> <b class="ml-2">แอร์ห้องรับแขก</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_TV" type="number" value=""> ทีวี
+                                        <input style="width: 15%" style="display: inline" name="room_Water_Heater" type="number" value=""> <b class="ml-2">เครื่องทำน้ำอุ่น</b>
                                     </p>
                                 </div>
 
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_Refrigerator" type="number" value=""> ตู้เย็น
+                                        <input style="width: 15%" style="display: inline" name="room_TV" type="number" value=""> <b class="ml-2">ทีวี</b>
+                                    </p>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <p class="form-group">
+                                        <input style="width: 15%" style="display: inline" name="room_Refrigerator" type="number" value=""> <b class="ml-2">ตู้เย็น</b>
                                     </p>
                                 </div>
                                 
@@ -571,12 +680,12 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_microwave" type="number" value=""> ไมโครเวฟ
+                                        <input style="width: 15%" style="display: inline" name="room_microwave" type="number" value=""> <b class="ml-2">ไมโครเวฟ</b>
                                     </p>
                                 </div>
                                 <div class="col-sm-2">
                                     <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="room_wash_machine" type="number" value=""> เครื่องซักผ้า
+                                        <input style="width: 15%" style="display: inline" name="room_wash_machine" type="number" value=""> <b class="ml-2">เครื่องซักผ้า</b>
                                     </p>
                                 </div>
 

@@ -1,16 +1,28 @@
 
 @extends('layouts.app')
 
-@section('title', 'โครงการ')
+@section('title', 'ค่าเช่า')
 
 @section('content')
-<form method="post" action="" enctype="multipart/form-data">
+<form method="post" action="{{ route('rental.recordRent') }}" enctype="multipart/form-data">
     @csrf
-    {{-- <input type="hidden" name="p1" value="{{ request()->input('p1') }}">
-    <input type="hidden" name="c1" value="{{ request()->input('c1') }}"> --}}
+    <input type="hidden" name="payment_id" value="{{ $result->payment_id }}">
+    <input type="hidden" name="project_id" value="{{ $result->project_id }}">
+    <input type="hidden" name="customer_id" value="{{ $result->customer_id }}">
+    <input type="hidden" name="room_id" value="{{ $result->room_id }}">
+    <input type="hidden" name="projectName" value="{{ $result->Project_Name }}">
+    <input type="hidden" name="roomNo" value="{{ $result->RoomNo }}">
+    <input type="hidden" name="owner" value="{{ $result->Owner }}">
     
     <div class="container-fluid">
         <div class="row">
+            <div class="col-md-6">
+                <h1 class="mb-2">
+                    <a href="javascript:void(0);" class="btn bg-gradient-warning" type="button"
+                        onclick="goBack();">
+                        <i class="fa-solid fa fa-reply"></i> กลับ </a>
+                </h1>
+            </div>
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-outline card-info">
@@ -21,19 +33,19 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>โครงการ</label>
-                                    <input type="text" readonly class="form-control" id="project" value="{{ $result->Project_Name }}">
+                                    <input type="text" readonly class="form-control" value="{{ $result->Project_Name }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>ห้องเลขที่</label>
-                                    <input type="text" readonly class="form-control" id="roomNo" value="{{ $result->RoomNo }}">
+                                    <input type="text" readonly class="form-control"  value="{{ $result->RoomNo }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>บ้านเลขที่</label>
-                                    <input type="text" readonly class="form-control" id="homeNo" value="{{ $result->HomeNo }}">
+                                    <input type="text" readonly class="form-control"  value="{{ $result->HomeNo }}">
                                 </div>
                             </div>
                         </div>
@@ -41,13 +53,13 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>เจ้าของห้อง</label>
-                                    <input type="text" readonly class="form-control" id="owner" value="{{ $result->Owner }}">
+                                    <input type="text" readonly class="form-control" value="{{ $result->Owner }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>เบอร์ติดต่อ</label>
-                                    <input type="text" readonly class="form-control" id="phone" value="{{ $result->Phone }}">
+                                    <input type="text" readonly class="form-control" value="{{ $result->phone }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">
@@ -108,47 +120,274 @@
                 </div>
             </div>
         </div>
-        {{-- <div class="row">
-            <div class="table-responsive">
-                <table class="table table-bordered" style="background: #cccccc;">
-                    <thead>
-                        <tr align="center">
-                            <th scope="col" class="bg-success text-white">ค่าเช่า</th>
-                            @for($i = 1; $i <= 12; $i++)
-                            <th scope="col" class="bg-success text-white"></th>
-                            @endfor
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row" class="bg-white">ยอดเงิน</th>
-                            @for($i = 1; $i <= 12; $i++)
-                            <td class="bg-white"><input name="Due{{ $i }}_Amount" value="" class="form-control" style="width: 80px; text-align: right;"></td>
-                            @endfor
-                        </tr>
-                        <tr>
-                            <th scope="row" class="bg-white">ชำระวันที่</th>
-                            <!-- Assuming you want to add date inputs here -->
-                            @for($i = 1; $i <= 12; $i++)
-                            <td class="bg-white"><input type="date" name="Due{{ $i }}_Date" value="" class="form-control"></td>
-                            @endfor
-                        </tr>
-                        <tr>
-                            <th scope="row" class="bg-white">หมายเหตุ</th>
-                            @for($i = 1; $i <= 12; $i++)
-                            <td class="bg-white"><textarea name="Remark{{ $i }}" class="form-control" style="width:80px; height:50px;"></textarea></td>
-                            @endfor
-                        </tr>
-                    </tbody>
-                </table>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="bg-success text-white">ค่าเช่า</th>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <th scope="col" class="bg-success text-white">{{ $result->{"Due{$i}_Date"} }}</th>
+                                    @endfor
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ยอดเงิน</td>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <td><input name="Due{{ $i }}_Amount" value="{{ $result->{"Due{$i}_Amount"} }}" class="form-control"></td>
+                                    @endfor
+                                </tr>
+                                <tr>
+                                    <td>วันที่ชำระ</td>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <td><input type="text" name="Payment_Date{{ $i }}" value="{{ $result->{"Payment_Date{$i}"} }}" class="form-control datepicker" placeholder="yyyy-mm-dd"></td>
+                                    @endfor
+                                </tr>
+                                <tr>
+                                    <td>หมายเหตุ</td>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <td><textarea name="Remark{{ $i }}" class="form-control">{{ $result->{"Remark{$i}"} }}</textarea></td>
+                                    @endfor
+                                </tr>
+                                <tr>
+                                    <td>สลิป</td>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <td>
+                                            @if ($result->{"slip{$i}"})
+                                                @if ($result->{"status_approve{$i}"} == 1)
+                                                    <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->{"slip{$i}"} }}" title="ดูสลิป">
+                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                    </button>
+                                                    <a href="{{ url('rental/download/' . $result->room_id . '/' . $result->{"Due{$i}_Date"}) }}" class="btn btn-primary">Print <i class="fa fa-print" aria-hidden="true"></i></a>
+                                                @elseif($result->{"status_approve{$i}"} == 2)
+                                                    <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
+                                                @else
+                                                    {{-- check role if admin show modal approve --}}
+                                                    {{-- @if ($result->{"status_approve{$i}"}) --}}
+                                                        
+                                                        {{-- modal approve for admin --}}
+                                                        <button type="button" class="btn bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip{$i}"} }}" data-index="{{ $i }}"  title="รออนุมัติ">
+                                                            รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                        </button>
+                                                        {{-- check role if not admin show text --}}
+                                                        {{-- <button type="button" class="btn bg-gradient-danger" title="รออนุมัติ">
+                                                            รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                        </button> --}}
+                                                        {{-- <p class="btn btn-danger">รออนุมัติ</p> --}}
+                                                    {{-- @endif --}}
+                                                @endif
+                                            @else
+                                                {{-- @if (!$result->{"slip{$i}"} && !$result->{"status_approve{$i}"}) --}}
+                                                    <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
+                                                {{-- @endif --}}
+                                            @endif
+                                            
+                                        </td>
+                                    @endfor
+                                </tr>
+                                <tr>
+                                    <td>สลิป Express</td>
+                                    @for ($i = 1; $i <= $result->Contract; $i++)
+                                        <td>
+                                            @if ($result->{"slip{16 + $i}"})
+                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->{"slip{16 + $i}"} }}" title="ดูสลิป">
+                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                            @if ($result->{"status_approve{16 + $i}"})
+                                                <a href="{{ url('rental/download/' . $result->room_id . '/' . $result->{"Due{$i}_Date"}) }}" class="btn btn-primary">Print</a>
+                                            @endif
+                                            @if (!$result->{"slip{16 + $i}"} && !$result->{"status_approve{16 + $i}"})
+                                                <input type="file" class="form-control" style="width:120px;" name="slips{{ 16 + $i }}">
+                                            @endif
+                                        </td>
+                                    @endfor
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div> --}}
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="bg-success text-white">{{ $result->Due1_Date }}</th>
+                                    <th scope="col" class="bg-success text-white">เงินล่วงหน้า</th>
+                                    <th scope="col" class="bg-success text-white">ค่าจอง</th>
+                                    <th scope="col" class="bg-success text-white">เงินประกัน(2เดือน)</th>
+                                    <th scope="col" class="bg-success text-white">เงิน Prorate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>จำนวนเงิน</td>
+                                    <td><input type="text" class="form-control" name="Paymentbefore" value="{{ $result->Paymentbefore }}"></td>
+                                    <td><input type="text" class="form-control" name="Deposit" value="{{ $result->Deposit }}"></td>
+                                    <td><input type="text" class="form-control" name="Bail" value="{{ $result->Bail }}"></td>
+                                    <td><input type="text" class="form-control" name="sum" value="{{ $result->Payment_Prorate ?? '0' }}"></td>
+                                </tr>
+                                <tr>
+                                    <td>ชำระวันที่</td>
+                                    <td>
+                                        <input type="text" class="form-control" id="calendar_input26" name="Payment_before" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}">
+                                    </td>
+                                    <td><input type="text" class="form-control" id="calendar_input27" name="Payment_reservation" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
+                                    <td><input type="text" class="form-control" id="calendar_input28" name="Payment_guarantee" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
+                                    <td><input type="text" class="form-control" id="calendar_input28" name="Payment_guarantee" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
+                                </tr>
+                                <tr>
+                                    <td>หมายเหตุ</td>
+                                    <td><textarea name="Remarkpay1" class="form-control" style="height: 50px;">{{ $result->Remarkpay1 }}</textarea></td>
+                                    <td><textarea name="Remarkpay2" class="form-control" style="height: 50px;">{{ $result->Remarkpay2 }}</textarea></td>
+                                    <td><textarea name="Remarkpay3" class="form-control" style="height: 50px;">{{ $result->Remarkpay3 }}</textarea></td>
+                                    <td><textarea name="Remarkpay4" class="form-control" style="height: 50px;">{{ $result->Remarkpay4 }}</textarea></td>
+                                </tr>
+                                <tr>
+                                    <td>สลิป</td>
+                                    <td><input type="file" class="form-control" style="width:120px;" name="slips13"></td>
+                                    <td><input type="file" class="form-control" style="width:120px;" name="slips14"></td>
+                                    <td><input type="file" class="form-control" style="width:120px;" name="slips15"></td>
+                                    <td><input type="file" class="form-control" style="width:120px;" name="slips16"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">บันทึกข้อมูล</button>
+            </div>
+        </div>
+        <div class="row">
+
+        </div>
+
+        {{-- view modal --}}
+        <div class="modal fade" id="modal-view-slip">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">ดูข้อมูลสลิป</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSlip">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box-body text-center">
+                            <img id="slip" src="" alt="sliper" class="img-fluid rounded"> 
+                        </div>
+
+                    </div>
+                    <div class="modal-footer justify-contentend">
+                        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeSlip">
+                            <i class="fa fa-times"></i> ปิดหน้าต่าง</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+
+         {{-- status approve modal --}}
+         <div class="modal fade" id="modal-status-approve">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">รออนุมัติ</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeApprove">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="editForm" name="editForm" class="form-horizontal" enctype="multipart/form-data">
+                        <input type="hidden" name="room_id" id="room_id">
+                        <input type="hidden" name="payment_id" id="payment_id">
+                        <input type="hidden" name="index" id="index">
+                        {{-- <input type="hidden" name="user_id" id="user_id" value="{{ $dataLoginUser->id }}"> --}}
+                        @csrf
+                        <div class="modal-body">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+
+                                        <label for="code" class="col-form-label">โครงการ</label>
+                                        <input type="text" class="form-control" id="projectName" name="projectName"
+                                            placeholder="" autocomplete="off" disabled>
+
+                                        <label for="code" class="col-form-label">ห้องเลขที่</label>
+                                        <input type="text" class="form-control" id="roomNo" name="roomNo"
+                                            placeholder="" autocomplete="off" disabled>
+
+                                        <label for="code" class="col-form-label">เจ้าของห้อง</label>
+                                        <input type="text" class="form-control" id="owner" name="owner"
+                                            placeholder="" autocomplete="off" disabled>
+
+                                        <label for="code" class="col-form-label">ลูกค้าเช่าซื้อ</label>
+                                        <input type="text" class="form-control" id="cus_name" name="cus_name"
+                                            placeholder="" autocomplete="off" disabled>
+
+                                        <label for="code" class="col-form-label">ค่าเช่าประจำเดือน</label>
+                                        <input type="text" class="form-control" id="monthly" name="monthly"
+                                            placeholder="" autocomplete="off" disabled>
+
+                                        {{-- <label for="code" class="col-form-label">รูปสลิป</label> --}}
+                                        {{-- <img src="" class="form-control" id="slip_img" name="slip_img"> --}}
+                                        <div class="mt-3">
+                                            <p class="text-bold">รูปสลิป</p>
+                                            <img id="slip_img" src="" alt="sliper" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="type" class="col-form-label">ประเภทการอนุมัติ</label>
+                                        <select class="form-control" id="role_approve" name="role_approve">
+                                            <option value="">เลือก</option>
+                                            <option value="1">อนุมัติ</option>
+                                            <option value="2">ไม่อนุมัติ</option>
+                                        </select>
+                                        <p class="text-danger mt-1 name_edit_err"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeApprove"><i
+                                    class="fa fa-times"></i> ยกเลิก</button>
+                            <button type="button" class="btn bg-gradient-success" id="updatedata" value="update"><i
+                                    class="fa fa-save"></i> อัพเดท</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
         
     </div>
 </form>
 
 @endsection
+{{-- @php
+    // $src = $(this).data('src');
+@endphp --}}
 @push('script')
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     $(document).ready(function() {
         $('.datepicker').datepicker({
@@ -160,9 +399,158 @@
         //     var selectedStartDate = e.date;
         //     $('#enddate').datepicker('setStartDate', selectedStartDate);
         // });
+
+        $('#closeApprove').click(function() {
+            $('#editForm').trigger("reset");
+            $('#modal-status-approve').modal('show');
+        });
+
+        $('#closeSlip').click(function() {
+            $('#modal-view-slip').trigger("reset");
+            $('#modal-view-slip').modal('show');
+        });
     });
     function goBack() {
         window.history.back();
     }
+
+     //View modal
+     $('body').on('click', '.view-slip', function() {
+
+        const id = $(this).data('id');
+        const src = $(this).data('src');
+        console.log(id,src);
+        $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+        // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+        $('#modal-view-slip').modal('show');
+        // $.get('../api/rental/detail/' + id, function(data) {
+        //     console.log(data);
+        // });
+    });
+
+    //modal approve
+    $('body').on('click', '.view-approve', function() {
+
+        const id = $(this).data('id');
+        const date = $(this).data('date');
+        const src = $(this).data('src');
+        const index = $(this).data('index');
+        const d = new Date(date)
+        console.log(index);
+        let month_full = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const year = d.getFullYear()+543;;
+        const month = month_full[d.getMonth()];
+        const monthYear = month + ' ' + year;
+        console.log(monthYear);
+        $('#modal-status-approve').modal('show');
+        $.get('../../api/rental/rent/preapprove/' + id, function(data) {
+            console.log('payment id = ',data.payment_id);
+            console.log(data.RoomNo);
+            $('#room_id').val(data.room_id);
+            $('#payment_id').val(data.payment_id);
+            $('#projectName').val(data.Project_Name);
+            $('#roomNo').val(data.RoomNo);
+            $('#owner').val(data.Owner);
+            $('#cus_name').val(data.Cus_Name);
+            $('#monthly').val(monthYear);
+            $('#slip_img').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+            // $('#slip_img').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+            $('#index').val(index);
+        });
+    });
+
+    $('#updatedata').click(function(e) {
+        e.preventDefault();
+        // const approve = $("#role_approve").val();
+        const status = $("#role_approve").val();
+        const index = $("#index").val();
+        const id = $("#payment_id").val();
+        const room_id = $("#room_id").val();
+        if(!status){
+            $(".name_edit_err").html('กรุณาเลือกประเภทการอนุมัติ');
+        }else{
+            $(".name_edit_err").html('');
+            $(this).html('รอสักครู่..');
+            const formData = new FormData($('#editForm')[0]);
+            
+            $.ajax({
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    url: "../../api/rental/rent/approve/" + id + "/" + status + "/" + index,
+                    type: "POST",
+                    dataType: 'json',
+
+                    success: function(data) {
+                        console.log(data);
+                        if (data.success = true) {
+
+                            if ($.isEmptyObject(data.error)) {
+                                Swal.fire({
+
+                                    icon: 'success',
+                                    title: data.message,
+                                    showConfirmButton: true,
+                                    timer: 2500
+                                });
+                                $('#modal-status-approve').trigger("reset");
+                                $('#modal-status-approve').modal('hide');
+                                //tableUser.draw();
+                                // setTimeout("location.href = '{{ url('rental/rent') }}'+ '/' + room_id;",
+                                //     1500);
+                                setTimeout(function() {
+                                    location.href = '{{ url('rental/rent') }}' + '/' + room_id;
+                                }, 1500);
+                            } else {
+
+                                $('#update').html('ลองอีกครั้ง');
+
+                                //$('#userFormEdit').trigger("reset");
+                                Swal.fire({
+                                    position: 'top-center',
+                                    icon: 'error',
+                                    title: 'ไม่สามารถบันทึกข้อมูลได้',
+                                    html: `เนื่องจากกรอกข้อมูลไม่ครบถ้วน`,
+                                    timer: 2500
+                                });
+                            }
+
+                        } else {
+                            Swal.fire({
+                                position: 'top-center',
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด!',
+                                showConfirmButton: true,
+                                timer: 2500
+                            });
+                            $('#editForm').trigger("reset");
+                        }
+
+
+                    },
+
+                });
+            
+            console.log(formData);
+        }
+        
+
+        
+        // const id = $(this).data('id');
+        // const src = $(this).data('src');
+        // console.log(id,src);
+        // $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+        // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+        // $('#modal-view-slip').modal('show');
+        // $.get('../api/rental/detail/' + id, function(data) {
+        //     console.log(data);
+        // });
+    });
+    function goBack() {
+        window.history.back();
+    }
+
+    //update
+   
 </script>
 @endpush

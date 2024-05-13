@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRoomRequest;
 use App\Models\Project;
 use App\Models\Role_user;
 use App\Models\Room;
+use App\Models\Room_Images;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,52 +34,43 @@ class RoomController extends Controller
 
     }
 
-    public function store(Request $request){
+    public function store(StoreRoomRequest $request){
 
-        $validator = Validator::make($request->all(), [
-            'project_id' => 'required',
-            'room_type' => 'required',
-            'Floor' => 'required',
-            'Building' => 'required',
-            'room_address' => 'required',
-            'address' => 'required',
-            'Location' => 'required',
-            // 'key' => 'required',
-            // 'room_card' => 'required',
-            'room_price' => 'required',
-            'room_size' => 'required',
+        // $validator = Validator::make($request->all(), [
+        //     'project_id' => 'required',
+        //     'room_type' => 'required',
+        //     'Floor' => 'required',
+        //     'Building' => 'required',
+        //     'room_address' => 'required',
+        //     'address' => 'required',
+        //     'Location' => 'required',
+        //     'room_price' => 'required',
+        //     'room_size' => 'required',
 
-        ], [
-            'project_id.required' => 'เลือก โครงการ',
-            'room_type.required' => 'เลือก Type',
-            'Floor.required' => 'กรอก ชั้น',
-            'Building.required' => 'กรอก ตึก',
-            'room_address.required' => 'กรอก ห้องเลขที่',
-            'address.required' => 'กรอก บ้านเลขที่',
-            'Location.required' => 'กรอก ทิศ/ฝั่ง',
-            // 'key.required' => 'กรอก จำนวนกุญแจ',
-            // 'room_card.required' => 'กรอก จำนวนคีย์การ์ด P/B ',
-            'room_price.required' => 'กรอก ราคาห้อง',
-            'room_size.required' => 'กรอก ขนาด',
-        ]);
+        // ], [
+        //     'project_id.required' => 'เลือก โครงการ',
+        //     'room_type.required' => 'เลือก Type',
+        //     'Floor.required' => 'กรอก ชั้น',
+        //     'Building.required' => 'กรอก ตึก',
+        //     'room_address.required' => 'กรอก ห้องเลขที่',
+        //     'address.required' => 'กรอก บ้านเลขที่',
+        //     'Location.required' => 'กรอก ทิศ/ฝั่ง',
+        //     'room_price.required' => 'กรอก ราคาห้อง',
+        //     'room_size.required' => 'กรอก ขนาด',
+        // ]);
 
-        if($validator->fails()){
-            return response()->json(['error' => $validator->errors()]);
-        }else{
+        // if($validator->fails()){
+        //     return response()->json(['error' => $validator->errors()]);
+        // }else{
+            $request->validated();
+
             $room = new Room();
-             // อัปโหลดไฟล์บัตรประชาชน
-            if ($request->hasFile('filUploadPersonID')) {
-                $file = $request->file('filUploadPersonID');
-                $extension = $file->getClientOriginalExtension();
-                $filename = 'Idcard' . $room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-                $file->move('uploads/image_id/', $filename);
-                $room->file_id_path = $filename;
-            }
+            
             $room->Create_Date = now();
             $room->pid = $request->project_id;
             $room->numberhome = $request->numberhome ?? NULL;
-            $room->RoomNo = $request->room_address;
-            $room->HomeNo = $request->address;
+            $room->RoomNo = $request->RoomNo;
+            $room->HomeNo = $request->HomeNo;
             $room->Owner = $request->onwername ?? NULL;
             $room->cardowner = $request->cardowner ?? NULL;
             // $room->filUploadPersonID = $request->filUploadPersonID;
@@ -87,7 +80,7 @@ class RoomController extends Controller
             $room->owner_khet = $request->owner_khet ?? NULL;
             $room->owner_province = $request->owner_province ?? NULL;
             $room->Phone = $request->ownerphone ?? NULL;
-            $room->transfer_date = $request->transfer_date ?? NULL;
+            $room->Transfer_Date = $request->transfer_date ?? NULL;
             $room->RoomType = $request->room_type ?? NULL;
             $room->Size = $request->room_size ?? NULL;
             $room->Location = $request->Location ?? NULL;
@@ -111,8 +104,61 @@ class RoomController extends Controller
             $room->price = $request->room_price ?? NULL;
             // $room->filUploadMain = $request->filUploadMain; // รูปภาพปก
             // $room->filUpload = $request->filUpload; // รูปภาพห้อง
+        
+            // $room->save();
+            if ($room->save()) { 
+                $lastId = $room->id;
+                $updateRoom = Room::where('id', $lastId)->first();
+                 // อัปโหลดไฟล์บัตรประชาชน
+                if ($request->hasFile('filUploadPersonID') && $updateRoom) {
+                    $file = $request->file('filUploadPersonID');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = 'Idcard' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                    $file->move('uploads/image_id/', $filename);
+                    $updateRoom->file_id_path = $filename;
+                }
+                // รูปภาพปก
+                if ($request->hasFile('filUploadMain') && $updateRoom) {
+                    $URL = request()->getHttpHost();
+                    $file = $request->file('filUploadMain');
+                    $extension = $file->getClientOriginalExtension();
+                    $filename = 'main_' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                    $file->move('uploads/images_room/', $filename);
+                    $updateRoom->image = $URL . '/uploads/images_room/' . $filename;
+                }
+                // รูปภาพห้อง
+                if ($request->hasFile('filUpload')) {
+                    $URL = request()->getHttpHost();
+                    $allowedfileExtension = ['jpg', 'png'];
+                    $files = $request->file('filUpload');
+                    $isImage = NULL;
+                    $isImage = Room_Images::where('rid', $lastId)->where('img_category', 'เช่าอยู่')->first();
+                    foreach ($files as $key => $file) {
+                        $extension = $file->getClientOriginalExtension();
+                        $check = in_array($extension, $allowedfileExtension);
+                        if ($check) {
+                            $filename = $file->getClientOriginalName();
+                            $file->move('uploads/images_room', $filename);
+                            $img_room[$key] =  $URL . '/uploads/images_room/' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
+                            if($isImage){
+                                $isImage->img_path = $img_room[$key];
+                                $isImage->img_category = 'เช่าอยู่';
+                                $isImage->save();
+                            }else{
+                                $image = new Room_Images();
+                                $image->rid = $request->room_id;
+                                $image->img_path = $img_room[$key];
+                                $image->img_category = 'เช่าอยู่';
+                                $image->save();
+                            }
+                        }
+                    }
+                }
 
-            $room->save();
+                if ($updateRoom) {
+                    $updateRoom->save();
+                }
+            }
 
 
             // dd($request->all());
@@ -123,7 +169,7 @@ class RoomController extends Controller
             Alert::success('Success', 'เพิ่มข้อมูลสำเร็จ');
             return redirect(route('room'));
 
-        }
+        // }
         
     }
 }

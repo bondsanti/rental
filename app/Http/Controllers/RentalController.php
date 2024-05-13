@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Customer;
 use App\Models\Lease_auto_code;
 use App\Models\Lease_code;
+use App\Models\Payment;
+use App\Models\Product;
 use App\Models\Project;
+use App\Models\Quarantee;
 use App\Models\Rental;
 use App\Models\Rental_Room_Images;
 use App\Models\Role_user;
@@ -18,6 +22,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Storage;
 
 class RentalController extends Controller
 {
@@ -56,6 +64,10 @@ class RentalController extends Controller
 
     public function search(Request $request)
     {
+        if($request->pid == 'all'){
+            $today  = date("Y-m-d");
+            // dd($today);
+        }
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
@@ -105,6 +117,7 @@ class RentalController extends Controller
             'customers.Cus_Name'
 
         )
+            ->from('rooms as rooms')
             ->join('projects', 'rooms.pid', '=', 'projects.pid')
             ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
         OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
@@ -112,13 +125,18 @@ class RentalController extends Controller
                     ->on('rooms.RoomNo', '=', 'customers.RoomNo')
                     ->on('rooms.id', '=', 'customers.rid');
             })
-            ->whereNotIn('rooms.Status_room', ['คืนห้อง'])
+            // ->when($today, function (Builder $query, string $today) {
+            //     $query->where('rooms.Create_Date','<=', $today);
+            // })
+            // ->whereNotIn('rooms.Status_Room', ['คืนห้อง'])
+            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
             });
 
 
+        
         if ($request->pid != 'all') {
             $rents->where('rooms.pid', $request->pid);
         }
@@ -162,8 +180,9 @@ class RentalController extends Controller
         $rents = $rents
             ->orderBy('Project_Name', 'asc')
             ->get();
+            // ->toSql();
 
-        // dd($rents[2]);
+        // dd($rents);
 
         $formInputs = $request->all();
 
@@ -191,37 +210,47 @@ class RentalController extends Controller
             'projects.Project_Name',
             'rooms.id',
             'rooms.pid',
-            'rooms.Create_Date',
+            'rooms.numberhome',
             'rooms.HomeNo',
             'rooms.RoomNo',
             'rooms.RoomType',
             'rooms.Location',
             'rooms.Size',
+            'rooms.Building',
+            'rooms.Floor',
             'rooms.Electric_Contract',
-            'rooms.Contract_Owner',
+            'rooms.owner_soi',
+            'rooms.owner_road',
+            'rooms.owner_district',
+            'rooms.owner_khet',
+            'rooms.owner_province',
             'rooms.Owner',
+            'rooms.cardowner',
             'rooms.Phone',
             'rooms.price',
+            'rooms.Transfer_Date',
             'rooms.date_firstrend',
             'rooms.date_endrend',
-            'rooms.Guarantee_Startdate',
-            'rooms.Guarantee_Enddate',
+            // 'rooms.Guarantee_Startdate',
+            // 'rooms.Guarantee_Enddate',
             'rooms.rental_status',
             'rooms.Status_Room',
-            'rooms.Other',
-            'rooms.contract_cus',
+            // 'rooms.Other',
+            // 'rooms.contract_cus',
             'rooms.contract_owner',
-            'rooms.price_insurance',
+            // 'rooms.price_insurance',
             'customers.Cus_Name',
-            'customers.Phone',
+            'customers.Phone as cusPhone',
+            'customers.IDCard',
+            'customers.contract_cus',
             'customers.Price',
             'customers.Contract_Status',
             'customers.Contract_Startdate',
-            'customers.Contract_Enddate'
+            'customers.Contract_Enddate',
+            'customers.Cancle_Date'
 
         )
             ->join('projects', 'projects.pid', '=', 'rooms.pid')
-            // ->join('customers', 'rooms.pid', '=', 'customers.pid')
             ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
         OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
                 $join->on('rooms.pid', '=', 'customers.pid')
@@ -230,11 +259,6 @@ class RentalController extends Controller
             })
 
             ->where('rooms.id', $id)
-            // ->whereHas('rental_customer', function(Builder $query) use($rental_room){
-            //     $query->where('rental_customer.pid',$rental_room->pid);
-            // })
-            // ->where('rental_customer.pid',$rental_room->pid)
-            // ->where('project.pid',$rental_room->pid)
             ->first();
 
         // $projects = Project::orderBy('name', 'asc')->where('active', 1)->get();
@@ -249,6 +273,12 @@ class RentalController extends Controller
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
+
+        $images = Room_Images::where('rid', $id)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // dd($images);
         // $rental_room = Rental::where('id', $id)->first();
         $rents = Room::select(
             'projects.*',
@@ -257,6 +287,7 @@ class RentalController extends Controller
             'rooms.id as room_id',
             'rooms.pid as project_id',
             'rooms.Phone as owner_phone',
+            'customers.id as customer_id',
             'customers.*'
         )
             ->join('projects', 'projects.pid', '=', 'rooms.pid')
@@ -274,22 +305,26 @@ class RentalController extends Controller
             ->get();
 
         foreach ($rents as $item) {
-            $ref_cus_id = $item->id;
+            $ref_cus_id = $item->customer_id;
         }
         // $ref_cus_id = $ref_cus_id ?? NULL;
 
         // dd($rents);
 
-        $lease_auto_code = DB::connection('mysql_report')
-            ->table('lease_auto_code')
-            ->where('ref_cus_id', $ref_cus_id)
+        $lease_auto_code = Lease_auto_code::where('ref_cus_id', $ref_cus_id)
             ->first();
 
-        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code'));
+        // dd($lease_auto_code);
+
+        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images'));
     }
 
-    public function update(Request $request)
+    public function update(UpdateRentalRequest $request)
     {
+        // $reNewContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
+        // dd($payment);
+        $request->validated();
+       
         // dd($request->room_id);
         $rental_room = Room::where('id', $request->room_id)->first();
         // อัปโหลดไฟล์บัตรประชาชน
@@ -326,8 +361,9 @@ class RentalController extends Controller
         // dd($request->project_id);
         // dd($rental_room);
         $rental_room->pid = $request->project_id ?? NULL;
-        $rental_room->numberhome = $request->room_address ?? NULL;
-        $rental_room->HomeNo = $request->numberhome ?? NULL;
+        // $rental_room->numebrhome = $request->room_address ?? NULL;
+        $rental_room->numberhome = $request->numberhome ?? NULL;
+        $rental_room->HomeNo = $request->HomeNo ?? NULL;
         $rental_room->Owner = $request->onwername ?? NULL;
         $rental_room->cardowner = $request->cardowner ?? NULL;
         $rental_room->owner_soi = $request->owner_soi ?? NULL;
@@ -358,6 +394,7 @@ class RentalController extends Controller
         $rental_room->Guarantee_Amount = $request->gauranteeamount ?? NULL;
         $rental_room->Status_Room = $request->Status_Room ?? NULL;
         $rental_room->date_firstget = $request->date_firstget ?? NULL;
+        $rental_room->date_print_contract_manual = $request->date_print_contract_manual ?? NULL;
         $rental_room->Electric_Contract = $request->Electric_Contract ?? NULL;
         $rental_room->Meter_Code = $request->Meter_Code ?? NULL;
         $rental_room->rental_status = $request->rental_status ?? NULL;
@@ -382,6 +419,43 @@ class RentalController extends Controller
         $rental_room->Other = $request->Other ?? NULL;
         $rental_room->save();
 
+        // รูปภาพห้อง
+        if ($request->hasFile('filUpload')) {
+            $URL = request()->getHttpHost();
+            $allowedfileExtension = ['jpg', 'png'];
+            $files = $request->file('filUpload');
+            $isImage = NULL;
+            $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
+            foreach ($files as $key => $file) {
+                $extension = $file->getClientOriginalExtension();
+                $check = in_array($extension, $allowedfileExtension);
+                if ($check) {
+                    $filename = $file->getClientOriginalName();
+                    $file->move('uploads/images_room', $filename);
+                    $img_room[$key] =  $URL . '/uploads/images_room/' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
+                    // Room_Images::updateOrCreate(
+                    //     ['img_path' => $img_room, 'img_category' => 'เช่าอยู่'],
+                    //     ['rid' =>  $request->room_id, 'img_category' => 'เช่าอยู่']
+                    // );
+                    if($isImage){
+                        // $isImage->rid = $request->room_id;
+                        $isImage->img_path = $img_room[$key];
+                        $isImage->img_category = 'เช่าอยู่';
+                        $isImage->save();
+                    }else{
+                        $image = new Room_Images();
+                        $image->rid = $request->room_id;
+                        $image->img_path = $img_room[$key];
+                        $image->img_category = 'เช่าอยู่';
+                        $image->save();
+                    }
+                }
+                // else {
+                //     echo '<div class="alert alert-warning"><strong>Warning!</strong> Sorry Only Upload png , jpg </div>';
+                // }
+            }
+        }
+
         $rental_customer = Customer::where('rid', $request->room_id)->where('id', $request->customer_id)->first();
         // dd($rental_customer);
         if ($rental_customer) {
@@ -399,49 +473,352 @@ class RentalController extends Controller
                 $file = $request->file('fileUploadExpress');
                 $extension = $file->getClientOriginalExtension();
                 $filename = $file->getClientOriginalName();
+                // $file->move('uploads/fileexpress/', $filename);
+                // $rental_customer->file_contract_path = 'uploads/fileexpress/' . $filename;
+            }
+            // ไฟล์บัตรประชาชนลูกค้า
+            if ($request->hasFile('file_id_path_cus')) {
+                $file = $request->file('file_id_path_cus');
+                $extension = $file->getClientOriginalExtension();
+                // $filename = $file->getClientOriginalName();
+                $filename = $request->customer_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
                 $file->move('uploads/image_custrent/', $filename);
-                $rental_customer->file_contract_path = 'uploads/image_custrent/' . $filename;
+                $rental_customer->file_id_path_cus = 'uploads/image_custrent/' . $filename;
             }
 
-            // รูปภาพห้อง
-            if ($request->hasFile('filUpload')) {
-                $URL = request()->getHttpHost();
-                $allowedfileExtension = ['jpg', 'png'];
-                $files = $request->file('filUpload');
-                foreach ($files as $file) {
-                    $extension = $file->getClientOriginalExtension();
-                    $check = in_array($extension, $allowedfileExtension);
-                    if ($check) {
-                        $filename = $file->getClientOriginalName();
-                        $file->move('uploads/images_room', $filename);
-                        $img_room =  $URL . '/uploads/images_room/' . $rental_customer->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-                        Room_Images::updateOrCreate(
-                            ['img_path' => $img_room, 'img_category' => 'เช่าอยู่'],
-                            ['rid' =>  $request->room_id, 'img_category' => 'เช่าอยู่']
-                        );
-                    }
-                    // else {
-                    //     echo '<div class="alert alert-warning"><strong>Warning!</strong> Sorry Only Upload png , jpg </div>';
-                    // }
+            
+
+            // if ($request->hasFile('filUpload')) {
+            //     $allowedMimeTypes = ['image/jpeg', 'image/png'];
+                
+            //     foreach ($request->file('filUpload') as $key => $file) {
+            //         if ($file->isValid() && in_array($file->getMimeType(), $allowedMimeTypes)) {
+            //             $fileName = $file->hashName();
+            //             $filePath = $file->storeAs('uploads/images_room', $fileName);
+            //             $imgRoomUrl = Storage::url($filePath);
+                        
+            //             dump($key);
+            //             // Perform database operations inside a transaction
+            //             DB::transaction(function () use ($imgRoomUrl, $request) {
+            //                 Room_Images::updateOrCreate(
+            //                     ['rid' =>  $request->room_id, 'img_category' => 'เช่าอยู่'],
+            //                     ['img_path' => $imgRoomUrl, 'img_category' => 'เช่าอยู่']
+                                
+            //                 );
+            //             });
+            //         }
+            //     }
+            // }
+
+           
+
+            if ($request->Contract_Status == 'ต่อสัญญา') {
+                // 1. update customer
+                $reNewContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
+                $reNewContract->Cancel_Date = date('Y-m-d');
+                $reNewContract->Contract_Status = $request->Contract_Status ?? NULL;
+                $reNewContract->save();
+
+                // 2. insert new customer new contract
+                $newContract = new Customer();
+                $newContract->Create_Date = date('Y-m-d');
+                $newContract->pid = $request->project_id;
+                $newContract->rid = $request->room_id;
+                $newContract->Cus_Name = $request->Cus_Name ?? NULL;
+                $newContract->IDCard = $request->IDCard ?? NULL;
+                $newContract->RoomNo = $request->RoomNo ?? NULL;
+                $newContract->Building = $request->Building ?? NULL;
+                $newContract->Floor = $request->Floor ?? NULL;
+                $newContract->Size = $request->Size ?? NULL;
+                $newContract->price_insurance = $request->price_insurance ?? 0;
+                $newContract->home_address = $request->cus_homeAddress ?? NULL;
+                $newContract->cust_soi = $request->cust_soi ?? NULL;
+                $newContract->cust_road = $request->cust_road ?? NULL;
+                $newContract->tumbon = $request->cus_tumbon ?? NULL;
+                $newContract->province = $request->cus_province ?? NULL;
+                $newContract->id_post = $request->cus_idPost ?? NULL;
+                $newContract->Phone = $request->cus_phone ?? NULL;
+                $newContract->Price = $request->Price ?? NULL;
+                $newContract->Contract = $request->Contract_Renew ?? NULL;
+                $newContract->Day = $request->Day_Renew ?? 0;
+                $newContract->start_paid_date = $request->start_paid_date_Renew ?? NULL;
+                $newContract->Contract_Startdate = $request->Contract_Startdate_Renew ?? NULL;
+                $newContract->Contract_Enddate = $request->Contract_Enddate_Renew ?? NULL;
+                $newContract->Contract_Status = 'เช่าอยู่';
+                $newContract->Contract_Reason = $request->Contract_Reason ?? NULL;
+                $newContract->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
+                $newContract->cust_remark = $request->cust_remark;
+                $newContract->save();
+
+                // 3. insert new payment
+                if($request->Contract_Renew == 1){
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Price1 = $request->Price;
+                }elseif ($request->Contract_Renew == 2) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                }elseif ($request->Contract_Renew == 3) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                }elseif ($request->Contract_Renew == 4) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                }elseif ($request->Contract_Renew == 5) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                }elseif ($request->Contract_Renew == 6) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                }elseif ($request->Contract_Renew == 7) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                }elseif ($request->Contract_Renew == 8) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                    $Price8 = $request->Price;
+                }elseif ($request->Contract_Renew == 9) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                    $Price8 = $request->Price;
+                    $Price9 = $request->Price;
+                }elseif ($request->Contract_Renew == 10) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                    $Price8 = $request->Price;
+                    $Price9 = $request->Price;
+                    $Price10 = $request->Price;
+                }elseif ($request->Contract_Renew == 11) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due11_Date = Carbon::parse($Due10_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                    $Price8 = $request->Price;
+                    $Price9 = $request->Price;
+                    $Price10 = $request->Price;
+                    $Price11 = $request->Price;
+                }elseif ($request->Contract_Renew == 12) {
+                    $Due1_Date = $request->Contract_Startdate_Renew;
+                    $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due11_Date = Carbon::parse($Due10_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Due12_Date = Carbon::parse($Due11_Date)->addMonth()->startOfMonth()->toDateString();
+                    $Price1 = $request->Price;
+                    $Price2 = $request->Price;
+                    $Price3 = $request->Price;
+                    $Price4 = $request->Price;
+                    $Price5 = $request->Price;
+                    $Price6 = $request->Price;
+                    $Price7 = $request->Price;
+                    $Price8 = $request->Price;
+                    $Price9 = $request->Price;
+                    $Price10 = $request->Price;
+                    $Price11 = $request->Price;
+                    $Price12 = $request->Price;
                 }
+                $paymentNew = new Payment();
+                $paymentNew->cid = $request->customer_id;
+                $paymentNew->rid = $request->room_id;
+                $paymentNew->Due1_Date = $Due1_Date ?? NULL;
+                $paymentNew->Due2_Date = $Due2_Date ?? NULL;
+                $paymentNew->Due3_Date = $Due3_Date ?? NULL;
+                $paymentNew->Due4_Date = $Due4_Date ?? NULL;
+                $paymentNew->Due5_Date = $Due5_Date ?? NULL;
+                $paymentNew->Due6_Date = $Due6_Date ?? NULL;
+                $paymentNew->Due7_Date = $Due7_Date ?? NULL;
+                $paymentNew->Due8_Date = $Due8_Date ?? NULL;
+                $paymentNew->Due9_Date = $Due9_Date ?? NULL;
+                $paymentNew->Due10_Date = $Due10_Date ?? NULL;
+                $paymentNew->Due11_Date = $Due11_Date ?? NULL;
+                $paymentNew->Due12_Date = $Due12_Date ?? NULL;
+                $paymentNew->Due1_Amount = $Price1 ?? NULL;
+                $paymentNew->Due2_Amount = $Price2 ?? NULL;
+                $paymentNew->Due3_Amount = $Price3 ?? NULL;
+                $paymentNew->Due4_Amount = $Price4 ?? NULL;
+                $paymentNew->Due5_Amount = $Price5 ?? NULL;
+                $paymentNew->Due6_Amount = $Price6 ?? NULL;
+                $paymentNew->Due7_Amount = $Price7 ?? NULL;
+                $paymentNew->Due8_Amount = $Price8 ?? NULL;
+                $paymentNew->Due9_Amount = $Price9 ?? NULL;
+                $paymentNew->Due10_Amount = $Price10 ?? NULL;
+                $paymentNew->Due11_Amount = $Price11 ?? NULL;
+                $paymentNew->Due12_Amount = $Price12 ?? NULL;
+                $paymentNew->save();
+
+            }elseif($request->Contract_Status == 'ออก'){
+                $rental_customer->Cus_Name = $request->Cus_Name ?? NULL;
+                $rental_customer->IDCard = $request->IDCard ?? NULL;
+                $rental_customer->RoomNo = $request->RoomNo ?? NULL;
+                $rental_customer->code_contract_old = $request->code_contract_old ?? NULL;
+                $rental_customer->price_insurance = $request->price_insurance ?? 0;
+                $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
+                $rental_customer->cust_soi = $request->cust_soi ?? NULL;
+                $rental_customer->cust_road = $request->cust_road ?? NULL;
+                $rental_customer->tumbon = $request->cus_tumbon ?? NULL;
+                $rental_customer->province = $request->cus_province ?? NULL;
+                $rental_customer->id_post = $request->cus_idPost ?? NULL;
+                $rental_customer->Phone = $request->cus_phone ?? NULL;
+                $rental_customer->Price = $request->Price ?? NULL;
+                $rental_customer->Day = $request->Day ?? 0;
+                $rental_customer->Cancle_Date = $request->Cancle_Date ?? NULL;
+                $rental_customer->Contract_Status = $request->Contract_Status ?? NULL;
+                $rental_customer->Contract_Reason = $request->Contract_Reason ?? NULL;
+                $rental_customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
+                $rental_customer->cust_remark = $request->cust_remark;
+                $rental_customer->save();
+
+                // insert report inout
+                if (date('m') == '01') {
+                    # code...
+                }elseif (date('m') == '02') {
+                    # code...
+                }elseif (date('m') == '03') {
+                    # code...
+                }elseif (date('m') == '04') {
+                    # code...
+                }elseif (date('m') == '05') {
+                    # code...
+                }elseif (date('m') == '06') {
+                    # code...
+                }elseif (date('m') == '07') {
+                    # code...
+                }elseif (date('m') == '08') {
+                    # code...
+                }elseif (date('m') == '09') {
+                    # code...
+                }elseif (date('m') == '10') {
+                    # code...
+                }elseif (date('m') == '11') {
+                    # code...
+                }elseif (date('m') == '12') {
+                    # code...
+                }
+            }else{
+                $rental_customer->Cus_Name = $request->Cus_Name ?? NULL;
+                $rental_customer->IDCard = $request->IDCard ?? NULL;
+                $rental_customer->RoomNo = $request->RoomNo ?? NULL;
+                $rental_customer->code_contract_old = $request->code_contract_old ?? NULL;
+                $rental_customer->price_insurance = $request->price_insurance ?? 0;
+                $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
+                $rental_customer->cust_soi = $request->cust_soi ?? NULL;
+                $rental_customer->cust_road = $request->cust_road ?? NULL;
+                $rental_customer->tumbon = $request->cus_tumbon ?? NULL;
+                $rental_customer->province = $request->cus_province ?? NULL;
+                $rental_customer->id_post = $request->cus_idPost ?? NULL;
+                $rental_customer->Phone = $request->cus_phone ?? NULL;
+                $rental_customer->Price = $request->Price ?? NULL;
+                $rental_customer->Day = $request->Day ?? 0;
+                $rental_customer->Contract_Status = $request->Contract_Status ?? NULL;
+                $rental_customer->Contract_Reason = $request->Contract_Reason ?? NULL;
+                $rental_customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
+                $rental_customer->cust_remark = $request->cust_remark;
+                $rental_customer->save();
             }
-            $rental_customer->Cus_Name = $request->Cus_Name ?? NULL;
-            $rental_customer->IDCard = $request->IDCard ?? NULL;
-            $rental_customer->code_contract_old = $request->code_contract_old ?? NULL;
-            $rental_customer->price_insurance = $request->price_insurance ?? 0;
-            $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
-            $rental_customer->cust_soi = $request->cust_soi ?? NULL;
-            $rental_customer->cust_road = $request->cust_road ?? NULL;
-            $rental_customer->tumbon = $request->cus_tumbon ?? NULL;
-            $rental_customer->province = $request->cus_province ?? NULL;
-            $rental_customer->id_post = $request->cus_idPost ?? NULL;
-            $rental_customer->Phone = $request->cus_phone ?? NULL;
-            $rental_customer->Price = $request->Price ?? NULL;
-            $rental_customer->Contract_Status = $request->Contract_Status ?? NULL;
-            $rental_customer->Contract_Reason = $request->file_contract_path ?? NULL;
-            $rental_customer->date_print_contract_manual = $request->date_print_contract_manual ?? NULL;
-            $rental_customer->cust_remark = $request->cust_remark;
-            $rental_customer->save();
+            
         } else {
             $customer = new Customer();
             $customer->rid = $request->room_id ?? NULL;
@@ -460,21 +837,351 @@ class RentalController extends Controller
             $customer->id_post = $request->cus_idPost ?? NULL;
             $customer->Phone = $request->cus_phone ?? NULL;
             $customer->Price = $request->Price ?? NULL;
+            $customer->Contract = $request->Contract ?? NULL;
+            $customer->Day = $request->Day ?? 0;
+            $customer->start_paid_date = $request->start_paid_date ?? NULL;
             $customer->Contract_Status = $request->Contract_Status ?? NULL;
-            $customer->Contract_Reason = $request->file_contract_path ?? NULL;
-            $customer->date_print_contract_manual = $request->date_print_contract_manual ?? NULL;
+            $customer->Contract_Reason = $request->Contract_Reason ?? NULL;
+            $customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
             $customer->cust_remark = $request->cust_remark ?? NULL;
             // dd($customer);
+            
             $customer->save();
-
             // dd($rental_customer);
         }
 
         // update table lease_auto_code
+        $lease_auto_code = Lease_auto_code::where('ref_cus_id', $request->customer_id)->first();
+        if($lease_auto_code){
+            $lease_auto_code->print_contract_manual = $request->date_print_contract_manual ?? NULL;
+            $lease_auto_code->price_insurance = $request->price_insurance ?? NULL;
+        }
+        
+        if($request->Contract == 1){
+            $Due1_Date = $request->Contract_Startdate;
+            $Price1 = $request->Price;
 
+            $Owner_Due1_Date = $request->gauranteestart;
+        }elseif ($request->Contract == 2) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 3) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 4) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 5) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 6) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 7) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 8) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+            $Price8 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due8_Date = Carbon::parse($Owner_Due7_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 9) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+            $Price8 = $request->Price;
+            $Price9 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due8_Date = Carbon::parse($Owner_Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due9_Date = Carbon::parse($Owner_Due8_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 10) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+            $Price8 = $request->Price;
+            $Price9 = $request->Price;
+            $Price10 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due8_Date = Carbon::parse($Owner_Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due9_Date = Carbon::parse($Owner_Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due10_Date = Carbon::parse($Owner_Due9_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 11) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due11_Date = Carbon::parse($Due10_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+            $Price8 = $request->Price;
+            $Price9 = $request->Price;
+            $Price10 = $request->Price;
+            $Price11 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due8_Date = Carbon::parse($Owner_Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due9_Date = Carbon::parse($Owner_Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due10_Date = Carbon::parse($Owner_Due9_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due11_Date = Carbon::parse($Owner_Due10_Date)->addMonth()->startOfMonth()->toDateString();
+        }elseif ($request->Contract == 12) {
+            $Due1_Date = $request->Contract_Startdate;
+            $Due2_Date = Carbon::parse($Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due3_Date = Carbon::parse($Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due4_Date = Carbon::parse($Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due5_Date = Carbon::parse($Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due6_Date = Carbon::parse($Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due7_Date = Carbon::parse($Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due8_Date = Carbon::parse($Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due9_Date = Carbon::parse($Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due10_Date = Carbon::parse($Due9_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due11_Date = Carbon::parse($Due10_Date)->addMonth()->startOfMonth()->toDateString();
+            $Due12_Date = Carbon::parse($Due11_Date)->addMonth()->startOfMonth()->toDateString();
+            $Price1 = $request->Price;
+            $Price2 = $request->Price;
+            $Price3 = $request->Price;
+            $Price4 = $request->Price;
+            $Price5 = $request->Price;
+            $Price6 = $request->Price;
+            $Price7 = $request->Price;
+            $Price8 = $request->Price;
+            $Price9 = $request->Price;
+            $Price10 = $request->Price;
+            $Price11 = $request->Price;
+            $Price12 = $request->Price;
+
+            $Owner_Due1_Date = $request->gauranteestart;
+            $Owner_Due2_Date = Carbon::parse($Owner_Due1_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due3_Date = Carbon::parse($Owner_Due2_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due4_Date = Carbon::parse($Owner_Due3_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due5_Date = Carbon::parse($Owner_Due4_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due6_Date = Carbon::parse($Owner_Due5_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due7_Date = Carbon::parse($Owner_Due6_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due8_Date = Carbon::parse($Owner_Due7_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due9_Date = Carbon::parse($Owner_Due8_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due10_Date = Carbon::parse($Owner_Due9_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due11_Date = Carbon::parse($Owner_Due10_Date)->addMonth()->startOfMonth()->toDateString();
+            $Owner_Due12_Date = Carbon::parse($Owner_Due11_Date)->addMonth()->startOfMonth()->toDateString();
+        }
 
         // insert date to table rental_payment
+        $payment = Payment::where('rid', $request->room_id)
+            ->where('cid', $request->customer_id)
+            ->count();
+        if(!$payment){
+            // $Contract_Startdates = $request->start_paid_date;
+            // $Contract_StartdateNew = date("Y-m-d", strtotime("-1 day", strtotime($Contract_Startdates)));
 
+            $paymentNew = new Payment();
+            $paymentNew->cid = $request->customer_id;
+            $paymentNew->rid = $request->room_id;
+            $paymentNew->Due1_Date = $Due1_Date ?? NULL;
+            $paymentNew->Due2_Date = $Due2_Date ?? NULL;
+            $paymentNew->Due3_Date = $Due3_Date ?? NULL;
+            $paymentNew->Due4_Date = $Due4_Date ?? NULL;
+            $paymentNew->Due5_Date = $Due5_Date ?? NULL;
+            $paymentNew->Due6_Date = $Due6_Date ?? NULL;
+            $paymentNew->Due7_Date = $Due7_Date ?? NULL;
+            $paymentNew->Due8_Date = $Due8_Date ?? NULL;
+            $paymentNew->Due9_Date = $Due9_Date ?? NULL;
+            $paymentNew->Due10_Date = $Due10_Date ?? NULL;
+            $paymentNew->Due11_Date = $Due11_Date ?? NULL;
+            $paymentNew->Due12_Date = $Due12_Date ?? NULL;
+            $paymentNew->Due1_Amount = $Price1 ?? NULL;
+            $paymentNew->Due2_Amount = $Price2 ?? NULL;
+            $paymentNew->Due3_Amount = $Price3 ?? NULL;
+            $paymentNew->Due4_Amount = $Price4 ?? NULL;
+            $paymentNew->Due5_Amount = $Price5 ?? NULL;
+            $paymentNew->Due6_Amount = $Price6 ?? NULL;
+            $paymentNew->Due7_Amount = $Price7 ?? NULL;
+            $paymentNew->Due8_Amount = $Price8 ?? NULL;
+            $paymentNew->Due9_Amount = $Price9 ?? NULL;
+            $paymentNew->Due10_Amount = $Price10 ?? NULL;
+            $paymentNew->Due11_Amount = $Price11 ?? NULL;
+            $paymentNew->Due12_Amount = $Price12 ?? NULL;
+            $paymentNew->Owner_Due1_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due2_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due3_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due4_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due5_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due6_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due7_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due8_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due9_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due10_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due11_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due12_Amount = $request->gauranteeamount ?? NULL;
+            $paymentNew->Owner_Due1_Date = $Owner_Due1_Date ?? NULL;
+            $paymentNew->Owner_Due2_Date = $Owner_Due2_Date ?? NULL;
+            $paymentNew->Owner_Due3_Date = $Owner_Due3_Date ?? NULL;
+            $paymentNew->Owner_Due4_Date = $Owner_Due4_Date ?? NULL;
+            $paymentNew->Owner_Due5_Date = $Owner_Due5_Date ?? NULL;
+            $paymentNew->Owner_Due6_Date = $Owner_Due6_Date ?? NULL;
+            $paymentNew->Owner_Due7_Date = $Owner_Due7_Date ?? NULL;
+            $paymentNew->Owner_Due8_Date = $Owner_Due8_Date ?? NULL;
+            $paymentNew->Owner_Due9_Date = $Owner_Due9_Date ?? NULL;
+            $paymentNew->Owner_Due10_Date = $Owner_Due10_Date ?? NULL;
+            $paymentNew->Owner_Due11_Date = $Owner_Due11_Date ?? NULL;
+            $paymentNew->Owner_Due12_Date = $Owner_Due12_Date ?? NULL;
+
+            $paymentNew->save();
+
+        }else{
+
+        }
         // insert and update quarantee
 
         // update product and rooms
@@ -675,19 +1382,19 @@ class RentalController extends Controller
         if ($rents->print_contract_manual) {
         }
 
-        if($rents->Price){
+        if ($rents->Price) {
             $customer_price = $this->convertAmount($rents->Price);
-        }else{
+        } else {
             $customer_price = null;
         }
-        if($rents->price_insurance){
+        if ($rents->price_insurance) {
             $price_insurance = $this->convertAmount($rents->price_insurance);
-        }else{
-             $price_insurance = null;
+        } else {
+            $price_insurance = null;
         }
-        if($rents->price){
+        if ($rents->price) {
             $room_price = $this->convertAmount($rents->price);
-        }else{
+        } else {
             $room_price = null;
         }
 
@@ -698,7 +1405,7 @@ class RentalController extends Controller
             // return view('rental.print.sub_apartment',compact('dataLoginUser'));
             // dd($request->status_approve);
             // dd($rents);
-            $pdf = Pdf::loadView('rental.print.sub_apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price'=> $customer_price, 'price_insurance' => $price_insurance]);
+            $pdf = Pdf::loadView('rental.print.sub_apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
             // return $pdf->download();
             return $pdf->stream();
         }
@@ -706,7 +1413,7 @@ class RentalController extends Controller
         // สัญญาเฟอร์
         if ($request->status_approve == 2) {
             // dd($request->status_approve);
-            $pdf = Pdf::loadView('rental.print.furniture', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price'=> $customer_price, 'price_insurance' => $price_insurance]);
+            $pdf = Pdf::loadView('rental.print.furniture', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
             // return $pdf->download('invoice.pdf');
             return $pdf->stream();
             // dd($request->status_approve);
@@ -714,17 +1421,22 @@ class RentalController extends Controller
         // สัญญาแต่งตั้งตัวแทน
         if ($request->status_approve == 3) {
             // dd($request->status_approve);
-            $pdf = Pdf::loadView('rental.print.representative', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price'=> $customer_price, 'price_insurance' => $price_insurance]);
+            $pdf = Pdf::loadView('rental.print.representative', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
             return $pdf->stream();
             // dd($request->status_approve);
         }
         // สัญญาเช่าห้องชุด
         if ($request->status_approve == 4) {
             // dd($request->status_approve);
-            $pdf = Pdf::loadView('rental.print.apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'room_price'=> $room_price, 'price_insurance' => $price_insurance]);
+            $pdf = Pdf::loadView('rental.print.apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'room_price' => $room_price, 'price_insurance' => $price_insurance]);
             return $pdf->stream();
             // dd($request->status_approve);
         }
+    }
+
+    public function getLeaseCode($id){
+        $LeaseCode = Lease_code::where('pid', $id)->first();
+        return response()->json($LeaseCode, 200);
     }
 
     public function convertAmount($amount_number)
@@ -777,7 +1489,8 @@ class RentalController extends Controller
         return $ret;
     }
 
-    public function rent(Request $request){
+    public function rent(Request $request)
+    {
         // dd($result);
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         // $result = Room::select('rooms.*','projects.*')
@@ -786,8 +1499,13 @@ class RentalController extends Controller
         // ->first();
         $result = Room::select(
             'projects.*',
+            'projects.pid as project_id',
             'rooms.*',
+            'rooms.id as room_id',
+            'rooms.Phone as phone',
             'customers.*',
+            'customers.id as customer_id',
+            'payments.id as payment_id',
             'payments.*',
         )
             ->join('projects', 'projects.pid', '=', 'rooms.pid')
@@ -804,5 +1522,432 @@ class RentalController extends Controller
 
         return view('rental.rent.index', compact('dataLoginUser', 'result'));
         // dd($result);
+    }
+
+    public function download(Request $request, $id, $date)
+    {
+        // dd($date);
+        // Determine the absolute path to the file
+        // $absoluteFilePath = storage_path('app/public/uploads/' . $filePath);
+
+        // Check if the file exists
+        // if (file_exists($absoluteFilePath)) {
+        //     // Set headers for file download
+        //     return response()->download($absoluteFilePath);
+        // } else {
+        //     // Handle if the file does not exist
+        //     abort(404);
+        // }
+        // $Due = explode('-',$date); 
+        $monthY = thaidate('F Y', $date);
+        // dd($monthY);
+        $result = Room::select(
+            'projects.Project_Name',
+            'projects.address_full',
+            'rooms.HomeNo',
+            'rooms.RoomNo',
+            'customers.Cus_Name',
+            'customers.Contract_Status',
+            'customers.pid',
+            'payments.*',
+        )
+            ->join('projects', 'projects.pid', '=', 'rooms.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+        OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
+            ->join('payments', 'payments.cid', '=', 'customers.id')
+            ->where('rooms.id', $request->id)
+            ->first();
+
+        $pdf = Pdf::loadView('rental.rent.print', ['result' => $result, 'monthY' => $monthY]);
+        return $pdf->stream();
+    }
+
+    public function recordRent(Request $request)
+    {
+        // dd($request->all());
+       
+        $payment = Payment::where('id', $request->payment_id)->first();
+        for ($i = 1; $i <= 28; $i++) {
+            if ($request->hasFile("slips{$i}")) {
+                $num = ($i > 12 ? $i - 16 : $i);
+                // dd($num);
+                $file = $request->file("slips{$i}");
+                $extension = $file->getClientOriginalExtension();
+                $month = str_replace("'", '', str_replace('-', '', $request->{"Payment_Date{$num}"}));
+                $filename = 'slip_' . $i . '_' . $request->project_id . '_' . $month . '_'.rand().'.' . $extension;
+                // dd($filename);
+                // $file->move('uploads/image_slip/', $filename);
+                $payment->{"slip{$i}"} = $filename ?? null;
+                // dd($payment->{"slip{$i}"});
+                $url = "https://property.vbeyond.co.th";
+                $toEmail = ['sakeerin.k@vbeyond.co.th'];
+                $toCC = ['santi.c@vbeyond.co.th'];
+                $toBCC = ['noreply@vbeyond.co.th'];
+
+                Mail::send(
+                    'rental.rent.mail',
+                    ['Link' => $url, 'roomNo' => $request->roomNo, 'project' => $request->projectName, 'owner' => $request->owner, 'monthY' => $request->{"Payment_Date{$num}"}],
+                    function (Message $message) use ($toEmail, $toCC, $toBCC) {
+                        $message->to($toEmail)
+                            ->cc($toCC)
+                            ->bcc($toBCC)
+                            ->subject('สลิปรอการอนุมัติ');
+                    }
+                );
+                
+                // update status approve
+                $payment->{"status_approve{$i}"} = 0;
+
+                dd($filename);
+            }
+        }
+        $payment->Bail = $request->Bail ?? 0;
+        $payment->Bail_date = $request->Bail_date ?? null; // ***
+        $payment->Bail_slip = $request->Bail_slip ?? null;
+        $payment->Bail_status = $request->Bail_status ?? null;
+        $payment->Deposit = $request->Deposit ?? 0;
+        $payment->Deposit_date = $request->Deposit_date ?? null;
+        $payment->Deposit_slip = $request->Deposit_slip ?? null;
+        $payment->Deposit_status = $request->Deposit_status ?? null;
+        $payment->Due1_Date = $request->Due1_Date ?? null;
+        $payment->Due2_Date = $request->Due2_Date ?? null;
+        $payment->Due3_Date = $request->Due3_Date ?? null;
+        $payment->Due4_Date = $request->Due4_Date ?? null;
+        $payment->Due5_Date = $request->Due5_Date ?? null;
+        $payment->Due6_Date = $request->Due6_Date ?? null;
+        $payment->Due7_Date = $request->Due7_Date ?? null;
+        $payment->Due8_Date = $request->Due8_Date ?? null;
+        $payment->Due9_Date = $request->Due9_Date ?? null;
+        $payment->Due10_Date = $request->Due10_Date ?? null;
+        $payment->Due11_Date = $request->Due11_Date ?? null;
+        $payment->Due12_Date = $request->Due12_Date ?? null;
+        $payment->Due1_Amount = $request->Due1_Amount ?? null;
+        $payment->Due2_Amount = $request->Due2_Amount ?? null;
+        $payment->Due3_Amount = $request->Due3_Amount ?? null;
+        $payment->Due4_Amount = $request->Due4_Amount ?? null;
+        $payment->Due5_Amount = $request->Due5_Amount ?? null;
+        $payment->Due6_Amount = $request->Due6_Amount ?? null;
+        $payment->Due7_Amount = $request->Due7_Amount ?? null;
+        $payment->Due8_Amount = $request->Due8_Amount ?? null;
+        $payment->Due9_Amount = $request->Due9_Amount ?? null;
+        $payment->Due10_Amount = $request->Due10_Amount ?? null;
+        $payment->Due11_Amount = $request->Due11_Amount ?? null;
+        $payment->Due12_Amount = $request->Due12_Amount ?? null;
+        $payment->Payment_Date1 = $request->Payment_Date1 ?? null;
+        $payment->Payment_Date2 = $request->Payment_Date2 ?? null;
+        $payment->Payment_Date3 = $request->Payment_Date3 ?? null;
+        $payment->Payment_Date4 = $request->Payment_Date4 ?? null;
+        $payment->Payment_Date5 = $request->Payment_Date5 ?? null;
+        $payment->Payment_Date6 = $request->Payment_Date6 ?? null;
+        $payment->Payment_Date7 = $request->Payment_Date7 ?? null;
+        $payment->Payment_Date8 = $request->Payment_Date8 ?? null;
+        $payment->Payment_Date9 = $request->Payment_Date9 ?? null;
+        $payment->Payment_Date10 = $request->Payment_Date10 ?? null;
+        $payment->Payment_Date11 = $request->Payment_Date11 ?? null;
+        $payment->Payment_Date12 = $request->Payment_Date12 ?? null;
+       
+        $payment->Remark1 = $request->Remark1 ?? null;
+        $payment->Remark2 = $request->Remark2 ?? null;
+        $payment->Remark3 = $request->Remark3 ?? null;
+        $payment->Remark4 = $request->Remark4 ?? null;
+        $payment->Remark5 = $request->Remark5 ?? null;
+        $payment->Remark6 = $request->Remark6 ?? null;
+        $payment->Remark7 = $request->Remark7 ?? null;
+        $payment->Remark8 = $request->Remark8 ?? null;
+        $payment->Remark9 = $request->Remark9 ?? null;
+        $payment->Remark10 = $request->Remark10 ?? null;
+        $payment->Remark11 = $request->Remark11 ?? null;
+        $payment->Remark12 = $request->Remark12 ?? null;
+
+        $payment->Remarkpay1 = $request->Remarkpay1 ?? null;
+        $payment->Remarkpay2 = $request->Remarkpay2 ?? null;
+        $payment->Remarkpay3 = $request->Remarkpay3 ?? null;
+        // $payment->slip16 = $request->slip16 ?? null;
+        // $payment->slip17 = $request->slip17 ?? null;
+        // $payment->slip18 = $request->slip18 ?? null;
+        // $payment->slip19 = $request->slip19 ?? null;
+        // $payment->slip20 = $request->slip20 ?? null;
+        // $payment->slip21 = $request->slip21 ?? null;
+        // $payment->slip22 = $request->slip22 ?? null;
+        // $payment->slip23 = $request->slip23 ?? null;
+        // $payment->slip24 = $request->slip24 ?? null;
+        // $payment->slip25 = $request->slip25 ?? null;
+        // $payment->slip26 = $request->slip26 ?? null;
+        // $payment->slip27 = $request->slip27 ?? null;
+        // $payment->slip28 = $request->slip28 ?? null;
+
+        dd($payment);
+    }
+
+    public function preapprove($id) {
+        $result = Room::select(
+            'projects.Project_Name',
+            'rooms.id as room_id',
+            'rooms.HomeNo',
+            'rooms.RoomNo',
+            'rooms.Owner',
+            'rooms.Phone as phone',
+            'customers.id as customer_id',
+            'customers.Cus_Name',
+            'customers.pid',
+            'payments.id as payment_id',
+            'payments.*',
+        )
+            ->join('projects', 'projects.pid', '=', 'rooms.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+        OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
+            ->join('payments', 'payments.cid', '=', 'customers.id')
+            ->where('rooms.id', $id)
+            ->first();
+
+        return response()->json($result, 200);
+    }
+
+    public function approve($id, $status, $index){
+        $payment = Payment::where('id', $id)->first();
+        $payment->{"approve{$index}_date"} = now();
+        $payment->{"status_approve{$index}"} = $status;
+        $payment->save();
+
+
+        return response()->json([
+            'data' => $payment,
+            'message' => 'อัพเดทข้อมูลสำเร็จ'], 200);
+        // dd($payment);
+    }
+
+    public function history(Request $request, $id){
+        // dd($id);
+        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $rent = Room::select(
+            'projects.Project_Name',
+            'rooms.RoomNo',
+            'rooms.HomeNo',
+            'rooms.Owner',
+            'rooms.Phone',
+            // 'customers.id as customer_id',
+            // 'payments.id as payment_id',
+        )
+            ->join('projects', 'projects.pid', '=', 'rooms.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+            OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
+            // ->join('payments', 'payments.cid', '=', 'customers.id')
+            ->where('rooms.id', $id)
+            ->first();
+
+        $history = Room::select(
+            // 'rooms.*',
+            // 'rooms.id as room_id',
+            // 'rooms.Phone as phone',
+            // DB::raw('COUNT(customers.Contract) as count'),
+            'customers.Cus_Name',
+            'customers.contract_startdate',
+            'customers.contract_enddate',
+            'customers.Contract_Status',
+            'payments.Due1_Date',
+            'payments.Due2_Date',
+            'payments.Due3_Date',
+            'payments.Due4_Date',
+            'payments.Due5_Date',
+            'payments.Due6_Date',
+            'payments.Due7_Date',
+            'payments.Due8_Date',
+            'payments.Due9_Date',
+            'payments.Due10_Date',
+            'payments.Due11_Date',
+            'payments.Due12_Date',
+            'payments.Due1_Amount',
+            'payments.Due2_Amount',
+            'payments.Due3_Amount',
+            'payments.Due4_Amount',
+            'payments.Due5_Amount',
+            'payments.Due6_Amount',
+            'payments.Due7_Amount',
+            'payments.Due8_Amount',
+            'payments.Due9_Amount',
+            'payments.Due10_Amount',
+            'payments.Due11_Amount',
+            'payments.Due12_Amount',
+            'payments.slip1',
+            'payments.slip2',
+            'payments.slip3',
+            'payments.slip4',
+            'payments.slip5',
+            'payments.slip6',
+            'payments.slip7',
+            'payments.slip8',
+            'payments.slip9',
+            'payments.slip10',
+            'payments.slip11',
+            'payments.slip12',
+            'payments.Payment_Date1',
+            'payments.Payment_Date2',
+            'payments.Payment_Date3',
+            'payments.Payment_Date4',
+            'payments.Payment_Date5',
+            'payments.Payment_Date6',
+            'payments.Payment_Date7',
+            'payments.Payment_Date8',
+            'payments.Payment_Date9',
+            'payments.Payment_Date10',
+            'payments.Payment_Date11',
+            'payments.Payment_Date12',
+            'payments.Remark1',
+            'payments.Remark2',
+            'payments.Remark3',
+            'payments.Remark4',
+            'payments.Remark5',
+            'payments.Remark6',
+            'payments.Remark7',
+            'payments.Remark8',
+            'payments.Remark9',
+            'payments.Remark10',
+            'payments.Remark11',
+            'payments.Remark12',
+            'payments.id as payment_id',
+            'payments.*',
+        )
+            ->join('projects', 'projects.pid', '=', 'rooms.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers) AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
+            ->join('payments', 'payments.cid', '=', 'customers.id')
+            ->where('rooms.id', $id)
+            // ->groupBy('customers.Cus_Name')
+            ->get();
+
+        $count = $history->count();
+        // dd($count);
+
+        $productPid = Product::join('rooms', function ($join) use ($id) {
+            $join->on('rooms.HomeNo', '=', 'products.HomeNo')
+                 ->on('rooms.RoomNo', '=', 'products.RoomNo')
+                 ->on('rooms.pid', '=', 'products.project_id');
+        })
+        ->where('rooms.id', $id)
+        // ->where('product.HomeNo', '=', trim($result['HomeNo']))
+        // ->where('product.RoomNo', '=', trim($result['RoomNo']))
+        // ->where('product.project_id', '=', trim($result['pid']))
+        ->orderByDesc('id')
+        ->limit(1)
+        ->pluck('products.pid')
+        ->first();
+
+        $sum = Quarantee::where('pid', $productPid)
+                ->where('status_quarantee', 'enabled')
+                ->count('pid');
+
+        if($productPid){
+            $quaranteeIdASC = Quarantee::where('pid', $productPid)
+                ->where('status_quarantee', 'enabled')
+                ->where('due_date','!=', null)
+                ->where('amount_fix', '!=',null)
+                ->where('amount_fix', '!=',0)
+                ->orderBy('id', 'ASC')
+                ->get();
+                // ->pluck('id');
+            $quaranteeIdDESC = Quarantee::where('pid', $productPid)
+                ->where('status_quarantee', 'enabled')
+                ->orderBy('id', 'DESC')
+                ->pluck('id');
+            $rows = ceil($sum/12);
+        }
+        // dd($sum);
+
+        $quarantees = Quarantee::where('pid', $productPid)
+        ->where('status_quarantee', 'enabled')
+        ->orderBy('due_date', 'ASC')
+        ->get();
+
+        // dd($quarantees);
+
+        $dueDate = array();
+        $amountFix = array();
+        $amount = array();
+        $paymentDate = array();
+        $count_krows=0;
+        // for($j=1; $j<= $sum; $j++){
+        //     // foreach ($quarantees as $key => $value) {
+        //     for($i=1; $i<= 12; $i++){
+        //         // if ($count_krows < 12*$j) {
+        //             // $final_id = ((int)$quaranteeIdASC[$count_krows])+$count_krows;
+        //             // $final_id = $quaranteeIdASC[$count_krows];
+        //             // if ($final_id) {
+        //             //     $data = Quarantee::where('id', $final_id)
+        //             //     ->where('status_quarantee', 'enabled')
+        //             //     ->first();
+        //             //     // $dueDate[$j][$i] = $data->due_date ?? '';
+        //             //     // $amountFix[$j][$i] = $data->amount_fix ?? '';
+        //             //     // $amount[$j][$i] = $data->amount ?? '';
+        //             //     // $paymentDate[$j][$i] = $data->payment_date ?? '';
+        //             //     // dump($final_id);
+        //             // }
+        //             // dump($quaranteeIdASC[$j]);
+        //             // $count_krows++;
+        //         // }
+        //     }
+        //  // }
+        // }
+        // if($count_krows <= $sum){
+        //     for ($i=1; $i <= $rows ; $i++) { 
+        //         for ($j=0; $j <= 11; $j++) { 
+        //             // $data = Quarantee::where('id', $quaranteeIdASC[$count_krows])
+        //             //     ->where('status_quarantee', 'enabled')
+        //             //     ->where('due_date','!=', null)
+        //             //     ->where('amount_fix', '!=',null)
+        //             //     ->where('amount_fix', '!=',0)
+        //             //     ->first();
+        //             // $dueDate[$i][$j] = $data->due_date ?? '';
+        //             // $amountFix[$i][$j] = $data->amount_fix ?? '';
+        //             // $amount[$i][$j] = $data->amount ?? '';
+        //             // $paymentDate[$i][$j] = $data->payment_date ?? '';
+        //             // dump($count_krows);
+        //             // $count_krows++;
+        //             foreach($quaranteeIdASC as $data){
+        //                 $dueDate[$i][$j] = $data->due_date ?? '';
+        //                 $amountFix[$i][$j] = $data->amount_fix ?? '';
+        //                 $amount[$i][$j] = $data->amount ?? '';
+        //                 $paymentDate[$i][$j] = $data->payment_date ?? '';
+        //                 // dump($count_krows);
+        //             }
+        //         }
+        //     }
+        // }
+        // foreach($quaranteeIdASC as $data){
+            // for ($i=1; $i <= $sum ; $i++) { 
+            //     for ($j=0; $j <= 11; $j++) { 
+            //         $dueDate[$i][$j] = $data->due_date ?? '';
+            //         $amountFix[$i][$j] = $data->amount_fix ?? '';
+            //         $amount[$i][$j] = $data->amount ?? '';
+            //         $paymentDate[$i][$j] = $data->payment_date ?? '';
+            //     }
+            // }
+        // }
+
+
+        // dd($dueDate);
+
+        // foreach ($dueArr as $key => $value) {
+            
+        // }
+
+        // dd($dueDate);
+
+        return view('rental.history', compact('dataLoginUser', 'rent', 'count','history','quarantees','dueDate','amountFix','amount','rows','sum'));
+            dd($history);
     }
 }

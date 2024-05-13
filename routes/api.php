@@ -22,4 +22,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/rental/store',[RentalController::class,'store'])->name('rental.store');
 
 Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
-// Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
+Route::get('/rental/getLeaseCode/{id}',[RentalController::class,'getLeaseCode'])->name('rental.getLeaseCode');
+Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
+
+Route::get('/rental/rent/preapprove/{id}',[RentalController::class,'preapprove'])->name('rental.rent.preapprove');
+Route::post('/rental/rent/approve/{id}/{status}/{index}',[RentalController::class,'approve'])->name('rental.rent.approve');

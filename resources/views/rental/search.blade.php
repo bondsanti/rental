@@ -117,9 +117,11 @@
                                         <div class="form-group">
                                             <label>สถานะห้องเช่า</label>
                                             <select name="status" id="status" class="form-control">
-                                                <option value="all">สถานะห้องเช่า ทั้งหมด</option>
+                                                <option value="all">ทั้งหมด</option>
                                                 @foreach ($status as $item)
-                                                    <option value="{{ $item->name }}">{{ $item->name }} </option>
+                                                    @if ($item->name)
+                                                        <option value="{{ $item->name }}">{{ $item->name }} </option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -289,21 +291,19 @@
                                                     <i class="fa fa-print"></i>
                                                 </button>
                                                 <a href="{{ url('/rental/rent/' . $item->id) }}"
-                                                    class="btn bg-gradient-success btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
+                                                    class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
                                                     <i class="fa fa-credit-card-alt">
                                                     </i>
 
                                                 </a>
-                                                <a href=""
-                                                class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="พิมพ์">
+                                                <a href="{{ url('/rental/history/' . $item->id) }}"
+                                                class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
                                                 <i class="fa fa-address-card">
                                                 </i>
 
                                             </a>
                                                 {{-- @endif --}}
                                             </td>
-
-
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -316,11 +316,11 @@
 
             {{-- view modal --}}
             <div class="modal fade" id="modal-view">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">ข้อมูลห้องและข้อมูลการเช่า</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <h5 class="modal-title">รายละเอียดการเช่า</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -331,431 +331,442 @@
                             {{-- <input type="hidden" class="form-control" id="user_id" name="user_id"
                                 value="{{ $dataLoginUser->id }}"> --}}
                             <div class="modal-body">
+                                
+                                {{-- <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header card-outline card-info">
+                                            <h3 class="card-title">ข้อมูลห้อง</h3>
+                
+                                        </div>
+                                        <div class="card-body">
 
+                                        </div>
+                                    </div>
+                                </div> --}}
                                 <div class="box-body">
-                                    <h5 class="modal-title text-info">ข้อมูลห้อง</h5>
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header card-outline card-info">
+                                                <h3 class="card-title">ข้อมูลห้อง</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+    
+                                                        <div class="form-group">
+                                                            <label>โครงการ</label>
+                                                            <input type="text" readonly class="form-control" value="" name="projectName" id="projectName">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขที่บ้านเจ้าของห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="numberhome" id="numberhome">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>บ้านเลขที่</label>
+                                                            <input type="text" readonly class="form-control" value="" name="HomeNo" id="HomeNo">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ลูกค้า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerName" id="ownerName">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>บัตรประชาชน</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cardOwner" id="cardOwner">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขที่สัญญาเจ้าของ</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerContract" id="ownerContract">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ซอย</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerSoi" id="ownerSoi">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ถนน</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerRoad" id="ownerRoad">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label>แขวง/ตำบล</label>
+                                                        <input type="text" readonly class="form-control" value="" name="ownerDistrict" id="ownerDistrict">
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <label>เขต/อำเภอ</label>
+                                                        <input type="text" readonly class="form-control" value="" name="ownerKhet" id="ownerKhet">
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>จังหวัด</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerProvince" id="ownerProvince">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เบอร์ติดต่อ</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerPhone" id="ownerPhone">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+    
+                                                        <div class="form-group">
+                                                            <label>วันรับห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="transferDate" id="transferDate">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขที่ห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomNo" id="roomNo">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ประเภทห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomType" id="roomType">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ขนาดห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomSize" id="roomSize">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+    
+                                                        <div class="form-group">
+                                                            <label>ทิศ/ฝั่ง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="location" id="location">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>อาคาร</label>
+                                                            <input type="text" readonly class="form-control" value="" name="building" id="building">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ชั้น</label>
+                                                            <input type="text" readonly class="form-control" value="" name="floor" id="floor">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>บัญชีแสดงสัญญา</label>
+                                                            <input type="text" readonly class="form-control" value="" name="electricContract" id="electricContract">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+    
+                                                        <div class="form-group">
+                                                            <label>ราคาห้องเช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomPrice" id="roomPrice">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>วันเริ่มสัญญา</label>
+                                                            <input type="text" readonly class="form-control" value="" name="dateFirstrend" id="dateFirstrend">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>	วันสิ้นสุดสัญญา</label>
+                                                            <input type="text" readonly class="form-control" value="" name="dateEndrend" id="dateEndrend">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>	ประเภทห้องเช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="rentalStatus" id="rentalStatus">
+                                                        </div>
+                                                    </div>
+                                                </div>
+    
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+    
+                                                        <div class="form-group">
+                                                            <label>สถานะห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomStatus" id="roomStatus">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันเริ่มเช่า</label> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <div class="row">
-                                        <div class="col-sm-4">
+                                        <div class="card">
+                                            <div class="card-header card-outline card-info">
+                                                <h3 class="card-title">ข้อมูลเช่า</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ผู้เช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cusName" id="cusName">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขบัตรประชาชน</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cusIDCard" id="cusIDCard">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>โทร</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cusPhone" id="cusPhone">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขที่สัญญาผู้เช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cusContract" id="cusContract">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ค่าเช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cusPrice" id="cusPrice">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>วันเริ่มเช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="contractStart" id="contractStart">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>วันสิ้นสุดสัญญา</label>
+                                                            <input type="text" readonly class="form-control" value="" name="contractEnd" id="contractEnd">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>วันออก</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cancelDate" id="cancelDate">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>สถานะการเช่า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="contractStatus" id="contractStatus">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันเริ่มเช่า</label> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            {{-- <label>วันออก</label> --}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                            <div class="form-group">
-                                                <label>โครงการ</label>
-                                                {{-- <select name="project_id" id="project_id" class="form-control">
-                                                    <option value="ทั้งหมด">ทั้งหมด</option>
-                                                    @foreach ($projects as $project)
-                                                        <option value="{{ $project->id }}">{{ $project->name }}</option>
-                                                    @endforeach
-                                                </select> --}}
-                                                {{-- <p>{{$rents->Project_Name ?? ''}}</p> --}}
+                                        {{-- <div class="card">
+                                            <div class="card-header card-outline card-info">
+                                                <h3 class="card-title">เฟอร์นิเจอร์</h3>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ห้องเลขที่</label>
-                                                {{-- <input class="form-control" name="room_address" type="text" value=""
-                                                    placeholder="ห้องเลขที่"> --}}
-                                                    {{-- <p>{{ $rents->RoomNo ?? '' }}</p> --}}
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>เตียง</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>เครื่องนอน</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>ม่านห้องนอน</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>ม่านห้องรับแขก</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>ตู้เสื้อผ้า</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>โซฟา</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>โต๊ะวางโทรทัศน์</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>โต๊ะกินข้าว</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>โต๊ะกลาง</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>เก้าอี้</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>บ้านเลขที่</label>
-                                                {{-- <input class="form-control" name="address" type="text" value=""
-                                                    placeholder="บ้านเลขที่"> --}}
-                                                    {{-- <p>{{ $rents->HomeNo ?? '' }}</p> --}}
+                                        </div> --}}
+
+                                        {{-- <div class="card">
+                                            <div class="card-header card-outline card-info">
+                                                <h3 class="card-title">เครื่องใช้ไฟฟ้า</h3>
                                             </div>
-                                        </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <p><label> แอร์ห้องนอน </label> 1</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <p>แอร์ห้องรับแขก 1</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>เครื่องทำน้ำอุ่น</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>ทีวี</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>ตู้เย็น</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                            <label>ไมโครเวฟ</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+            
+                                                        <div class="form-group">
+                                                            <label>เครื่องซักผ้า</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <div class="form-group">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> --}}
+
                                     </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ประเภทห้อง</label>
-                                                {{-- <input class="form-control" name="agent" type="text" value=""
-                                                    placeholder="MNG"> --}}
-                                                    {{-- <p>{{ $rents->RoomType ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ขนาดห้อง</label>
-                                                {{-- <input class="form-control" name="fixseller" type="text" value=""
-                                                    placeholder="ช่องทางการขาย"> --}}
-                                                    {{-- <p>{{ $rents->Size ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>Location</label>
-                                                {{-- <input class="form-control" name="startprice" type="number" value=""
-                                                    placeholder="ราคาเริ่มต้น"> --}}
-                                                    {{-- <p>{{ $rents->Location ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <label>บัญชีแสดงสัญญา</label>
-                                            {{-- <p>{{ $rents->Electric_Contract ?? '' }}</p> --}}
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <label>เลขที่สัญญาเจ้าของ</label>
-                                            {{-- <p>{{ $rents->contract_owner ?? '' }}</p> --}}
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ชื่อลูกค้า</label>
-                                                {{-- <input class="form-control" name="user_name" type="text" value=""
-                                                    placeholder="ชื่อลูกค้า"> --}}
-                                                    {{-- <p>{{ $rents->owner ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>เบอร์โทรศัพท์</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Phone ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ราคาค่าเช่าห้อง</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>วันเริ่มสัญญา</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->date_firstrend ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>วันสิ้นสุดสัญญา</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->date_endrend ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ประเภทห้องเช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                {{-- <p>{{ $rents->rental_status ?? '' }}</p>     --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Status_Room ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>เลขที่สัญญาผู้เช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->contract_cus ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ผู้เช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Cus_Name ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>	โทร</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Phone ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>ค่าเช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Price ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>วันเริ่มเช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Startdate ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>วันสิ้นสุดสัญญา</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Enddate ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>วันออก</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>สถานะการเช่า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ค่าประกันทรัพย์สิน</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <h5 class="modal-title text-info">เฟอร์นิเจอร์</h5>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>เตียง</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>เครื่องนอน</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ม่านห้องนอน</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>ม่านห้องรับแขก</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ตู้เสื้อผ้า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>โซฟา</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>โต๊ะวางโทรทัศน์</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>โต๊ะกินข้าว</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>โต๊ะกลาง</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>เก้าอี้</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                {{-- <label>สถานะการเช่า</label> --}}
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                {{-- <label>ค่าประกันทรัพย์สิน</label> --}}
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr>
-                                    <h5 class="modal-title text-info">เครื่องใช้ไฟฟ้า</h5>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                {{-- <label>แอร์ห้องนอน</label> --}}
-                                                <p><label> แอร์ห้องนอน </label> 1</p>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                {{-- <label>แอร์ห้องรับแขก</label> --}}
-                                                <p>แอร์ห้องรับแขก 1</p>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>เครื่องทำน้ำอุ่น</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>ทีวี</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ตู้เย็น</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label>ไมโครเวฟ</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-
-                                            <div class="form-group">
-                                                <label>เครื่องซักผ้า</label>
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                {{-- <label>โต๊ะกินข้าว</label> --}}
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->Contract_Status ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                {{-- <label>โต๊ะกลาง</label> --}}
-                                                {{-- <input class="form-control" name="phone" type="text" value=""
-                                                    placeholder="เบอร์โทรศัพท์"> --}}
-                                                    {{-- <p>{{ $rents->price_insurance ?? '' }}</p> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
 
 
                             </div>
                             <div class="modal-footer justify-contentend">
-                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
+                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnCloseView"><i
                                         class="fa fa-times"></i> ปิดหน้าต่าง</button>
                                 {{-- <button type="button" class="btn bg-gradient-success" id="savedata"
                                     value="create"><i class="fa fa-save"></i> บันทึก</button> --}}
@@ -774,7 +785,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title text-bold"><img src="../uploads/images/print.svg" width="20" height="20" style="margin-top: -4px;"> ปริ้นเอกสารสัญญา</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closePrint">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -839,7 +850,7 @@
                                     <br><br>
                                     <div class="row text-center">
                                         <div class="col-sm-12">
-                                            <button type="submit" name="submit" value="approve" class="button
+                                            <button type="submit" name="submit" value="approve" class="button btnApprove
                                                 {{-- <?php echo ($lease_agr_code == null ? "button-dis":"button");?> button1 fontGoogle"
                                                 <?php echo ($lease_agr_code == null ? "disabled":"");?> 
                                                 <?php echo ($sub_lease_code == null ? "disabled":"");?> 
@@ -856,7 +867,7 @@
 
                             </div>
                             <div class="modal-footer justify-contentend">
-                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal"><i
+                                <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnPrint"><i
                                         class="fa fa-times"></i> ปิดหน้าต่าง</button>
                                 {{-- <button type="button" class="btn bg-gradient-success" id="savedata"
                                     value="create"><i class="fa fa-save"></i> บันทึก</button> --}}
@@ -903,6 +914,26 @@
                 var selectedStartDate = e.date;
                 $('#enddate').datepicker('setStartDate', selectedStartDate);
             });
+
+            $('#close').click(function() {
+                $('#modal-view').trigger("reset");
+                $('#modal-view').modal('hide');
+            });
+
+            $('#btnCloseView').click(function() {
+                $('#modal-view').trigger("reset");
+                $('#modal-view').modal('hide');
+            });
+
+            $('#closePrint').click(function() {
+                $('#createForm').trigger("reset");
+                $('#modal-print').modal('hide');
+            });
+
+            $('#btnPrint').click(function() {
+                $('#createForm').trigger("reset");
+                $('#modal-print').modal('hide');
+            });
         });
 
         //View modal
@@ -913,27 +944,40 @@
             $('#modal-view').modal('show');
             $.get('../api/rental/detail/' + id, function(data) {
                 console.log(data);
-                // $('#id_edit').val(data.id);
-                // $('#code_edit').val(data.role.code);
-                // $('#name_edit').val(data.role.name_th);
-                // // $('#dept_edit').val(data.dept);
-                // $('#dept_edit2').val(data.dept);
-                // $('#logo_img').attr('src', data.logo);
-                // if (data.role_type == null || data.role_type === "") {
-                //     $('#role_type_edit option[value=""]').prop('selected', true);
-                // } else {
-                //     $('#role_type_edit option[value="' + data.role_type + '"]').prop('selected',
-                //         true);
-                // }
-                // if (data.dept == null || data.dept === "") {
-                //     $('#dept_edit option[value=""]').prop('selected', true);
-                // } else {
-                //     $('#dept_edit option[value="' + data.dept + '"]').prop('selected', true);
-                // }
-
-
-                // $('input[name="r1"][value="' + data.active + '"]').prop('checked', true);
-                // handleRoleChange();
+                $('#projectName').val(data.Project_Name);
+                $('#numberhome').val(data.numberhome);
+                $('#HomeNo').val(data.HomeNo);
+                $('#ownerName').val(data.Owner);
+                $('#cardOwner').val(data.cardowner ?? '-');
+                $('#ownerContract').val(data.contract_owner ?? '-');
+                $('#ownerSoi').val(data.owner_soi ?? '-');
+                $('#ownerRoad').val(data.owner_road ?? '-');
+                $('#ownerDistrict').val(data.owner_district ?? '-');
+                $('#ownerKhet').val(data.owner_khet ?? '-');
+                $('#ownerProvince').val(data.owner_province ?? '-');
+                $('#ownerPhone').val(data.Phone ?? '-');
+                $('#transferDate').val(data.Transfer_Date ?? '-');
+                $('#roomNo').val(data.RoomNo ?? '-');
+                $('#roomType').val(data.RoomType ?? '-');
+                $('#roomSize').val(data.Size ?? '-');
+                $('#location').val(data.Location ?? '-');
+                $('#building').val(data.Building ?? '-');
+                $('#floor').val(data.Floor ?? '-');
+                $('#electricContract').val(data.Electric_Contract ?? '-');
+                $('#roomPrice').val(data.price ?? '-');
+                $('#dateFirstrend').val(data.date_firstrend ?? '-');
+                $('#dateEndrend').val(data.date_endrend ?? '-');
+                $('#rentalStatus').val(data.rental_status ?? '-');
+                $('#roomStatus').val(data.Status_Room ?? '-');
+                $('#cusName').val(data.Cus_Name ?? '-');
+                $('#cusIDCard').val(data.IDCard ?? '-');
+                $('#cusPhone').val(data.cusPhone ?? '-');
+                $('#cusContract').val(data.contract_cus ?? '-');
+                $('#cusPrice').val(data.Price ?? '-');
+                $('#contractStart').val(data.Contract_Startdate ?? '-');
+                $('#contractEnd').val(data.Contract_Status ?? '-');
+                $('#cancelDate').val(data.Cancle_Date ?? '-');
+                $('#contractStatus').val(data.Contract_Status ?? '-');
 
 
             });
@@ -950,10 +994,34 @@
             $('#room_id').val(room_id);
             $('#project_id').val(project_id);
             $('#customer_id').val(customer_id);
-            // $.get('../api/rental/detail/' + id, function(data) {
-            //     console.log(data);
+            $.get('../api/rental/getLeaseCode/' + project_id, function(data) {
+                // console.log(data);
+                const lease_code_id = data.lease_code_id;
+                const lease_agr_code = data.lease_agr_code;
+                const sub_lease_code = data.sub_lease_code;
+                const insurance_code = data.insurance_code;
+                const agent_contract_code = data.agent_contract_code;
+                if(lease_code_id == null || lease_agr_code == null || sub_lease_code == null || insurance_code == null || agent_contract_code == null){
+                    $('.btnApprove').prop('disabled', true);
+                    $('.btnApprove').html('ไม่สามารถปริ้นเอกสารได้ เนื่องจากไม่ได้กำหนดรูปแบบ<br>กรุณาติดต่อ IT');
+                    $('.btnApprove').css({
+                        'background-color': 'gray',
+                        'cursor': 'not-allowed',
+                        
+                    });
+                }else{
+                    $('.btnApprove').prop('disabled', false);
+                    $('.btnApprove').html('ยืนยันการปริ้นเอกสาร');
+                    $('.btnApprove').css({
+                        'background-color': 'green',
+                        'cursor': 'pointer',
+                        
+                    });
+                }
+
+                console.log(lease_code_id);
                 
-            // });
+            });
         });
 
     </script>
