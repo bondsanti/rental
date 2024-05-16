@@ -73,6 +73,40 @@
 
                                 </div>
                                 <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>เลือกประเภทวันที่</label>
+                                            <select name="dateselect" id="dateselect" class="form-control">
+                                                <option value="all">ทั้งหมด</option>
+                                                <option value="transfer_date">วันรับห้อง</option>
+                                                <option value="Guarantee_Startdate">วันเริ่มสัญญา</option>
+                                                <option value="Guarantee_Enddate">วันสิ้นสุดสัญญา</option>
+                                                <option value="Contract_Startdate">วันเริ่มเช่า</option>
+                                                <option value="Contract_Startdate">วันชำระเงินค่าเช่า</option>
+                                                <option value="Cancle_Date">วันออก</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>วันที่เริ่มต้น</label>
+                                            <input class="form-control datepicker" name="startdate" id="startdate"
+                                            type="text" value="" placeholder="วันที่เริ่มต้น" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>วันที่สิ้นสุด</label>
+                                            <input class="form-control datepicker" name="enddate" id="enddate"
+                                            type="text" value="" placeholder="วันที่สิ้นสุด" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ห้องเลขที่</label>
@@ -88,23 +122,21 @@
                                                     placeholder="บ้านเลขที่" autocomplete="off">
                                         </div>
                                     </div>
-
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>วันที่เริ่มต้น</label>
-                                            <input class="form-control datepicker" name="startdate" id="startdate"
-                                            type="text" value="" placeholder="วันที่เริ่มต้น" autocomplete="off">
+                                            <label>ชื่อลูกค้า</label>
+                                                <input class="form-control" name="Owner" type="text" value=""
+                                                    placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>วันที่สิ้นสุด</label>
-                                            <input class="form-control datepicker" name="enddate" id="enddate"
-                                            type="text" value="" placeholder="วันที่สิ้นสุด" autocomplete="off">
+                                            <label>ชื่อคนเช่า</label>
+                                                <input class="form-control" name="Customer" type="text" value=""
+                                                    placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="box-footer text-center">

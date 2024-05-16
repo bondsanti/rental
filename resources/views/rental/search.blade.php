@@ -145,6 +145,40 @@
 
                                 </div>
                                 <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>เลือกประเภทวันที่</label>
+                                            <select name="dateselect" id="dateselect" class="form-control">
+                                                <option value="all">ทั้งหมด</option> 
+                                                <option value="transfer_date">วันรับห้อง</option> 
+                                                <option value="Guarantee_Startdate">วันเริ่มสัญญา</option>
+                                                <option value="Guarantee_Enddate">วันสิ้นสุดสัญญา</option>
+                                                <option value="Contract_Startdate">วันเริ่มเช่า</option>
+                                                <option value="Contract_Startdate">วันชำระเงินค่าเช่า</option>
+                                                <option value="Cancle_Date">วันออก</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>วันที่เริ่มต้น</label>
+                                            <input class="form-control datepicker" name="startdate" id="startdate"
+                                            type="text" value="" placeholder="วันที่เริ่มต้น" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>วันที่สิ้นสุด</label>
+                                            <input class="form-control datepicker" name="enddate" id="enddate"
+                                            type="text" value="" placeholder="วันที่สิ้นสุด" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ห้องเลขที่</label>
@@ -160,23 +194,21 @@
                                                     placeholder="บ้านเลขที่" autocomplete="off">
                                         </div>
                                     </div>
-
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>วันที่เริ่มต้น</label>
-                                            <input class="form-control datepicker" name="startdate" id="startdate"
-                                            type="text" value="" placeholder="วันที่เริ่มต้น" autocomplete="off">
+                                            <label>ชื่อลูกค้า</label>
+                                                <input class="form-control" name="Owner" type="text" value=""
+                                                    placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>วันที่สิ้นสุด</label>
-                                            <input class="form-control datepicker" name="enddate" id="enddate"
-                                            type="text" value="" placeholder="วันที่สิ้นสุด" autocomplete="off">
+                                            <label>ชื่อคนเช่า</label>
+                                                <input class="form-control" name="Cusmoter" type="text" value=""
+                                                    placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="box-footer text-center">
@@ -227,15 +259,33 @@
                                 <tbody>
                                     @foreach ($rents as $item)
                                         <tr>
-                                            <td>{{ $loop->index + 1 }}</td>
-                                            <td>{{ $item->Project_Name }}</td>
+                                            <td>
+                                                <div class="h6">{{ $loop->index + 1 }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="h6">{{ $item->Project_Name }}</div>
+                                            </td>
                                             {{-- <td>{{ $item->RoomNo }}</td> --}}
-                                            <td>{{ $item->HomeNo }}</td>
-                                            <td>{{ $item->contract_owner }}</td>
-                                            <td>{{ $item->Owner }}</td>
+                                            <td>
+                                                <div class="h6">{{ $item->HomeNo }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="h6">{{ $item->contract_owner }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="h6">{{ $item->Owner }}</div>
+                                            </td>
                                             {{-- <td>{{ number_format($item->price) }}</td> --}}
-                                            <td>{{ $item->rental_status }}</td>
-                                            <td>{{ $item->Status_Room }}</td>
+                                            <td>
+                                                <div class="text-bold h6 {{ $item->rental_status == 'การันตี' ? 'text-green' : ''}} {{ $item->rental_status == 'ฝากต่อหักภาษี' ? 'text-sky' : ''}} {{ $item->rental_status == 'ฝากต่อไม่หักภาษี' ? 'text-gray' : ''}} {{ $item->rental_status == 'เบิกจ่ายล่วงหน้า' ? 'text-yellow' : ''}} {{ $item->rental_status == 'ฝากเช่า' ? 'text-blue' : ''}}">
+                                                    {{ $item->rental_status }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-bold h6 {{ $item->Status_Room == 'อยู่แล้ว' ? 'text-green' : ''}} {{ $item->Status_Room == 'พร้อมอยู่' ? 'text-orange' : ''}} {{ $item->Status_Room == 'จอง' ? 'text-yellow' : ''}} {{ $item->Status_Room == 'ไม่พร้อมอยู่' ? 'text-gray' : ''}} {{ $item->Status_Room == 'รอคลีน' ? 'text-gray' : ''}} {{ $item->Status_Room == 'รอตรวจ' ? 'text-gray' : ''}} {{ $item->Status_Room == 'รอเฟอร์' ? 'text-gray' : ''}} {{ $item->Status_Room == 'ห้องตัวอย่าง' ? 'text-sky' : ''}} {{ $item->Status_Room == 'ห้องออฟฟิต' ? 'text-sky' : ''}} ">
+                                                    {{ $item->Status_Room }}
+                                                </div>
+                                            </td>
                                             <td>{{ $item->Contract_Status }}</td>
                                             <td>
                                                 @if ($item->rental_status=="การันตี")

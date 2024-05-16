@@ -114,7 +114,7 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a style="" href="" class="nav-link">
+                              <a style="" href="{{ route('report.payment') }}" class="nav-link {{ request()->routeIs('report.payment') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>

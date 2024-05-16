@@ -5,6 +5,7 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use App\http\Controllers\ContractController;
+use App\Http\Controllers\RentalPaymentReportController;
 use App\http\controllers\ReportRoomController;
 use Illuminate\Support\Facades\Route;
 
@@ -82,6 +83,12 @@ Route::middleware(['isLogin'])->group(function () {
     Route::get('/report/rental/AvailableRoom',[ReportRoomController::class,'avaliableRoom'])->name('report.availble');
     Route::get('/report/rental/Asset',[ReportRoomController::class,'listRoom'])->name('report.asset');
     Route::post('/report/rental/asset/search',[ReportRoomController::class,'asset_search'])->name('report.asset.search');
+
+    // Report Payment
+    Route::get('/report/payment',[RentalPaymentReportController::class,'index'])->name('report.payment');
+    Route::post('/report/payment/serach',[RentalPaymentReportController::class,'search'])->name('report.payment.search');
+    Route::get('/report/payment/download/{rid}/{cid}/{date}', [RentalPaymentReportController::class, 'download'])->name('report.payment.download');
+    Route::post('/report/payment/print', [RentalPaymentReportController::class, 'print'])->name('report.payment.print');
 
 });
 

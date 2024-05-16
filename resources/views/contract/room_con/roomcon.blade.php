@@ -42,8 +42,8 @@
                                         <div class="form-group">
                                             <div class="form-group">
                                                 <label>วันที่</label>
-                                                <select name="" id="" class="form-control">
-                                                    <option value="all">วันเริ่มสัญญา</option>
+                                                <select name="dateselect" id="dateselect" class="form-control">
+                                                    <option value="Contract_Startdate">วันเริ่มทำสัญญา</option>
                                                     {{-- @foreach ($projects as $project)
                                                         <option value="{{ $project->pid }}">{{ $project->Project_Name }}
                                                         </option>
@@ -74,21 +74,21 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ห้องเลขที่</label>
-                                            <input class="form-control" name="RoomNo" type="text" value=""
+                                            <input class="form-control" name="RoomNo" id="RoomNo" type="text" value=""
                                                 placeholder="ห้องเลขที่" autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อลูกค้า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Owner" id="Owner" type="text" value=""
                                                 placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อคนเช่า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Customer" id="Customer" type="text" value=""
                                                 placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>

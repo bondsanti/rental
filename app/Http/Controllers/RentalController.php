@@ -64,10 +64,7 @@ class RentalController extends Controller
 
     public function search(Request $request)
     {
-        if($request->pid == 'all'){
-            $today  = date("Y-m-d");
-            // dd($today);
-        }
+        
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
@@ -153,8 +150,8 @@ class RentalController extends Controller
             $rents->where('rooms.HomeNo', 'LIKE', '%' . $request->HomeNo . '%');
         }
 
-        if ($request->Phone) {
-            $rents->where('rooms.Phone', 'LIKE', '%' . $request->Phone . '%');
+        if ($request->Cusmoter) {
+            $rents->where('customers.Cus_Name', 'LIKE', '%' . $request->Cusmoter . '%');
         }
 
         if ($request->typerent != 'all') {
@@ -171,9 +168,48 @@ class RentalController extends Controller
             }
         }
 
-        if ($request->startdate  && $request->enddate) {
-            $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
+        // if (!$request->dateselect && $request->startdate  && $request->enddate) {
+        //     $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
+        // }
+
+        if ($request->dateselect && $request->startdate) {
+            if ($request->dateselect == "transfer_date") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Transfer_Date', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Transfer_Date', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Guarantee_Startdate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Guarantee_Startdate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Guarantee_Startdate', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Guarantee_Enddate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Guarantee_Enddate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Guarantee_Enddate', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Contract_Startdate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
+                }
+            }elseif ($request->dateselect == "Cancle_Date") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Cancle_Date', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Cancle_Date', [$request->startdate, $request->startdate]);
+                }
+            }else{
+                $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
+            }
         }
+        // elseif ($request->startdate  && $request->enddate) {
+        //     $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
+        // }
 
         $rentsCount = $rents->count();
 
