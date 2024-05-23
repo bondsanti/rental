@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RentalController;
+use App\Http\Controllers\ReportGuaranteeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,5 @@ Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rent
 
 Route::get('/rental/rent/preapprove/{id}',[RentalController::class,'preapprove'])->name('rental.rent.preapprove');
 Route::post('/rental/rent/approve/{id}/{status}/{index}',[RentalController::class,'approve'])->name('rental.rent.approve');
+
+Route::post('/report/guarantee/updateBank/{pid}/{bankId}/{bankName}',[ReportGuaranteeController::class,'updateBank'])->name('report.guarantee.updateBank');

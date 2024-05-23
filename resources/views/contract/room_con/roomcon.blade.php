@@ -44,10 +44,6 @@
                                                 <label>วันที่</label>
                                                 <select name="dateselect" id="dateselect" class="form-control">
                                                     <option value="Contract_Startdate">วันเริ่มทำสัญญา</option>
-                                                    {{-- @foreach ($projects as $project)
-                                                        <option value="{{ $project->pid }}">{{ $project->Project_Name }}
-                                                        </option>
-                                                    @endforeach --}}
                                                 </select>
                                             </div>
                                         </div>
@@ -142,12 +138,16 @@
         // โดยใช้คำสั่ง new Date() เพื่อสร้างวัตถุ Date ที่เก็บวันที่และเวลาปัจจุบัน
         var today = new Date();
 
+        // getFirstDayOfMonth
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // Note: Month starts from 0
+        const formattedMonth = month < 10 ? '0' + month : month; 
         // แปลงวัตถุ Date เป็นสตริงในรูปแบบที่ต้องการ (ในที่นี้เราใช้วิธีการกำหนดใน HTML)
         // โดยเราจะให้สตริงนี้เป็นค่าของ value ของ input
         var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
 
         // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
-        document.getElementById('startdate').value = todayString;
+        document.getElementById('startdate').value = `${year}-${formattedMonth}-01`;
         document.getElementById('enddate').value = todayString;
     </script>
 @endpush

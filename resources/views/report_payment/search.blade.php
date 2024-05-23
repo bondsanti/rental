@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'สัญญาห้องเช่า')
+@section('title', 'รายงานชำระค่าเช่า')
 
 @section('content')
 
@@ -34,7 +34,7 @@
                                             <div class="form-group">
                                                 <label>ประจำเดือน</label>
                                                 <input class="form-control datepicker" name="monthly" id="monthly"
-                                                type="text" value="{{ old('monthly') }}" placeholder="ประจำเดือน"
+                                                type="text" value="{{ $monthly ?? '' }}" placeholder="ประจำเดือน"
                                                 autocomplete="off">
                                             </div>
                                         </div>
@@ -43,7 +43,7 @@
                                         <div class="form-group">
                                             <label>วันในใบแจ้งหนี้</label>
                                             <input class="form-control datepicker" name="invoiceDate" id="invoiceDate"
-                                                type="text" value="" placeholder="วันในใบแจ้งหนี้"
+                                                type="text" value="{{ $invoiceDate ?? '' }}" placeholder="วันในใบแจ้งหนี้"
                                                 autocomplete="off">
                                         </div>
                                     </div>
@@ -68,7 +68,7 @@
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text">
-                                                    <input type="checkbox" name="p" id="p" value="" checked>
+                                                    <input type="checkbox" name="p" id="p" value="{{ $p ?? ''}}" {{ $p == 1 ? 'checked' : ''}}>
                                                     </div>
                                                 </div>
                                                 <p class="form-control">จ่ายเงินแล้ว</p>
@@ -81,7 +81,7 @@
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text">
-                                                    <input type="checkbox" name="np" id="np" value="" checked>
+                                                    <input type="checkbox" name="np" id="np" value="{{ $np ?? ''}}" {{ $np == 1 ? 'checked' : ''}}>
                                                     </div>
                                                 </div>
                                                 <p class="form-control">ยังไม่จ่ายเงิน</p>
@@ -94,7 +94,7 @@
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text">
-                                                    <input type="checkbox" name="sp" id="sp" value="" checked>
+                                                    <input type="checkbox" name="sp" id="sp" value="{{ $sp ?? ''}}" {{ $sp == 1 ? 'checked' : ''}}>
                                                     </div>
                                                 </div>
                                                 <p class="form-control">ห้องสวัสดิการ</p>
@@ -116,7 +116,7 @@
                     <div class="row">
                         <div class="col-12">
                             <button type="button" class="btn btn-info btn-block">
-                                <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา สัญญาห้องเช่า</h4>
+                                <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา รายงานชำระค่าเช่า</h4>
                             </button>
 
                         </div>
@@ -174,7 +174,7 @@
                                                 <div class="h6">{{ $item->Phone }}</div>
                                             </td>
                                             <td>
-                                                <div class="h6">{{ $item->status_room }}</div>
+                                                <div class="h6 {{ $item->status_room === 'อยู่แล้ว' ? 'text-green' : ''}}">{{ $item->status_room }}</div>
                                             </td>
                                             <td>
                                                 <div class="h6">
@@ -187,23 +187,25 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="h6">{{ $item->Contract_Status }}</div>
+                                                <div class="h6 {{ $item->Contract_Status === 'ออก' ? 'text-red' : ''}} {{ $item->Contract_Status === 'เช่าอยู่' ? 'text-green' : ''}} {{ $item->Contract_Status === 'ต่อสัญญา' ? 'text-orange' : ''}}">{{ $item->Contract_Status }}</div>
                                             </td>
                                             <td>
                                                 <div class="h6">{{ number_format($item->price) }}</div>
                                             </td>
                                             <td>
-                                                <div class="text-bold h6 {{ $item->paid === 'ห้องสวัสดิการ' || $item->paid ===  'จ่ายแล้ว' ? 'text-green' : ''}} {{$item->paid ===  'ยังไม่จ่าย' ? 'text-red' : ''}}">{{ $item->paid === 'ห้องสวัสดิการ' ? 'จ่ายแล้ว' : $countPayment[$loop->index] }}</div>
+                                                <div class="text-bold h6 {{ $item->paid ===  'จ่ายแล้ว' ? 'text-green' : ''}} {{ $item->paid === 'ห้องสวัสดิการ'  ? 'text-orange' : ''}} {{$item->paid ===  'ยังไม่จ่าย' ? 'text-red' : ''}}">{{ $item->paid === 'ห้องสวัสดิการ' ? 'จ่ายแล้ว' : $countPayment[$loop->index] }}</div>
                                             </td>
                                             <td>
-                                                <div class="h6">{{ $item->date_paid }}</div>
+                                                <div class="h6 {{ $item->date_paid != '-' ? 'text-green text-bold' : '' }}">{{ $item->date_paid }}</div>
                                             </td>
                                             <td>
-                                                <div class="h6">{{ $item->total_paid }}</div>
+                                                <div class="h6 {{ $item->total_paid != '0' ? 'text-green text-bold' : '' }}">{{ $item->total_paid }}</div>
                                             </td>
                                             <td>
                                                 @if ($item->paid ===  'ยังไม่จ่าย' && $monthly != '')
-                                                    <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $monthly) }}" class="btn btn-primary"><i class="fa fa-print" aria-hidden="true"></i></a>
+                                                    <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $monthly. '/'. $item->paid) }}" class="btn btn-warning"><i class="fa fa-print" aria-hidden="true"></i></a>
+                                                @elseif($item->paid ===  'จ่ายแล้ว')
+                                                    <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $item->date_paid. '/'. $item->paid) }}" class="btn btn-success"><i class="fa fa-print" aria-hidden="true"></i></a>
                                                 @endif
                                             </td>
                                             
@@ -221,7 +223,7 @@
     </section>
 @endsection
 @push('script')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    {{-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script> --}}
     <script>
         $(document).ready(function() {
 
@@ -233,6 +235,19 @@
             $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd', // รูปแบบวันที่
                 autoclose: true,
+            });
+
+            $('#table').DataTable({
+                'paging': false,
+                'lengthChange': false,
+                'searching': false,
+                'ordering': true,
+                'info': false,
+                'autoWidth': false,
+                "responsive": true,
+                "columnDefs": [
+                        { "orderable": false, "targets": [0, 1, 2, 3, 5, 10, 12, 13, 14] }
+                    ]
             });
 
             $('#monthly').on('changeDate', function(e) {
@@ -254,9 +269,7 @@
                     if ($(this).is(':checked')) {
                         let value = $(this);
                         let id = value[0]['id'];
-                        // console.log('#'. value[0]['id']);
                         $('#'+id).val(count);
-                        // console.log('#'+value[0]['id']);
                     }else{
                         let value = $(this);
                         let id = value[0]['id'];
@@ -275,7 +288,14 @@
         var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
 
         // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
-        document.getElementById('startdate').value = todayString;
-        document.getElementById('enddate').value = todayString;
+        const monthly =  $('#monthly').val();
+        const invoiceDate =  $('#invoiceDate').val();
+        if (!monthly) {
+            document.getElementById('monthly').value = todayString;
+        }
+        if (!invoiceDate) {
+            document.getElementById('invoiceDate').value = todayString;
+        }
+        
     </script>
 @endpush

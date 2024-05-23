@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 
 class RentalPaymentReportController extends Controller
 {
@@ -23,8 +24,6 @@ class RentalPaymentReportController extends Controller
                 'dataLoginUser',
                 'isRole'
             )
-
-
         );
     }
 
@@ -32,9 +31,12 @@ class RentalPaymentReportController extends Controller
 
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-
         $countPayment = array();
         $monthly = $request->monthly;
+        $invoiceDate = $request->invoiceDate;
+        $p = $request->p ?? '';
+        $np = $request->np ?? '';
+        $sp = $request->sp ?? '';
         if($request->p && $request->np && $request->sp){
             $w = "จ่ายแล้ว','ยังไม่จ่าย','ห้องสวัสดิการ";
         }elseif($request->p && $request->np){
@@ -50,10 +52,7 @@ class RentalPaymentReportController extends Controller
         }elseif(!$request->p && !$request->np && $request->sp){
             $w = "ห้องสวัสดิการ";
         }
-        // $w = $request->p ? "จ่ายแล้ว" : "";
-        // $w .= $request->np ? "ยังจ่าย" : "";
-        // $w .= $request->sp ? "ห้องสวัสดิการ" : "";
-        // dd($w);
+
         $results = DB::table('customers as c')
         ->select(
             'p.project_name',
@@ -63,15 +62,6 @@ class RentalPaymentReportController extends Controller
             'c.cus_name',
             'c.Phone',
             'c.price',
-            // 'c.Contract_Status',
-            // 'c.Cancle_Date',
-            // 'c.contract_startdate',
-            // 'c.contract_enddate',
-            // 'c.Phone',
-            // 'c.pid',
-            // 'c.rid',
-            // 'pa. * ',
-            // 'pa.id as room_id',
             DB::raw("CASE 
                         WHEN IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ' THEN 'ไม่มีวันเซ็นต์สัญญา' 
                         WHEN r.status_room = 'สวัสดิการ' THEN 'ห้องสวัสดิการ' 
@@ -164,37 +154,13 @@ class RentalPaymentReportController extends Controller
                         WHEN (DATE_FORMAT( due11_Date, '%Y%m') = DATE_FORMAT( '".$monthly."', '%Y%m' ) and ifnull(Payment_Date11, '' ) not in ('','0000-00-00')) then approve11_date
                         WHEN (DATE_FORMAT( due12_Date, '%Y%m') = DATE_FORMAT( '".$monthly."', '%Y%m' ) and ifnull(Payment_Date12, '' ) not in ('','0000-00-00')) then approve12_date
                         else '0' end as  approve_dates"),
-            // DB::raw("
-            //     SUM(
-            //         CASE WHEN Payment_Date1 IS NULL AND Due1_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date2 IS NULL AND Due2_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date3 IS NULL AND Due3_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date4 IS NULL AND Due4_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date5 IS NULL AND Due5_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date6 IS NULL AND Due6_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date7 IS NULL AND Due7_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date8 IS NULL AND Due8_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date9 IS NULL AND Due9_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date10 IS NULL AND Due10_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date11 IS NULL AND Due11_Date < '$monthly' THEN 1 ELSE 0 END +
-            //         CASE WHEN Payment_Date12 IS NULL AND Due12_Date < '$monthly' THEN 1 ELSE 0 END
-            //     ) AS countPayment
-            // "),
             'c.price','c.Contract_Status','Cancle_Date', 'contract_startdate', 'contract_enddate','c.Phone', 'c.pid', 'c.rid', 'pa.*'         
             // Add similar CASE statements for other columns
         )
-        // ->select(
-        //     'p.project_name',
-        // 'c.Roomno',
-        // 'r.HomeNo',
-        // 'r.status_room',
-        // 'c.cus_name',
-        // 'c.Phone',
-        // 'c.price','c.Contract_Status','Cancle_Date', 'contract_startdate', 'contract_enddate','c.Phone', 'c.pid', 'c.rid', 'pa.*')
         ->join('projects as p', 'p.pid', '=', 'c.pid')
         ->join('payments as pa', 'pa.cid', '=', 'c.id')
         ->join('rooms as r', 'r.id', '=', 'c.rid')
-        ->whereRaw("DATE_FORMAT('2024-05-14', '%Y%m%d') BETWEEN DATE_FORMAT(c.contract_startdate, '%Y%m%d') AND DATE_FORMAT(c.contract_enddate, '%Y%m%d')
+        ->whereRaw("DATE_FORMAT('".$monthly."', '%Y%m%d') BETWEEN DATE_FORMAT(c.contract_startdate, '%Y%m%d') AND DATE_FORMAT(c.contract_enddate, '%Y%m%d')
                             and CASE WHEN IFNULL( contract_startdate, '' ) = '' 
                     OR contract_startdate = '0000-00-00' and r.status_room <>'สวัสดิการ' THEN 'ยังไม่จ่าย'
                     when r.status_room ='สวัสดิการ' then 'ห้องสวัสดิการ'
@@ -227,18 +193,18 @@ class RentalPaymentReportController extends Controller
                     then 'จ่ายแล้ว'
                     else 'ยังไม่จ่าย' end in ( '".$w."') 
         ")
-        ->where(function ($query) {
+        ->where(function ($query) use($monthly){
             $query->whereRaw("IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ'")
                 ->orWhere('r.status_room', '=', 'สวัสดิการ')
-                ->orWhere(function ($query) {
+                ->orWhere(function ($query) use($monthly) {
                     $query->whereIn('c.Contract_Status', ['เช่าอยู่', 'ต่อสัญญา'])
-                        ->orWhere(function ($query) {
+                        ->orWhere(function ($query) use($monthly){
                             $query->whereIn('c.Contract_Status', ['ออก', 'ยกเลิกสัญญา'])
-                                ->whereRaw("DATE_FORMAT(c.Cancle_Date, '%Y%m') >= DATE_FORMAT('2024-05-14', '%Y%m')");
+                                ->whereRaw("DATE_FORMAT(c.Cancle_Date, '%Y%m') >= DATE_FORMAT('".$monthly."', '%Y%m')");
                         });
                 });
         })
-        ->where('c.contract_startdate', '<=', '2024-05-14')
+        ->where('c.contract_startdate', '<=', $monthly)
         ->whereNotIn(DB::raw("IFNULL(r.Trans_status, '')"), ['del'])
         ->orderBy('p.project_name')
         ->orderBy('c.Roomno')
@@ -247,20 +213,23 @@ class RentalPaymentReportController extends Controller
         foreach ($results as $key => $item) {
             if ($item->paid == 'ยังไม่จ่าย' && ($item->STATUS < $monthly)) {
                 $countPayment[$key] = $this->countNumMonth($item->STATUS, $monthly, $item->cid, $item->rid);
+            }else if($item->paid == 'ยังไม่จ่าย' && ($item->STATUS >= $monthly)){
+                $countPayment[$key] = 'ยังไม่จ่าย';
             }else{
-                $countPayment[$key] = 0;
+                $countPayment[$key] = 'จ่ายแล้ว';
             }
         }
-        // dump($countPayment);
-
-        // dd($results);
 
         return view('report_payment.search', compact(
             'results',
             'dataLoginUser',
             'isRole',
             'countPayment',
-            'monthly'
+            'monthly',
+            'invoiceDate',
+            'p',
+            'np',
+            'sp'
         ));
 
     }
@@ -287,14 +256,10 @@ class RentalPaymentReportController extends Controller
             ->where('rid', $rids)
             ->first()->countPayment;
             
-        // dd($countPayment);
-
-        // $countPayment = $payments->count();
-
         $st = explode('-', $startDate);
-        if ($countPayment == 0 && date('d') < $st[2]) {
+        if ($countPayment == '0' && date('d') < $st[2]) {
             $rowNumAns = '-';
-        } elseif ($countPayment == 0) {
+        } elseif ($countPayment == '0') {
             $rowNumAns = 'ยังไม่จ่าย';
         } else {
             $rowNumAns = 'ยังไม่จ่าย (' . $countPayment . ')';
@@ -303,23 +268,144 @@ class RentalPaymentReportController extends Controller
         return $rowNumAns;
     }
 
-    public function download(Request $request, $rid, $cid, $date){
-        // dd($rid, $cid, $date);
+    public function download($rid, $cid, $date, $status){
 
         $monthY = thaidate('F Y', $date);
-        // dd($monthY);
+        $current_date = Carbon::now()->format('Y-m-d');
+        $print_date = Carbon::now()->format('d-m-Y');
+        $DateChk = explode('-', $current_date);	  
+        $date_check = $DateChk[0].'-'.$DateChk[1].'-01';
         $Payment = explode('-', $date);
         $year = $Payment[0]+543;
         $Payment_Dates = $Payment[2].' / '.$Payment[1].' / '.$year;
         $rent = DB::table('customers')
-            ->select('customers.Cus_Name', 'customers.Contract_Status', 'customers.pid', 'customers.rid', 'rooms.HomeNo', 'rooms.RoomNo', 'projects.Project_Name', 'projects.address_full')
+            ->select('customers.Cus_Name', 'customers.Contract_Status', 'customers.price','customers.pid', 'customers.rid', 'rooms.HomeNo', 'rooms.RoomNo', 'projects.Project_Name', 'projects.address_full')
             ->leftJoin('rooms', 'customers.rid', '=', 'rooms.id')
             ->leftJoin('projects', 'customers.pid', '=', 'projects.pid')
             ->where('customers.rid', $rid)
             ->where('customers.Contract_Status', 'เช่าอยู่')
             ->get();
 
+        foreach ($rent as $item) {
+            $Cus_Name = $item->Cus_Name;
+            $price = $item->price;
+        }
 
+        if ($status == 'ยังไม่จ่าย') {
+            $invoce = DB::table('list_invoice')
+            ->where('rid', $rid)
+            ->where('cid', $cid)
+            ->where('payment_date', $date)
+            ->first();
+
+            $invoceLimit = DB::table('list_invoice')
+                ->where('date_check', $date_check)
+                ->orderBy('id', 'DESC')
+                ->limit(1)
+                ->get();
+        
+            $check=0;
+            foreach ($invoceLimit as $item) {
+                $check++;
+                if (is_object($item) && property_exists($item, 'invoce_id')) {
+                    $invoice_id = $item->invoce_id + 1;
+                } else {
+                    // Handle the case when $item is not an object or 'invoce_id' property doesn't exist
+                    // You can set a default value for $invoice_id or handle the error accordingly
+                }
+            }
+
+            if (!$invoce){
+                if ($check == '0') {
+                    DB::table('list_invoice')->insert([
+                        'cid' => $cid,
+                        'rid' => $rid,
+                        'invoce_id' => 1,
+                        'cus_name' => $Cus_Name,
+                        'amount' => $price,
+                        'payment_date' => $date,
+                        'date_check' => $date_check,
+                        'current_dates' => $current_date
+                    ]);
+                }else{
+                    DB::table('list_invoice')->insert([
+                        'cid' => $cid,
+                        'rid' => $rid,
+                        'invoce_id' => $invoice_id,
+                        'cus_name' => $Cus_Name,
+                        'amount' => $price,
+                        'payment_date' => $date,
+                        'date_check' => $date_check,
+                        'current_dates' => $current_date
+                    ]);
+                }
+            }
+
+            $getYmd = DB::table('list_invoice')
+                ->select('invoce_id', DB::raw('MONTH(date_check) as monthdate'), DB::raw('YEAR(date_check) as yeardate'))
+                ->where('rid', $rid)
+                ->where('cid', $cid)
+                ->where('payment_date', $date)
+                ->first();
+            $INV = 'INV'.substr($getYmd->yeardate, -2).'/'.$getYmd->monthdate.'/'. str_pad($getYmd->invoce_id, 4, '0', STR_PAD_LEFT);
+
+        } elseif($status == 'จ่ายแล้ว') {
+            $bill = DB::table('list_bills')
+            ->where('rid', $rid)
+            ->where('cid', $cid)
+            ->where('payment_date', $date)
+            ->first();
+
+            $billLimit = DB::table('list_bills')
+                ->where('date_check', $date_check)
+                ->orderBy('id', 'DESC')
+                ->limit(1)
+                ->get();
+
+            $check=0;
+            foreach ($billLimit as $item) {
+                $check++;
+                if (is_object($item) && property_exists($item, 'bill_id')) {
+                    $bill_id = $item->bill_id + 1;
+                } else {
+                    // Handle the case when $item is not an object or 'invoce_id' property doesn't exist
+                    // You can set a default value for $invoice_id or handle the error accordingly
+                }
+            }
+            if (!$bill){
+                if ($check == '0') {
+                    DB::table('list_bills')->insert([
+                        'cid' => $cid,
+                        'rid' => $rid,
+                        'bill_id' => 1,
+                        'cus_name' => $Cus_Name,
+                        'amount' => $price,
+                        'payment_date' => $date,
+                        'date_check' => $date_check
+                    ]);
+                }else{
+                    DB::table('list_bills')->insert([
+                        'cid' => $cid,
+                        'rid' => $rid,
+                        'bill_id' => $bill_id,
+                        'cus_name' => $Cus_Name,
+                        'amount' => $price,
+                        'payment_date' => $date,
+                        'date_check' => $date_check,
+                        'current_dates' => $current_date
+                    ]);
+                }
+            }
+            $getBill = DB::table('list_bills')
+                ->select('bill_id')
+                ->where('rid', $rid)
+                ->where('cid', $cid)
+                ->where('payment_date', $date)
+                ->first();
+            $REC = substr($year, -2).'/'.$Payment[1].'/'. str_pad($getBill->bill_id, 4, '0', STR_PAD_LEFT);
+    
+        }
+        
         $result = Room::select(
                 'projects.*',
                 'projects.pid as project_id',
@@ -340,13 +426,71 @@ class RentalPaymentReportController extends Controller
                 })
                 ->join('payments', 'payments.cid', '=', 'customers.id')
                 ->where('rooms.id', $rid)
-                // ->where('rooms.id', $request->id)
                 ->first();
 
+            if ($result->Price) {
+                $customer_price = $this->convertAmount($result->Price);
+            } else {
+                $customer_price = null;
+            }
+            if ($status == 'ยังไม่จ่าย') {
+                $pdf = Pdf::loadView('report_payment.print', ['result' => $result, 'monthY' => $monthY, 'INV' => $INV, 'current_date' => $current_date,'print_date' => $print_date, 'date_check' => $date_check]);
+                return $pdf->stream();
+            } elseif($status == 'จ่ายแล้ว') {
+                $pdf = Pdf::loadView('report_payment.print_receipt', ['result' => $result, 'monthY' => $monthY, 'REC' => $REC, 'Payment_Dates' => $Payment_Dates, 'date_check' => $date_check, 'customer_price' => $customer_price]);
+                return $pdf->stream();
+            }
+            
+            
+    }
 
-            $pdf = Pdf::loadView('report_payment.print', ['result' => $result, 'monthY' => $monthY]);
-            // return $pdf->download('invoice.pdf');
-            return $pdf->stream();
-        // dd($result);
+    public function convertAmount($amount_number)
+    {
+        $amount_number = number_format($amount_number, 2, ".", "");
+        $pt = strpos($amount_number, ".");
+        $number = $fraction = "";
+        if ($pt === false)
+            $number = $amount_number;
+        else {
+            $number = substr($amount_number, 0, $pt);
+            $fraction = substr($amount_number, $pt + 1);
+        }
+
+        $ret = "";
+        $baht = $this->readNumber($number);
+        if ($baht != "")
+            $ret .= $baht . "บาท";
+
+        $satang = $this->readNumber($fraction);
+        if ($satang != "")
+            $ret .=  $satang . "สตางค์";
+        else
+            $ret .= "ถ้วน";
+        return $ret;
+    }
+
+    public function readNumber($number)
+    {
+        $position_call = array("แสน", "หมื่น", "พัน", "ร้อย", "สิบ", "");
+        $number_call = array("", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า");
+        $number = $number + 0;
+        $ret = "";
+        if ($number == 0) return $ret;
+        if ($number > 1000000) {
+            $ret .= $this->readNumber(intval($number / 1000000)) . "ล้าน";
+            $number = intval(fmod($number, 1000000));
+        }
+
+        $divider = 100000;
+        $pos = 0;
+        while ($number > 0) {
+            $d = intval($number / $divider);
+            $ret .= (($divider == 10) && ($d == 2)) ? "ยี่" : ((($divider == 10) && ($d == 1)) ? "" : ((($divider == 1) && ($d == 1) && ($ret != "")) ? "เอ็ด" : $number_call[$d]));
+            $ret .= ($d ? $position_call[$pos] : "");
+            $number = $number % $divider;
+            $divider = $divider / 10;
+            $pos++;
+        }
+        return $ret;
     }
 }

@@ -6,7 +6,11 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 use App\http\Controllers\ContractController;
 use App\Http\Controllers\RentalPaymentReportController;
+use App\Http\Controllers\ReportGuaranteeController;
+use App\Http\Controllers\ReportRentalController;
 use App\http\controllers\ReportRoomController;
+use App\Http\Controllers\StatHistoryController;
+use App\Http\Controllers\SummaryBookingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,9 +90,25 @@ Route::middleware(['isLogin'])->group(function () {
 
     // Report Payment
     Route::get('/report/payment',[RentalPaymentReportController::class,'index'])->name('report.payment');
-    Route::post('/report/payment/serach',[RentalPaymentReportController::class,'search'])->name('report.payment.search');
-    Route::get('/report/payment/download/{rid}/{cid}/{date}', [RentalPaymentReportController::class, 'download'])->name('report.payment.download');
+    Route::post('/report/payment/search',[RentalPaymentReportController::class,'search'])->name('report.payment.search');
+    Route::get('/report/payment/download/{rid}/{cid}/{date}/{status}', [RentalPaymentReportController::class, 'download'])->name('report.payment.download');
     Route::post('/report/payment/print', [RentalPaymentReportController::class, 'print'])->name('report.payment.print');
 
+    // Report guarantee
+    Route::get('/report/guarantee',[ReportGuaranteeController::class,'index'])->name('report.guarantee');
+    Route::post('/report/guarantee/search',[ReportGuaranteeController::class,'search'])->name('report.guarantee.search');
+    Route::post('/report/guarantee/saveData',[ReportGuaranteeController::class,'saveData'])->name('report.guarantee.saveData');
+
+    // History Rental and Quarantee
+    Route::get('/summary/history',[StatHistoryController::class,'index'])->name('summary.history');
+    Route::post('/summary/history/search',[StatHistoryController::class,'search'])->name('summary.history.search');
+
+    // Report Rental
+    Route::get('/report/rent',[ReportRentalController::class,'index'])->name('report.rent');
+    Route::post('/report/rent/search',[ReportRentalController::class,'search'])->name('report.rent.search');
+
+    // Summary Booking
+    Route::get('/summary/booking',[SummaryBookingController::class,'index'])->name('summary.booking');
+    Route::post('/summary/booking/search',[SummaryBookingController::class,'search'])->name('summary.booking.search');
 });
 

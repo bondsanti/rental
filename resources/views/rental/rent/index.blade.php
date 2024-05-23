@@ -303,7 +303,7 @@
 
 
          {{-- status approve modal --}}
-         <div class="modal fade" id="modal-status-approve">
+        <div class="modal fade" id="modal-status-approve">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -446,7 +446,7 @@
         $.get('../../api/rental/rent/preapprove/' + id, function(data) {
             console.log('payment id = ',data.payment_id);
             console.log(data.RoomNo);
-            $('#room_id').val(data.room_id);
+             
             $('#payment_id').val(data.payment_id);
             $('#projectName').val(data.Project_Name);
             $('#roomNo').val(data.RoomNo);
@@ -480,9 +480,10 @@
                     url: "../../api/rental/rent/approve/" + id + "/" + status + "/" + index,
                     type: "POST",
                     dataType: 'json',
-
+                    // console.log();
+                    // alert(url),
                     success: function(data) {
-                        console.log(data);
+                        // console.log(url);
                         if (data.success = true) {
 
                             if ($.isEmptyObject(data.error)) {

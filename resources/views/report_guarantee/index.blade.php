@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'รายงานชำระค่าเช่า')
+@section('title', 'รายงานชำระค่าการันตี')
 
 @section('content')
 
@@ -8,7 +8,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">รายงานชำระค่าเช่า</h1>
+                    <h1 class="m-0">รายงานชำระค่าการันตี</h1>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -21,36 +21,50 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header card-outline card-info">
-                            <h3 class="card-title">ค้นหารายงานชำระค่าเช่า</h3>
+                            <h3 class="card-title">ค้นหารายงานชำระค่าการันตี</h3>
                         </div>
-                        <form action="{{ route('report.payment.search')}}" method="POST" id="contractSearch">
+                        <form action="{{ route('report.guarantee.search')}}" method="POST" id="contractSearch">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-sm-3">
-                                        
+                                    <div class="col-sm-1"> 
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <div class="form-group">
                                                 <label>ประจำเดือน</label>
                                                 <input class="form-control datepicker" name="monthly" id="monthly"
-                                                type="text" value="{{ old('monthly') }}" placeholder="ประจำเดือน"
-                                                autocomplete="off">
+                                                type="text" value="" placeholder="ประจำเดือน"
+                                                autocomplete="off" required>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label>วันในใบแจ้งหนี้</label>
-                                            <input class="form-control datepicker" name="invoiceDate" id="invoiceDate"
-                                                type="text" value="{{ old('invoiceDate') }}" placeholder="วันในใบแจ้งหนี้"
-                                                autocomplete="off">
+                                            <label>โครงการ</label>
+                                            <select name="pid" id="pid" class="form-control">
+                                                <option value="All">โครงการ ทั้งหมด</option>
+                                                @foreach ($projects as $project)
+                                                    <option value="{{ $project->pid }}">{{ $project->Project_Name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
 
                                     <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>ธนาคาร</label>
+                                            <select name="bid" id="bid" class="form-control">
+                                                <option value="0">ธนาคาร ทั้งหมด</option>
+                                                @foreach ($activeBanks as $bank)
+                                                    <option value="{{ $bank->id }}">{{ $bank->Code }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
+                                    <div class="col-sm-1"> 
+                                    </div>
+
                                 </div>
                                 <div class="row" id="Payment">
                                     <div class="col-sm-1">
@@ -95,7 +109,7 @@
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text">
-                                                    <input type="checkbox" name="sp" id="sp" value="" checked>
+                                                    <input type="checkbox" name="fp" id="fp" value="" checked>
                                                     </div>
                                                 </div>
                                                 <p class="form-control">ห้องสวัสดิการ</p>
@@ -108,7 +122,7 @@
                                 <div class="box-footer text-center">
                                     <button type="submit" class="btn bg-gradient-success"><i class="fa fa-search"></i>
                                         ค้นหา</button>
-                                    <a href="{{ route('report.payment') }}" type="button" class="btn bg-gradient-danger"><i
+                                    <a href="{{ route('report.guarantee') }}" type="button" class="btn bg-gradient-danger"><i
                                             class="fa fa-refresh"></i> เคลียร์</a>
                                 </div>
                             </div>
@@ -117,7 +131,7 @@
                     <div class="row">
                         <div class="col-12">
                             <button type="button" class="btn btn-info btn-block">
-                                <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา รายงานชำระค่าเช่า</h4>
+                                <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา รายงานชำระค่าการันตี</h4>
                             </button>
 
                         </div>
@@ -183,6 +197,6 @@
 
         // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
         document.getElementById('monthly').value = todayString;
-        document.getElementById('invoiceDate').value = todayString;
+        // document.getElementById('enddate').value = todayString;
     </script>
 @endpush

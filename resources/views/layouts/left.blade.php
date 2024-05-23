@@ -74,7 +74,7 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a style="" href="{{route('contract.list')}}" class="nav-link {{ request()->routeIs('contract.list') ? 'active' : '' }}">
+                              <a style="" href="{{route('contract.list')}}" class="nav-link {{ request()->routeIs('contract.list') ? 'active' : '' }} {{ request()->routeIs('list.search') ? 'active' : '' }}">
                                 &nbsp;&nbsp;
                                 <i class="nav-icon"> - </i>
                                   <p>
@@ -88,7 +88,7 @@
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
-                                      Codeสัญญา
+                                      Code สัญญา
                                   </p>
                               </a>
                           </li>
@@ -98,7 +98,7 @@
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
-                                      รายงานโครงการ(ออกสัญญา)
+                                      รายงานโครงการ (ออกสัญญา)
                                   </p>
                               </a>
                           </li>
@@ -114,7 +114,7 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a style="" href="{{ route('report.payment') }}" class="nav-link {{ request()->routeIs('report.payment') ? 'active' : '' }}">
+                              <a style="" href="{{ route('report.payment') }}" class="nav-link {{ request()->routeIs('report.payment') ? 'active' : '' }} {{ request()->routeIs('report.payment.search') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
@@ -123,7 +123,7 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a style="" href="" class="nav-link">
+                              <a style="" href="{{ route('report.guarantee') }}" class="nav-link {{ request()->routeIs('report.guarantee') ? 'active' : '' }} {{ request()->routeIs('report.guarantee.search') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
@@ -132,7 +132,7 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a style="" href="" class="nav-link">
+                              <a style="" href="{{ route('summary.history') }}" class="nav-link {{ request()->routeIs('summary.history') ? 'active' : '' }} {{ request()->routeIs('summary.history.search') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
@@ -141,7 +141,7 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a style="" href="" class="nav-link">
+                              <a style="" href="{{ route('report.rent') }}" class="nav-link {{ request()->routeIs('report.rent') ? 'active' : '' }} {{ request()->routeIs('report.rent.search') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
@@ -150,11 +150,11 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a style="" href="" class="nav-link">
+                              <a style="" href="{{ route('summary.booking') }}" class="nav-link {{ request()->routeIs('summary.booking') ? 'active' : '' }} {{ request()->routeIs('summary.booking.search') ? 'active' : '' }}">
                                   &nbsp;&nbsp;
                                   <i class="nav-icon"> - </i>
                                   <p>
-                                      สรุปค่าจอว/ค่าประกัน(ห้องเช่า)
+                                      สรุปค่าจอง/ค่าประกัน(ห้องเช่า)
                                   </p>
                               </a>
                           </li>

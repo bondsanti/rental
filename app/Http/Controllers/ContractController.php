@@ -128,7 +128,8 @@ class ContractController extends Controller
             ->get();
 
         // dd($request->dateselect, $request->startdate);
-        
+        $startdate = $request->startdate;
+        $enddate = $request->enddate;
         $rents = Room::select(
             'projects.Project_Name',
             'rooms.id',
@@ -142,7 +143,7 @@ class ContractController extends Controller
             'rooms.Owner',
             'rooms.Status_Room',
             'rooms.Phone',
-            'rooms.price',
+            'rooms.price as room_price',
             'rooms.Trans_Status',
             'rooms.contract_owner',
             'rooms.Owner',
@@ -150,60 +151,67 @@ class ContractController extends Controller
             'rooms.Guarantee_Enddate',
             'rooms.date_firstrend',
             'rooms.date_endrend',
+            'rooms.Electric_Contract',
+            'rooms.Meter_Code',
+            'rooms.Transfer_Date',
+            'rooms.Other',
+            'rooms.public',
             'customers.id as cid',
             'customers.Contract_Status',
             'customers.Contract_Startdate',
             'customers.Contract_Enddate',
-            'customers.Cus_Name'
+            'customers.Cus_Name',
+            'customers.Phone as Cus_phone',
+            'customers.Price as Cus_price'
     
         )
         ->from('rooms as rooms')
         ->join('projects', 'rooms.pid', '=', 'projects.pid')
-        // ->leftJoin('customers','rooms.id','=','customers.rid')
-        ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
-            OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
-            $join
-                ->on('rooms.pid', '=', 'customers.pid')
-                ->on('rooms.RoomNo', '=', 'customers.RoomNo')
-                ->on('rooms.id', '=', 'customers.rid');
-            })
+        ->leftJoin('customers','rooms.id','=','customers.rid');
+        // ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+        //     OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+        //     $join
+        //         ->on('rooms.pid', '=', 'customers.pid')
+        //         ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+        //         ->on('rooms.id', '=', 'customers.rid');
+        //     })
             // ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
-            ->where(function ($query) {
-                $query->where('rooms.Trans_Status', '=', '')
-                    ->orWhereNull('rooms.Trans_Status');
-            });
+            // ->where(function ($query) {
+            //     $query->where('rooms.Trans_Status', '=', '')
+            //         ->orWhereNull('rooms.Trans_Status');
+            // });
 
-            $results = Customer::select(
-                    'projects.Project_Name',
-                    'rooms.id',
-                    'rooms.pid',
-                    'rooms.Create_Date',
-                    'rooms.HomeNo',
-                    'rooms.RoomNo',
-                    'rooms.RoomType',
-                    'rooms.rental_status',
-                    'rooms.Size',
-                    'rooms.Owner',
-                    'rooms.Status_Room',
-                    'rooms.Phone',
-                    'rooms.price',
-                    'rooms.Trans_Status',
-                    'rooms.contract_owner',
-                    'rooms.Owner',
-                    'rooms.Guarantee_Startdate',
-                    'rooms.Guarantee_Enddate',
-                    'rooms.date_firstrend',
-                    'rooms.date_endrend',
-                    'customers.id as cid',
-                    'customers.Contract_Status',
-                    'customers.Contract_Startdate',
-                    'customers.Contract_Enddate',
-                    'customers.Cus_Name'
+            // $results = Customer::select(
+            //         'projects.Project_Name',
+            //         'rooms.id',
+            //         'rooms.pid',
+            //         'rooms.Create_Date',
+            //         'rooms.HomeNo',
+            //         'rooms.RoomNo',
+            //         'rooms.RoomType',
+            //         'rooms.rental_status',
+            //         'rooms.Size',
+            //         'rooms.Owner',
+            //         'rooms.Status_Room',
+            //         'rooms.Phone',
+            //         'rooms.price',
+            //         'rooms.Trans_Status',
+            //         'rooms.contract_owner',
+            //         'rooms.Owner',
+            //         'rooms.Guarantee_Startdate',
+            //         'rooms.Guarantee_Enddate',
+            //         'rooms.date_firstrend',
+            //         'rooms.date_endrend',
+            //         'customers.id as cid',
+            //         'customers.Contract_Status',
+            //         'customers.Contract_Startdate',
+            //         'customers.Contract_Enddate',
+            //         'customers.Cus_Name'
             
-                )->from('customers')
-                ->leftJoin('rooms', 'customers.rid', '=', 'rooms.id')
-                ->join('projects','projects.pid', '=', 'projects.pid')
-                ->whereBetween('customers.Contract_Startdate', ['2024-01-01', '2024-05-14']);
+            //     )->from('customers')
+            //     ->leftJoin('rooms', 'customers.rid', '=', 'rooms.id')
+            //     ->join('projects','projects.pid', '=', 'projects.pid')
+            //     ->whereBetween('customers.Contract_Startdate', ['2024-01-01', '2024-05-14']);
 
             // $results = Room::select(
             //     'projects.Project_Name',
@@ -241,51 +249,56 @@ class ContractController extends Controller
             // });
         
 
-        // if ($request->pid != 'all') {
-        //     $rents->where('rooms.pid', $request->pid);
-        // }
+        if ($request->pid != 'all') {
+            $rents->where('rooms.pid', $request->pid);
+        }
         
-        // if ($request->Owner) {
-        //     $rents->where('rooms.Owner', 'LIKE', '%' . $request->Owner . '%');
-        // }
+        if ($request->Owner) {
+            $rents->where('rooms.Owner', 'LIKE', '%' . $request->Owner . '%');
+        }
         
-        // if ($request->RoomNo) {
-        //     $rents->where('rooms.RoomNo', 'LIKE', '%' . $request->RoomNo . '%');
-        // }
+        if ($request->RoomNo) {
+            $rents->where('rooms.RoomNo', 'LIKE', '%' . $request->RoomNo . '%');
+        }
         
-        // if ($request->HomeNo) {
-        //     $rents->where('rooms.HomeNo', 'LIKE', '%' . $request->HomeNo . '%');
-        // }
+        if ($request->HomeNo) {
+            $rents->where('rooms.HomeNo', 'LIKE', '%' . $request->HomeNo . '%');
+        }
         
-        // if ($request->Cusmoter) {
-        //     $rents->where('customers.Cus_Name', 'LIKE', '%' . $request->Customer . '%');
-        // }
+        if ($request->Customer) {
+            $rents->where('customers.Cus_Name', 'LIKE', '%' . $request->Customer . '%');
+        }
 
-        // if ($request->dateselect && $request->startdate) {
-        //     if ($request->dateselect == "Contract_Startdate") {
-        //         if ($request->enddate != null) {
-        //             $results->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->enddate]);
-        //         } else {
-        //             $results->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
-        //         }
-        //     }
-        // }
+        if ($request->dateselect && $request->startdate) {
+            if ($request->dateselect == "Contract_Startdate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
+                }
+            }
+        }
 
-       
+        $rentsCount = $rents->count();
 
 
-        $results = $results
+        $rents = $rents
             ->orderBy('Project_Name', 'asc')
+            ->orderBy('RoomNo', 'asc') 
             ->get();
             // ->toSql();
 
-        dd($results);
+        // dd($rents);
         return view(
             'contract.room_con.room_search',
             compact(
                 'dataLoginUser',
                 'isRole',
                 'projects',
+                'rents',
+                'rentsCount',
+                'startdate',
+                'enddate'
             )
         );
     }
