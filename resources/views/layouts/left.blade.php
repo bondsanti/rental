@@ -51,7 +51,7 @@
                           class="nav-link {{ request()->routeIs('rental') ? 'active' : '' }} {{ request()->routeIs('rental.search') ? 'active' : '' }} {{ request()->routeIs('rental.detail') ? 'active' : '' }}">
                           <i class="nav-icon fas fa-building"></i>
                           <p>
-                              ห้องเช่า
+                              ค้นหาห้องเช่า
                           </p>
                       </a>
                   </li>
