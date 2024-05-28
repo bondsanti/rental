@@ -347,7 +347,7 @@
 
                                                 </a>
                                                 <a href="{{ url('/rental/history/' . $item->id) }}"
-                                                class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
+                                                class="btn bg-gradient-info btn-sm edit-item {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
                                                 <i class="fa fa-address-card"></i>
                                                 </a>
                                                 {{-- @endif --}}

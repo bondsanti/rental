@@ -8,8 +8,10 @@ use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\User;
 use App\Models\Role_user;
 use App\Models\Log;
-use DB;
-use Session;
+// use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+// use Session;
 
 class CustomAuthController extends Controller
 {
@@ -57,6 +59,7 @@ class CustomAuthController extends Controller
                         }
 
                         $request->session()->put('loginId', $user_hr->id);
+                        $request->session()->put('code', $user_hr->code);
 
                         DB::table('vbeyond_report.log_login')->insert([
                             'username' => $user_hr->code,

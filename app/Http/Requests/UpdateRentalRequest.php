@@ -42,6 +42,9 @@ class UpdateRentalRequest extends FormRequest
             'cus_province' => 'required|string',
             'cus_idPost' => 'required',
             'cus_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
+            'Contract_Startdate' => 'required',
+            'Contract_Enddate' => 'required',
+            'Contract' => 'required|numeric|gt:0',
             'start_paid_date' => 'required|date',
         ];
     }
@@ -66,7 +69,10 @@ class UpdateRentalRequest extends FormRequest
             'cus_aumper.required' => 'กรุณากรอกเขต/อำเภอ',
             'cus_province.required' => 'กรุณาเลือกจังหวัด',
             'cus_idPost.required' => 'กรุณากรอกรหัสไปรษณีย์',
-            'cus_phone.required' => 'กรุณากรอกเลขบัตรประชาชนของลูกค้าเช่าซื้อ',
+            'cus_phone.required' => 'กรุณากรอกหมายเลขโทรศัพท์ลูกค้าเช่าซื้อ',
+            'Contract_Startdate.required' => 'กรุณากรอกวันเริ่มสัญญา',
+            'Contract_Enddate.required' => 'กรุณากรอกวันสิ้นสุดสัญญา',
+            'Contract.required' => 'กรุณาระบุจำนวนเดือน',
             'start_paid_date.required' => 'กรุณากรอกวันที่จ่ายงวดแรก',
         ];
     }
@@ -74,18 +80,7 @@ class UpdateRentalRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            // 'numberhome' => 'เลขที่บ้านเจ้าของห้อง',
-            // 'HomeNo' => 'บ้านเลขที่',
-            // 'onwername' => 'เจ้าของบ้าน',
-            // 'cardowner' => 'เลขบัตรประชาชน',
-            // 'owner_district' => 'แขวง/ตำบล',
-            // 'owner_khet' => 'เขต/อำเภอ',
-            // 'owner_province' => 'จังหวัด',
-            // 'RoomNo' => 'เลขที่ห้อง',
             'ownerphone' => 'Contact number',
-            // 'date_print_contract_manual' => 'วันที่ทำสัญญา',
-            // 'Cus_Name' => 'ชื่อลูกค้าเช่าซื้อ',
-            // 'IDCard' => 'เลขบัตรประชาชนของลูกค้าเช่าซื้อ',
             'cus_phone' => 'Telephone number',
         ];
     }

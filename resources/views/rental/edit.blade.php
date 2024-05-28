@@ -10,20 +10,19 @@
         <input type="hidden" name="room_id" value="{{ $item->rid ?? $item->room_id }}">
         <input type="hidden" name="customer_id" value="{{ $item->id }}">
         <input type="hidden" name="project_id" value="{{ $item->pid }}">
+        <input type="hidden" name="chk_satrt" value="{{ $item->Guarantee_Startdate }}">
+        <input type="hidden" name="chk_end" value="{{ $item->Guarantee_Enddate }}">
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-md-6">
-                        {{-- @foreach ($rents as $item) --}}
                         <h1 class="m-0">
                             บ้านเลขที่ {{ $item->HomeNo }} ห้องเลขที่ {{ $item->RoomNo }}
                             <a href="javascript:void(0);" class="btn bg-gradient-primary " type="button"
                                 onclick="goBack();">
                                 <i class="fa-solid fa fa-reply"></i> กลับ </a>
                         </h1>
-                        {{-- @endforeach --}}
                         
-
                     </div><!-- /.col -->
                     <div class="col-md-6 text-right">
                         <div class="form-group">
@@ -62,7 +61,6 @@
                                             <div class="form-group">
                                                 <label>โครงการ</label>
                                                 <select name="project_id" id="project_id" class="form-control">
-                                                    {{-- <option value="ทั้งหมด">ทั้งหมด</option> --}}
                                                     @foreach ($projects as $project)
                                                     <option value="{{  $project->pid  }}"
                                                     {{ $project->pid == $item->project_id ? 'selected' : '' }}
@@ -77,7 +75,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>เลขที่บ้านเจ้าของห้อง</label>
-                                                <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text" value="{{ $item->numberhome ?? '' }}"
+                                                <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text" value="{{ $item->numberhome ?? old('numberhome') ?? '' }}"
                                                     placeholder="ห้องเลขที่">
                                                 @error('numberhome')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -89,7 +87,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>บ้านเลขที่</label>
-                                                <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text" value="{{ $item->HomeNo ?? '' }}"
+                                                <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text" value="{{ $item->HomeNo ?? old('HomeNo') ?? '' }}"
                                                     placeholder="บ้านเลขที่">
                                                 @error('HomeNo')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -100,7 +98,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>เจ้าของห้อง</label>
-                                                <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text" value="{{ $item->Owner ?? '' }}"
+                                                <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text" value="{{ $item->Owner ?? old('onwername') ?? '' }}"
                                                     placeholder="เจ้าของห้อง">
                                                 @error('onwername')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -115,7 +113,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>บัตรประชาชน</label>
-                                                <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text" value="{{ $item->cardowner ?? '' }}"
+                                                <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text" value="{{ $item->cardowner ?? old('cardowner') ?? '' }}"
                                                     placeholder="บัตรประชาชน">
                                                 @error('cardowner')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -165,7 +163,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ซอย</label>
-                                                <input class="form-control" name="owner_soi" type="text" value="{{ $item->owner_soi ?? '' }}"
+                                                <input class="form-control" name="owner_soi" type="text" value="{{ $item->owner_soi ??  old('owner_soi') ?? '' }}"
                                                     placeholder="ซอย">
                                             </div>
                                         </div>
@@ -174,7 +172,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ถนน</label>
-                                                <input class="form-control" name="owner_road" type="text" value="{{ $item->owner_road ?? '' }}"
+                                                <input class="form-control" name="owner_road" type="text" value="{{ $item->owner_road ?? old('owner_road') ?? '' }}"
                                                     placeholder="ถนน">
                                             </div>
                                         </div>
@@ -182,10 +180,22 @@
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>แขวง/ตำบล</label>
-                                                <input class="form-control @error('owner_district') is-invalid @enderror" name="owner_district" type="text" value="{{ $item->owner_district ?? '' }}"
-                                                    placeholder="แขวง/ตำบล">
-                                                @error('owner_district')
+                                                <label for="owner_province">จังหวัด</label>
+                                                {{-- <input class="form-control @error('owner_province') is-invalid @enderror" name="owner_province" type="text" value="{{ $item->owner_province ?? '' }}"
+                                                    placeholder="จังหวัด">
+                                                @error('owner_province')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror --}}
+
+                                                <select name="owner_province" id="owner_province" class="form-control">
+                                                    @foreach ($provinces as $province)
+                                                        <option value="{{ $province->province_id }}"
+                                                            {{ $province->province == $item->owner_province ? 'selected' : '' }}>
+                                                            {{ $province->province }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('owner_province')
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
@@ -196,24 +206,44 @@
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>เขต/อำเภอ</label>
-                                                <input class="form-control @error('owner_khet') is-invalid @enderror" name="owner_khet" type="text" value="{{ $item->owner_khet ?? '' }}"
+                                                <label for="owner_khet">เขต/อำเภอ</label>
+                                                {{-- <input class="form-control @error('owner_khet') is-invalid @enderror" name="owner_khet" type="text" value="{{ $item->owner_khet ?? '' }}"
                                                     placeholder="เขต/อำเภอ">
                                                 @error('owner_khet')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
+                                                @enderror --}}
+
+                                                <select name="owner_khet" id="owner_khet" class="form-control">
+                                                    @foreach ($amphoes as $amphure)
+                                                        <option value="{{ $amphure->amphoe_id }}"
+                                                            {{ $amphure->amphoe == $item->owner_khet ? 'selected' : '' }}>
+                                                            {{ $amphure->amphoe }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
+                                            
                                         </div>
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>จังหวัด</label>
-                                                <input class="form-control @error('owner_province') is-invalid @enderror" name="owner_province" type="text" value="{{ $item->owner_province ?? '' }}"
-                                                    placeholder="จังหวัด">
-                                                @error('owner_province')
+                                                <label for="owner_district">แขวง/ตำบล</label>
+                                                {{-- <input class="form-control @error('owner_district') is-invalid @enderror" name="owner_district" type="text" value="{{ $item->owner_district ?? '' }}"
+                                                    placeholder="แขวง/ตำบล">
+                                                @error('owner_district')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
+                                                @enderror --}}
+
+                                                <select name="owner_district" id="owner_district"class="form-control">
+
+                                                    @foreach ($tambons as $district)
+                                                        <option value="{{ $district->tambon_id }}"
+                                                            {{ $district->tambon == $item->owner_district ? 'selected' : '' }}>
+                                                            {{ $district->tambon }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -221,7 +251,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>เบอร์ติดต่อ</label>
-                                                <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text" value="{{ $item->owner_phone ?? '' }}"
+                                                <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text" value="{{ $item->owner_phone ?? old('ownerphone') ?? '' }}"
                                                     placeholder="เบอร์ติดต่อ">
                                                 @error('ownerphone')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -233,7 +263,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันรับห้อง</label>
-                                                <input class="form-control datepicker" name="transfer_date" id="transfer_date" value="{{ $item->Transfer_Date ?? '' }}"
+                                                <input class="form-control datepicker" name="transfer_date" id="transfer_date" value="{{ $item->Transfer_Date ?? old('transfer_date') ?? '' }}"
                                                     placeholder="วันรับห้อง">
                                             </div>
                                         </div>
@@ -245,7 +275,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>เลขที่ห้อง</label>
-                                                <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->RoomNo ?? '' }}"
+                                                <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->RoomNo ?? old('RoomNo') ?? '' }}"
                                                     placeholder="เลขที่ห้อง">
                                                 @error('RoomNo')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -257,7 +287,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ประเภทห้อง</label>
-                                                <input class="form-control" name="room_type" type="text" value="{{ $item->RoomType ?? '' }}"
+                                                <input class="form-control" name="room_type" type="text" value="{{ $item->RoomType ?? old('room_type') ?? '' }}"
                                                     placeholder="ประเภทห้อง">
                                             </div>
                                         </div>
@@ -266,7 +296,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ขนาดห้อง</label>
-                                                <input class="form-control" name="room_size" type="text" value="{{ $item->Size ?? '' }}"
+                                                <input class="form-control" name="room_size" type="text" value="{{ $item->Size ?? old('room_size') ?? '' }}"
                                                     placeholder="ขนาดห้อง">
                                             </div>
                                         </div>
@@ -275,7 +305,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ทิศ/ฝั่ง</label>
-                                                <input class="form-control" name="Location" type="text" value="{{ $item->Location ?? '' }}"
+                                                <input class="form-control" name="Location" type="text" value="{{ $item->Location ?? old('Location') ?? '' }}"
                                                     placeholder="ทิศ/ฝั่ง">
                                             </div>
                                         </div>
@@ -287,7 +317,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>อาคาร</label>
-                                                <input class="form-control" name="Building" type="text" value="{{ $item->Building ?? '' }}"
+                                                <input class="form-control" name="Building" type="text" value="{{ $item->Building ?? old('Building') ?? '' }}"
                                                     placeholder="อาคาร">
                                             </div>
                                         </div>
@@ -296,7 +326,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ชั้น</label>
-                                                <input class="form-control" name="Floor" type="text" value="{{ $item->Floor ?? '' }}"
+                                                <input class="form-control" name="Floor" type="text" value="{{ $item->Floor ?? old('Floor') ?? '' }}"
                                                     placeholder="ชั้น">
                                             </div>
                                         </div>
@@ -305,7 +335,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ หน้า</label>
-                                                <input class="form-control" name="room_key_front" type="text" value="{{ $item->Key_front ?? '' }}"
+                                                <input class="form-control" name="room_key_front" type="text" value="{{ $item->Key_front ?? old('room_key_front') ?? '' }}"
                                                     placeholder="กุญแจ หน้า">
                                             </div>
                                         </div>
@@ -314,7 +344,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ นอน</label>
-                                                <input class="form-control" name="room_key_bed" type="text" value="{{ $item->Key_bed ?? '' }}"
+                                                <input class="form-control" name="room_key_bed" type="text" value="{{ $item->Key_bed ?? old('room_key_bed') ?? '' }}"
                                                     placeholder="กุญแจ นอน">
                                             </div>
                                         </div>
@@ -326,7 +356,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ ระเบียง</label>
-                                                <input class="form-control" name="room_key_balcony" type="text" value="{{ $item->Key_balcony ?? '' }}"
+                                                <input class="form-control" name="room_key_balcony" type="text" value="{{ $item->Key_balcony ?? old('room_key_balcony') ?? '' }}"
                                                     placeholder="กุญแจ ระเบียง">
                                             </div>
                                         </div>
@@ -335,7 +365,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ Mail Box</label>
-                                                <input class="form-control" name="room_key_mailbox" type="text" value="{{ $item->Key_mailbox }}"
+                                                <input class="form-control" name="room_key_mailbox" type="text" value="{{ $item->Key_mailbox ?? old('room_key_mailbox') ?? '' }}"
                                                     placeholder="กุญแจ Mail Box">
                                             </div>
                                         </div>
@@ -344,7 +374,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด</label>
-                                                <input class="form-control" name="room_card" type="text" value="{{ $item->KeyCard ?? '' }}"
+                                                <input class="form-control" name="room_card" type="text" value="{{ $item->KeyCard ?? old('room_card') ?? '' }}"
                                                     placeholder="คีย์การ์ด">
                                             </div>
                                         </div>
@@ -353,7 +383,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด P</label>
-                                                <input class="form-control" name="room_card_p" type="text" value="{{ $item->KeyCard_P ?? '' }}"
+                                                <input class="form-control" name="room_card_p" type="text" value="{{ $item->KeyCard_P ?? old('room_card_p') ?? '' }}"
                                                     placeholder="คีย์การ์ด P">
                                             </div>
                                         </div>
@@ -365,7 +395,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด B</label>
-                                                <input class="form-control" name="room_card_b" type="text" value="{{ $item->KeyCard_B ?? '' }}"
+                                                <input class="form-control" name="room_card_b" type="text" value="{{ $item->KeyCard_B ?? old('room_card_b') ?? '' }}"
                                                     placeholder="คีย์การ์ด B">
                                             </div>
                                         </div>
@@ -374,7 +404,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด C</label>
-                                                <input class="form-control" name="room_card_c" type="text" value="{{ $item->KeyCard_C ?? ''}}"
+                                                <input class="form-control" name="room_card_c" type="text" value="{{ $item->KeyCard_C ?? old('room_card_c') ?? ''}}"
                                                     placeholder="คีย์การ์ด C">
                                             </div>
                                         </div>
@@ -383,7 +413,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ระยะเริ่มการันตี</label>
-                                                <input class="form-control datepicker" name="gauranteestart" id="gauranteestart" value="{{ $item->Guarantee_Startdate ?? '' }}"
+                                                <input class="form-control datepicker" name="gauranteestart" id="gauranteestart" value="{{ $item->Guarantee_Startdate ?? old('gauranteestart') ?? '' }}"
                                                     placeholder="ระยะเริ่มการันตี">
                                             </div>
                                         </div>
@@ -392,7 +422,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ระยะสิ้นสุดการันตี</label>
-                                                <input class="form-control datepicker" name="gauranteeend" id="gauranteeend" value="{{ $item->Guarantee_Enddate ?? '' }}"
+                                                <input class="form-control datepicker" name="gauranteeend" id="gauranteeend" value="{{ $item->Guarantee_Enddate ?? old('gauranteeend') ?? '' }}"
                                                     placeholder="ระยะสิ้นสุดการันตี">
                                             </div>
                                         </div>
@@ -404,7 +434,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันที่ฝากเช่า</label>
-                                                <input class="form-control datepicker" name="date_firstrend" id="date_firstrend"  type="text" value="{{ $item->date_firstrend ?? '' }}"
+                                                <input class="form-control datepicker" name="date_firstrend" id="date_firstrend"  type="text" value="{{ $item->date_firstrend ?? old('date_firstrend') ?? '' }}"
                                                     placeholder="วันที่ฝากเช่า">
                                             </div>
                                         </div>
@@ -413,7 +443,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันที่สิ้นสุดฝากเช่า</label>
-                                                <input class="form-control datepicker" name="date_endrend" id="date_endrend" type="text" value="{{ $item->date_endrend ?? ''}}"
+                                                <input class="form-control datepicker" name="date_endrend" id="date_endrend" type="text" value="{{ $item->date_endrend ?? old('date_endrend') ?? '' }}"
                                                     placeholder="วันที่สิ้นสุดฝากเช่า">
                                             </div>
                                         </div>
@@ -422,7 +452,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>จำนวนเงินการันตี</label>
-                                                <input class="form-control" name="gauranteeamount" type="text" value="{{ $item->Guarantee_Amount ?? '' }}"
+                                                <input class="form-control" name="gauranteeamount" type="text" value="{{ $item->Guarantee_Amount ?? old('gauranteeamount') ?? '' }}"
                                                     placeholder="จำนวนเงินการันตี">
                                             </div>
                                         </div>
@@ -431,8 +461,20 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>สถานะห้อง</label>
-                                                <input class="form-control" name="Status_Room" type="text" value="{{ $item->Status_Room ?? '' }}"
-                                                    placeholder="สถานะห้อง"> 
+                                                {{-- <input class="form-control" name="Status_Room" type="text" value="{{ $item->Status_Room ?? '' }}"
+                                                    placeholder="สถานะห้อง">  --}}
+                                                <select class="form-control" name="Status_Room">
+                                                    <option value="">-- เลือก --</option>
+                                                    <option value="รอตรวจ" {{ $item->Status_Room == 'รอตรวจ' ? 'selected' : '' }} {{ old('Status_Room') == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
+                                                    <option value="รอเฟอร์" {{ $item->Status_Room == 'รอเฟอร์' ? 'selected' : '' }} {{ old('Status_Room') == 'รอเฟอร์' ? 'selected' : '' }}>รอเฟอร์</option>
+                                                    <option value="รอคลีน" {{ $item->Status_Room == 'รอคลีน' ? 'selected' : '' }} {{ old('Status_Room') == 'รอคลีน' ? 'selected' : '' }}>รอคลีน</option>
+                                                    <option value="พร้อมอยู่" {{ $item->Status_Room == 'พร้อมอยู่' ? 'selected' : '' }} {{ old('Status_Room') == 'พร้อมอยู่' ? 'selected' : '' }}>พร้อมอยู่</option>
+                                                    <option value="อยู่แล้ว" {{ $item->Status_Room == 'อยู่แล้ว' ? 'selected' : '' }} {{ old('Status_Room') == 'อยู่แล้ว' ? 'selected' : '' }}>อยู่แล้ว</option>
+                                                    <option value="ห้องออฟฟิต" {{ $item->Status_Room == 'ห้องออฟฟิต' ? 'selected' : '' }} {{ old('Status_Room') == 'ห้องออฟฟิต' ? 'selected' : '' }}>ห้องออฟฟิต</option>
+                                                    <option value="ห้องตัวอย่าง" {{ $item->Status_Room == 'ห้องตัวอย่าง' ? 'selected' : '' }} {{ old('Status_Room') == 'ห้องตัวอย่าง' ? 'selected' : '' }}>ห้องตัวอย่าง</option>
+                                                    <option value="จอง" {{ $item->Status_Room == 'จอง' ? 'selected' : '' }}>จอง</option>
+                                                    <option value="สวัสดิการ" {{ $item->Status_Room == 'สวัสดิการ' ? 'selected' : '' }}>สวัสดิการ</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -443,7 +485,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันที่รับค่าเช่างวดแรก</label>
-                                                <input class="form-control datepicker" name="date_firstget" id="date_firstget" value="{{ $item->date_firstget ?? '' }}"
+                                                <input class="form-control datepicker" name="date_firstget" id="date_firstget" value="{{ $item->date_firstget ?? old('date_firstget') ?? '' }}"
                                                     placeholder="วันที่รับค่าเช่างวดแรก">
                                             </div>
                                         </div>
@@ -452,7 +494,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="text-danger">วันที่ *<u>ทำสัญญา</u></label>
-                                                <input class="form-control datepicker @error('date_print_contract_manual') is-invalid @enderror" name="date_print_contract_manual" id="date_print_contract_manual" value="{{ $item->date_print_contract_manual ?? ''}}"
+                                                <input class="form-control datepicker @error('date_print_contract_manual') is-invalid @enderror" name="date_print_contract_manual" id="date_print_contract_manual" value="{{ $item->date_print_contract_manual ?? old('date_print_contract_manual') ?? '' }}"
                                                     placeholder="วันที่ ทำสัญญา">
                                                 @error('date_print_contract_manual')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -464,7 +506,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>บัญชีแสดงสัญญา</label>
-                                                <input class="form-control" name="Electric_Contract" type="text" value="{{ $item->Electric_Contract ?? '' }}"
+                                                <input class="form-control" name="Electric_Contract" type="text" value="{{ $item->Electric_Contract ?? old('Electric_Contract') ?? '' }}"
                                                     placeholder="บัญชีแสดงสัญญา">
                                             </div>
                                         </div>
@@ -473,7 +515,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>รหัสเครื่องวัดฯ</label>
-                                                <input class="form-control" name="Meter_Code" type="text" value="{{ $item->Meter_Code ?? '' }}"
+                                                <input class="form-control" name="Meter_Code" type="text" value="{{ $item->Meter_Code ?? old('Meter_Code') ?? '' }}"
                                                     placeholder="รหัสเครื่องวัดฯ">
                                             </div>
                                         </div>
@@ -493,23 +535,15 @@
                                                     <option value="ฝากเช่า" {{ $item->rental_status == 'ฝากเช่า' ? 'selected' : '' }}>ฝากเช่า</option>
                                                     <option value="ติดต่อเจ้าของห้องไม่ได้" {{ $item->rental_status == 'ติดต่อเจ้าของห้องไม่ได้' ? 'selected' : '' }}>ติดต่อเจ้าของห้องไม่ได้</option>
                                                 </select>
-                                                {{-- <input class="form-control" name="rental_status" type="text" value="{{ $item->rental_status ?? '' }}"
-                                                    placeholder="ประเภทห้องเช่า"> --}}
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
-                                            {{-- <div class="form-group">
-                                                <label>ราคาค่าเช่า</label>
-                                                <div><input name="room_price" type="text" value="{{ $item->price ?? ''}}"
-                                                    placeholder="ราคาค่าเช่า"><input name="show_price" type="checkbox" value="1"
-                                                ></div>
-                                            </div> --}}
                                             <div class="form-group">
                                                 <label>ราคาค่าเช่า</label>
                                                 <div class="input-group mb-3">
-                                                    <input type="text" class="form-control" name="room_price" value="{{ $item->price ?? ''}}">
+                                                    <input type="text" class="form-control" name="room_price" value="{{ $item->price ?? old('room_price') ?? '' }}">
                                                     <div class="input-group-prepend">
                                                         <div class="input-group-text">
                                                         <input type="checkbox" name="show_price" value="{{ $item->public ?? 0}}" {{ $item->public == 1 ? 'checked' : ''}}>
@@ -553,30 +587,30 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Bed" type="number" value="{{ $item->Bed }}"> เตียง
+                                            <input style="width: 15%" style="display: inline" name="room_Bed" type="number" value="{{ $item->Bed ?? old('room_Bed') ?? '' }}"> เตียง
                                         </p>
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Beding" type="number" value="{{ $item->Beding }}"> เครื่องนอน
-                                        </p>
-                                    </div>
-
-                                    <div class="col-sm-2">
-                                        <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Bedroom_Curtain" type="number" value="{{ $item->Bedroom_Curtain }}"> ม่านห้องนอน
+                                            <input style="width: 15%" style="display: inline" name="room_Beding" type="number" value="{{ $item->Beding ?? old('room_Beding') ?? '' }}"> เครื่องนอน
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Livingroom_Curtain" type="number" value="{{ $item->Livingroom_Curtain }}"> ม่านห้องรับแขก
+                                            <input style="width: 15%" style="display: inline" name="room_Bedroom_Curtain" type="number" value="{{ $item->Bedroom_Curtain ?? old('room_Bedroom_Curtain') ?? '' }}"> ม่านห้องนอน
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Wardrobe" type="number" value="{{ $item->Wardrobe }}"> ตู้เสื้อผ้า
+                                            <input style="width: 15%" style="display: inline" name="room_Livingroom_Curtain" type="number" value="{{ $item->Livingroom_Curtain ?? old('room_Livingroom_Curtain') ?? '' }}"> ม่านห้องรับแขก
+                                        </p>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <p class="form-group">
+                                            <input style="width: 15%" style="display: inline" name="room_Wardrobe" type="number" value="{{ $item->Wardrobe ?? old('room_Wardrobe') ?? '' }}"> ตู้เสื้อผ้า
                                         </p>
                                     </div>
                                     
@@ -586,30 +620,30 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Sofa" type="number" value="{{ $item->Sofa }}"> โซฟา
+                                            <input style="width: 15%" style="display: inline" name="room_Sofa" type="number" value="{{ $item->Sofa ?? old('room_Sofa') ?? '' }}"> โซฟา
                                         </p>
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_TV_Table" type="number" value="{{ $item->TV_Table }}"> โต๊ะวางโทรทัศน์
-                                        </p>
-                                    </div>
-
-                                    <div class="col-sm-2">
-                                        <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Dining_Table" type="number" value="{{ $item->Dining_Table }}"> โต๊ะกินข้าว
+                                            <input style="width: 15%" style="display: inline" name="room_TV_Table" type="number" value="{{ $item->TV_Table ?? old('room_TV_Table') ?? '' }}"> โต๊ะวางโทรทัศน์
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Center_Table" type="number" value="{{ $item->Center_Table }}"> โต๊ะกลาง
+                                            <input style="width: 15%" style="display: inline" name="room_Dining_Table" type="number" value="{{ $item->Dining_Table ?? old('room_Dining_Table') ?? '' }}"> โต๊ะกินข้าว
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Chair" type="number" value="{{ $item->Chair }}"> เก้าอี้
+                                            <input style="width: 15%" style="display: inline" name="room_Center_Table" type="number" value="{{ $item->Center_Table ?? old('room_Center_Table') ?? '' }}"> โต๊ะกลาง
+                                        </p>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <p class="form-group">
+                                            <input style="width: 15%" style="display: inline" name="room_Chair" type="number" value="{{ $item->Chair ?? old('room_Chair') ?? '' }}"> เก้าอี้
                                         </p>
                                     </div>
                                 </div>
@@ -619,30 +653,30 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Bedroom_Air" type="number" value="{{ $item->Bedroom_Air }}"> แอร์ห้องนอน
+                                            <input style="width: 15%" style="display: inline" name="room_Bedroom_Air" type="number" value="{{ $item->Bedroom_Air ?? old('room_Bedroom_Air') ?? '' }}"> แอร์ห้องนอน
                                         </p>
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Livingroom_Air" type="number" value="{{ $item->Livingroom_Air }}"> แอร์ห้องรับแขก
-                                        </p>
-                                    </div>
-
-                                    <div class="col-sm-2">
-                                        <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Water_Heater" type="number" value="{{ $item->Water_Heater }}"> เครื่องทำน้ำอุ่น
+                                            <input style="width: 15%" style="display: inline" name="room_Livingroom_Air" type="number" value="{{ $item->Livingroom_Air ?? old('room_Livingroom_Air') ?? '' }}"> แอร์ห้องรับแขก
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_TV" type="number" value="{{ $item->TV }}"> ทีวี
+                                            <input style="width: 15%" style="display: inline" name="room_Water_Heater" type="number" value="{{ $item->Water_Heater ?? old('room_Water_Heater') ?? '' }}"> เครื่องทำน้ำอุ่น
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_Refrigerator" type="number" value="{{ $item->Refrigerator }}"> ตู้เย็น
+                                            <input style="width: 15%" style="display: inline" name="room_TV" type="number" value="{{ $item->TV ?? old('room_TV') ?? '' }}"> ทีวี
+                                        </p>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <p class="form-group">
+                                            <input style="width: 15%" style="display: inline" name="room_Refrigerator" type="number" value="{{ $item->Refrigerator ?? old('room_Refrigerator') ?? '' }}"> ตู้เย็น
                                         </p>
                                     </div>
                                     
@@ -653,31 +687,22 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_microwave" type="number" value="{{ $item->wash_machine }}"> ไมโครเวฟ
+                                            <input style="width: 15%" style="display: inline" name="room_microwave" type="number" value="{{ $item->wash_machine ?? old('room_microwave') ?? '' }}"> ไมโครเวฟ
                                         </p>
                                     </div>
                                     <div class="col-sm-2">
                                         <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="room_wash_machine" type="number" value="{{ $item->wash_machine }}"> เครื่องซักผ้า
+                                            <input style="width: 15%" style="display: inline" name="room_wash_machine" type="number" value="{{ $item->wash_machine ?? old('room_wash_machine') ?? '' }}"> เครื่องซักผ้า
                                         </p>
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> เครื่องทำน้ำอุ่น
-                                        </p> --}}
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ทีวี
-                                        </p> --}}
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ตู้เย็น
-                                        </p> --}}
                                     </div>
                                     
                                 </div>
@@ -686,30 +711,18 @@
                                         <p>หมายเหตุ</p>
                                     </div>
                                     <div class="col-sm-2">
-                                        <textarea name="Other" id="" cols="33" rows="3">{{ $item->Other }}</textarea>
+                                        <textarea name="Other" id="" cols="33" rows="3">{{ $item->Other ?? old('Other') ?? '' }}</textarea>
                                     </div>
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number" value="{{ $item->Sofa }}"> เครื่องซักผ้า
-                                        </p> --}}
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> เครื่องทำน้ำอุ่น
-                                        </p> --}}
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ทีวี
-                                        </p> --}}
                                     </div>
 
                                     <div class="col-sm-2">
-                                        {{-- <p class="form-group">
-                                            <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ตู้เย็น
-                                        </p> --}}
                                     </div>
                                     
                                 </div>
@@ -790,18 +803,10 @@
                                     <div class="col-sm-1"></div>
 
                                     <div class="col-sm-2">
-                                        {{-- <div class="form-group">
-                                            <label><font color="red">เลขที่สัญญา *<u>ผู้เช่า</u></font></label>
-                                            <p class="form-control">{{ $item->contract_cus }}</p>
-                                        </div> --}}
                                     </div>
                                     <div class="col-sm-1"></div>
 
                                     <div class="col-sm-2">
-                                        {{-- <div class="form-group">
-                                            <label><font color="red">เลขที่สัญญา *<u>ประกันทรัพย์สิน</u></font></label>
-                                                <p class="form-control">{{ $item->contract_insurance_number }}</p>
-                                        </div> --}}
                                     </div>
                                     <div class="col-sm-1"></div>
                                     
@@ -848,22 +853,43 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label>แขวง/ตำบล</label>
-                                            <input class="form-control @error('cus_tumbon') is-invalid @enderror" name="cus_tumbon" type="text" value="{{ $item->tumbon ?? '' }}"
-                                                placeholder="แขวง/ตำบล">
-                                            @error('cus_tumbon')
+                                            <label for="cus_province">จังหวัด</label>
+                                            {{-- <input class="form-control @error('cus_province') is-invalid @enderror" name="cus_province" type="text" value="{{ $item->province ?? '' }}"
+                                                placeholder="จังหวัด">
+                                            @error('cus_province')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror --}}
+
+                                            <select name="cus_province" id="cus_province" class="form-control">
+                                                @foreach ($provinces as $province)
+                                                    <option value="{{ $province->province_id }}"
+                                                        {{ $province->province == $item->province ? 'selected' : '' }}>
+                                                        {{ $province->province }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('cus_province')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
+                                       
                                     </div>
                                     <div class="col-sm-1"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label>เขต/อำเภอ</label>
-                                            <input class="form-control @error('cus_aumper') is-invalid @enderror" name="cus_aumper" type="text" value="{{ $item->cus_tumbon ?? '' }}"
-                                                placeholder="เขต/อำเภอ">
+                                            <label for="cus_aumper">เขต/อำเภอ</label>
+                                            {{-- <input class="form-control @error('cus_aumper') is-invalid @enderror" name="cus_aumper" type="text" value="{{ $item->cus_tumbon ?? '' }}"
+                                                placeholder="เขต/อำเภอ"> --}}
+                                            <select name="cus_aumper" id="cus_aumper" class="form-control">
+                                                @foreach ($amphoes as $amphure)
+                                                    <option value="{{ $amphure->amphoe_id }}"
+                                                        {{ $amphure->amphoe == $item->aumper ? 'selected' : '' }}>
+                                                        {{ $amphure->amphoe }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                             @error('cus_aumper')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
@@ -872,11 +898,21 @@
                                     <div class="col-sm-1"></div>
 
                                     <div class="col-sm-2">
+                                        {{--  --}}
                                         <div class="form-group">
-                                            <label>จังหวัด</label>
-                                            <input class="form-control @error('cus_province') is-invalid @enderror" name="cus_province" type="text" value="{{ $item->province ?? '' }}"
-                                                placeholder="จังหวัด">
-                                            @error('cus_province')
+                                            <label for="cus_tumbon">แขวง/ตำบล</label>
+                                            {{-- <input class="form-control @error('cus_tumbon') is-invalid @enderror" name="cus_tumbon" type="text" value="{{ $item->tumbon ?? '' }}"
+                                                placeholder="แขวง/ตำบล"> --}}
+
+                                            <select name="cus_tumbon" id="cus_tumbon" class="form-control">
+                                                @foreach ($amphoes as $amphure)
+                                                    <option value="{{ $amphure->amphoe_id }}"
+                                                        {{ $amphure->amphoe == $item->tumbon ? 'selected' : '' }}>
+                                                        {{ $amphure->amphoe }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('cus_tumbon')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -885,8 +921,8 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label>รหัสไปรษณีย์</label>
-                                            <input class="form-control @error('cus_idPost') is-invalid @enderror" name="cus_idPost" type="text" value="{{ $item->id_post ?? ''}}"
+                                            <label for="cus_idPost">รหัสไปรษณีย์</label>
+                                            <input class="form-control @error('cus_idPost') is-invalid @enderror" name="cus_idPost" id="cus_idPost" type="text" value="{{ $item->id_post ?? ''}}"
                                                 placeholder="รหัสไปรษณีย์">
                                             @error('cus_idPost')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -921,8 +957,11 @@
                                             placeholder="วันเริ่มสัญญา">
                                                 </div>
                                             @else
-                                                <input class="form-control datepicker" name="Contract_Startdate" type="text" value=""
+                                                <input class="form-control datepicker @error('Contract_Startdate') is-invalid @enderror" name="Contract_Startdate" type="text" value=""
                                             placeholder="วันเริ่มสัญญา">
+                                                @error('Contract_Startdate')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
                                             @endif
                                             {{-- <p class="form-control text-danger {{ $item->Contract_Startdate ? '' : 'datepicker' }}" name="Contract_Startdate" {{ $item->Contract_Startdate ? 'readonly' : '' }}> {{ $item->Contract_Startdate ?? '' }} </p> --}}
                                         </div>
@@ -942,8 +981,11 @@
                                             placeholder="วันสิ้นสุดสัญญา">
                                                 </div>
                                             @else
-                                                <input class="form-control datepicker" name="Contract_Enddate" type="text" value=""
+                                                <input class="form-control datepicker @error('Contract_Enddate') is-invalid @enderror" name="Contract_Enddate" type="text" value=""
                                             placeholder="วันสิ้นสุดสัญญา">
+                                                @error('Contract_Enddate')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
                                             @endif
                                             {{-- <p class="form-control text-danger {{ $item->Contract_Enddate ? '' : 'datepicker' }}" name="Contract_Enddate" {{ $item->Contract_Enddate ? 'readonly' : '' }}>{{ $item->Contract_Enddate ?? '' }}</p> --}}
                                         </div>
@@ -963,7 +1005,10 @@
                                             </div>
                                                 
                                             @else
-                                                <p class="form-control"><input name="Contract" type="number" value="" style="width: 25%"> เดือน <input name="Day" type="number" value="" style="width:25%; margin-left:15px;"> วัน </p>
+                                                <p class="form-control @error('Contract') is-invalid @enderror"><input name="Contract" type="number" value="" style="width: 25%"> เดือน <input name="Day" type="number" value="" style="width:25%; margin-left:15px;"> วัน </p>
+                                                @error('Contract')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
                                             @endif
                                         </div>
                                     </div>
@@ -1215,5 +1260,129 @@
     function goBack() {
         window.history.back();
     }
+
+    function showAmphoes() {
+            let input_province = document.querySelector("#owner_province");                    
+            let url = "{{ url('../api/rental/amphoes') }}?province_id=" + input_province.value;
+            // console.log(url);
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    let input_amphoe = document.querySelector("#owner_khet");
+                    input_amphoe.innerHTML = '<option value="">กรุณาเลือกเขต/อำเภอ</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.amphoe;
+                    option.value = item.amphoe_id;
+                    input_amphoe.appendChild(option);
+                }
+                showTambons();
+            });
+    }
+
+    function showTambons() {
+        let input_province = document.querySelector("#owner_province");
+        let input_amphoe = document.querySelector("#owner_khet");
+        let url = "{{ url('../api/rental/tambons') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
+                .value;
+        console.log(url);
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                let input_tambon = document.querySelector("#owner_district");
+                input_tambon.innerHTML = '<option value="">กรุณาเลือกแขวง/ตำบล</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.tambon;
+                    option.value = item.tambon_id;
+                    input_tambon.appendChild(option);
+                }
+                // showZipcode(); // เรียกใช้ showZipcode เมื่อมีการเลือกอำเภอและตำบลใหม่
+            });
+    }
+
+    function cusAmphoes() {
+            let input_province = document.querySelector("#cus_province");                    
+            let url = "{{ url('../api/rental/amphoes') }}?province_id=" + input_province.value;
+            // console.log(url);
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    let input_amphoe = document.querySelector("#cus_aumper");
+                    input_amphoe.innerHTML = '<option value="">กรุณาเลือกเขต/อำเภอ</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.amphoe;
+                    option.value = item.amphoe_id;
+                    input_amphoe.appendChild(option);
+                }
+                cusTambons();
+            });
+    }
+
+    function cusTambons() {
+        let input_province = document.querySelector("#cus_province");
+        let input_amphoe = document.querySelector("#cus_aumper");
+        let url = "{{ url('../api/rental/tambons') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
+                .value;
+        console.log(url);
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                let input_tambon = document.querySelector("#cus_tumbon");
+                input_tambon.innerHTML = '<option value="">กรุณาเลือกแขวง/ตำบล</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.tambon;
+                    option.value = item.tambon_id;
+                    input_tambon.appendChild(option);
+                }
+                showZipcode(); // เรียกใช้ showZipcode เมื่อมีการเลือกอำเภอและตำบลใหม่
+            });
+    }
+
+    function showZipcode() {
+        let input_zipcode = document.querySelector("#cus_idPost");
+        input_zipcode.value = '';
+        let input_province = document.querySelector("#cus_province");
+        let input_amphoe = document.querySelector("#cus_aumper");
+        let input_tambon = document.querySelector("#cus_tumbon");
+        let url = "{{ url('../api/rental/zipcodes') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
+            .value + "&tambon_id=" + input_tambon.value;
+        console.log(url);
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                // let input_zipcode = document.querySelector("#cus_idPost");
+                input_zipcode.value = result[0].zipcode; // แสดง zipcode ที่ได้รับจาก API
+            });
+    }
+
+    // EVENTS RENT ROOM
+    document.querySelector('#owner_province').addEventListener('change', (event) => {
+        showAmphoes();
+    }); 
+    document.querySelector('#owner_khet').addEventListener('change', (event) => {
+        showTambons();
+    });
+    document.querySelector('#owner_district').addEventListener('change', (event) => {
+        showZipcode();
+    });
+
+    // EVENTS CUSTOMER
+    document.querySelector('#cus_province').addEventListener('change', (event) => {
+        cusAmphoes();
+    }); 
+    document.querySelector('#cus_aumper').addEventListener('change', (event) => {
+        cusTambons();
+    });
+    document.querySelector('#cus_tumbon').addEventListener('change', (event) => {
+        showZipcode();
+    });
 </script>
 @endpush

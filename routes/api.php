@@ -28,5 +28,9 @@ Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rent
 
 Route::get('/rental/rent/preapprove/{id}',[RentalController::class,'preapprove'])->name('rental.rent.preapprove');
 Route::post('/rental/rent/approve/{id}/{status}/{index}',[RentalController::class,'approve'])->name('rental.rent.approve');
+Route::get('/rental/provinces',[RentalController::class,'getProvinces'])->name('rental.provinces');
+Route::get('/rental/amphoes',[RentalController::class,'getAmphoes'])->name('rental.amphoes');
+Route::get('/rental/tambons',[RentalController::class,'getTambons'])->name('rental.tambons');
+Route::get('/rental/zipcodes',[RentalController::class,'getZipcodes'])->name('rental.zipcodes');
 
 Route::post('/report/guarantee/updateBank/{pid}/{bankId}/{bankName}',[ReportGuaranteeController::class,'updateBank'])->name('report.guarantee.updateBank');

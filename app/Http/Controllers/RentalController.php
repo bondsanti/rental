@@ -6,15 +6,19 @@ use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Customer;
 use App\Models\Lease_auto_code;
 use App\Models\Lease_code;
+use App\Models\Log_Customer;
+use App\Models\Log_Rental;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\Quarantee;
 use App\Models\Rental;
 use App\Models\Rental_Room_Images;
+use App\Models\ReportInOut;
 use App\Models\Role_user;
 use App\Models\Room;
 use App\Models\Room_Images;
+use App\Models\Tambon;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -314,11 +318,12 @@ class RentalController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        // dd($images);
-        // $rental_room = Rental::where('id', $id)->first();
+        $provinces = Tambon::select('province', 'province_id')->distinct()->get();
+        $amphoes = Tambon::select('amphoe', 'amphoe_id')->distinct()->get();
+        $tambons = Tambon::select('tambon', 'tambon_id')->distinct()->get();
+
         $rents = Room::select(
             'projects.*',
-            // 'projects.pid as pids',
             'rooms.*',
             'rooms.id as room_id',
             'rooms.pid as project_id',
@@ -327,8 +332,6 @@ class RentalController extends Controller
             'customers.*'
         )
             ->join('projects', 'projects.pid', '=', 'rooms.pid')
-            // ->join('rooms', 'rooms.pid', '=', 'projects.pid')
-            // ->join('customers', 'rooms.pid', '=', 'customers.pid')
             ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
             OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
                 $join->on('rooms.pid', '=', 'customers.pid')
@@ -336,33 +339,36 @@ class RentalController extends Controller
                     ->on('rooms.id', '=', 'customers.rid');
             })
             ->where('rooms.id', $id)
-            // ->where('rental_customer.rid',$id)
-            // ->where('project.pid',$rental_room->pid)
             ->get();
 
         foreach ($rents as $item) {
             $ref_cus_id = $item->customer_id;
         }
-        // $ref_cus_id = $ref_cus_id ?? NULL;
-
-        // dd($rents);
 
         $lease_auto_code = Lease_auto_code::where('ref_cus_id', $ref_cus_id)
             ->first();
 
-        // dd($lease_auto_code);
-
-        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images'));
+        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons'));
     }
 
     public function update(UpdateRentalRequest $request)
     {
-        // $reNewContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
-        // dd($payment);
+        
         $request->validated();
-       
-        // dd($request->room_id);
+        // dd($request->all());
         $rental_room = Room::where('id', $request->room_id)->first();
+
+        if($request->owner_province && $request->owner_khet && $request->owner_district){
+            $owner_province = Tambon::select('province')->distinct()->where('province_id',$request->owner_province)->first();
+            $owner_khet = Tambon::select('amphoe')->distinct()->where('amphoe_id',$request->owner_khet)->first();
+            $owner_district = Tambon::select('tambon')->distinct()->where('tambon_id',$request->owner_district)->first();
+        }
+        if ($request->cus_province && $request->cus_aumper && $request->cus_tumbon) {
+            $cus_province = Tambon::select('province')->distinct()->where('province_id',$request->cus_province)->first();
+            $cus_aumper = Tambon::select('amphoe')->distinct()->where('amphoe_id',$request->cus_aumper)->first();
+            $cus_tumbon = Tambon::select('tambon')->distinct()->where('tambon_id',$request->cus_tumbon)->first();
+        }
+
         // อัปโหลดไฟล์บัตรประชาชน
         if ($request->hasFile('filUploadPersonID')) {
             $file = $request->file('filUploadPersonID');
@@ -373,11 +379,10 @@ class RentalController extends Controller
         }
         // อัปโหลดไฟล์สัญญา
         if ($request->hasFile('filUploadContract')) {
-            // dd($request->file('filUploadPersonID'));
             $file = $request->file('filUploadContract');
             $extension = $file->getClientOriginalExtension();
             $filename = 'Idrent' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-            $file->move('uploads/image_id/', $filename);
+            $file->move('uploads/image_rent/', $filename);
             $rental_room->file_rent = $filename;
         }
         // รูปภาพปก
@@ -394,8 +399,20 @@ class RentalController extends Controller
             $rental_room->public = 0;
         }
 
-        // dd($request->project_id);
-        // dd($rental_room);
+        // หาจำนวนวัน
+        if ($request->Contract_Startdate && $request->Contract_Enddate) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Startdate);
+            $endDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Enddate);
+
+            $totalMonths = $startDate->diffInMonths($endDate) + 1;
+            $days = $startDate->diffInDays($endDate);
+            if($days > 365){
+                $totalDays = $days - 365;
+            }else{
+                $totalDays = 0;
+            }
+        }
+
         $rental_room->pid = $request->project_id ?? NULL;
         // $rental_room->numebrhome = $request->room_address ?? NULL;
         $rental_room->numberhome = $request->numberhome ?? NULL;
@@ -404,9 +421,9 @@ class RentalController extends Controller
         $rental_room->cardowner = $request->cardowner ?? NULL;
         $rental_room->owner_soi = $request->owner_soi ?? NULL;
         $rental_room->owner_road = $request->owner_road ?? NULL;
-        $rental_room->owner_district = $request->owner_district ?? NULL;
-        $rental_room->owner_khet = $request->owner_khet ?? NULL;
-        $rental_room->owner_province = $request->owner_province ?? NULL;
+        $rental_room->owner_district = $owner_district ?? NULL;
+        $rental_room->owner_khet = $owner_khet ?? NULL;
+        $rental_room->owner_province = $owner_province ?? NULL;
         $rental_room->Phone = $request->ownerphone ?? NULL;
         $rental_room->Transfer_Date = $request->transfer_date ?? NULL;
         $rental_room->RoomNo = $request->RoomNo ?? NULL;
@@ -436,7 +453,7 @@ class RentalController extends Controller
         $rental_room->rental_status = $request->rental_status ?? NULL;
         $rental_room->price = $request->room_price ?? NULL;
         $rental_room->Bed = $request->room_Bed ?? NULL;
-        $rental_room->Beding = $request->room_Curtain ?? NULL;
+        $rental_room->Beding = $request->room_Beding ?? NULL;
         $rental_room->Bedroom_Curtain = $request->room_Bedroom_Curtain ?? NULL;
         $rental_room->Livingroom_Curtain = $request->Livingroom_Curtain ?? NULL;
         $rental_room->Wardrobe = $request->room_Wardrobe ?? NULL;
@@ -445,8 +462,8 @@ class RentalController extends Controller
         $rental_room->Center_Table = $request->room_Center_Table ?? NULL;
         $rental_room->Dining_Table = $request->room_Dining_Table ?? NULL;
         $rental_room->Chair = $request->room_Chair ?? NULL;
-        $rental_room->Bedroom_Air = $request->Bedroom_Air ?? NULL;
-        $rental_room->Livingroom_Air = $request->Livingroom_Air ?? NULL;
+        $rental_room->Bedroom_Air = $request->room_Bedroom_Air ?? NULL;
+        $rental_room->Livingroom_Air = $request->room_Livingroom_Air ?? NULL;
         $rental_room->Water_Heater = $request->room_Water_Heater ?? NULL;
         $rental_room->TV = $request->room_TV ?? NULL;
         $rental_room->Refrigerator = $request->room_Refrigerator ?? NULL;
@@ -458,7 +475,7 @@ class RentalController extends Controller
         // รูปภาพห้อง
         if ($request->hasFile('filUpload')) {
             $URL = request()->getHttpHost();
-            $allowedfileExtension = ['jpg', 'png'];
+            $allowedfileExtension = ['jpg', 'jpeg','png'];
             $files = $request->file('filUpload');
             $isImage = NULL;
             $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
@@ -469,12 +486,8 @@ class RentalController extends Controller
                     $filename = $file->getClientOriginalName();
                     $file->move('uploads/images_room', $filename);
                     $img_room[$key] =  $URL . '/uploads/images_room/' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
-                    // Room_Images::updateOrCreate(
-                    //     ['img_path' => $img_room, 'img_category' => 'เช่าอยู่'],
-                    //     ['rid' =>  $request->room_id, 'img_category' => 'เช่าอยู่']
-                    // );
+            
                     if($isImage){
-                        // $isImage->rid = $request->room_id;
                         $isImage->img_path = $img_room[$key];
                         $isImage->img_category = 'เช่าอยู่';
                         $isImage->save();
@@ -486,21 +499,21 @@ class RentalController extends Controller
                         $image->save();
                     }
                 }
-                // else {
-                //     echo '<div class="alert alert-warning"><strong>Warning!</strong> Sorry Only Upload png , jpg </div>';
-                // }
+                else {
+                    Alert::error('Error', 'Allowed types: jpg, jpeg, png');
+                    return redirect()->back(); 
+                }
             }
         }
 
         $rental_customer = Customer::where('rid', $request->room_id)->where('id', $request->customer_id)->first();
         // dd($rental_customer);
         if ($rental_customer) {
-            // dd($rental_customer);
             // หนังสือสัญญา
             if ($request->hasFile('file_contract_path')) {
                 $file = $request->file('file_contract_path');
                 $extension = $file->getClientOriginalExtension();
-                $filename = $file->getClientOriginalName();
+                $filename = 'contract_' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
                 $file->move('uploads/image_custrent/', $filename);
                 $rental_customer->file_contract_path = 'uploads/image_custrent/' . $filename;
             }
@@ -508,9 +521,11 @@ class RentalController extends Controller
             if ($request->hasFile('fileUploadExpress')) {
                 $file = $request->file('fileUploadExpress');
                 $extension = $file->getClientOriginalExtension();
-                $filename = $file->getClientOriginalName();
-                // $file->move('uploads/fileexpress/', $filename);
+                $fileExpress = $file->getClientOriginalName();
+                // $file->move('uploads/fileexpress/', $fileExpress);
                 // $rental_customer->file_contract_path = 'uploads/fileexpress/' . $filename;
+            }else{
+                $fileExpress = $request->filename;
             }
             // ไฟล์บัตรประชาชนลูกค้า
             if ($request->hasFile('file_id_path_cus')) {
@@ -522,42 +537,16 @@ class RentalController extends Controller
                 $rental_customer->file_id_path_cus = 'uploads/image_custrent/' . $filename;
             }
 
-            
-
-            // if ($request->hasFile('filUpload')) {
-            //     $allowedMimeTypes = ['image/jpeg', 'image/png'];
-                
-            //     foreach ($request->file('filUpload') as $key => $file) {
-            //         if ($file->isValid() && in_array($file->getMimeType(), $allowedMimeTypes)) {
-            //             $fileName = $file->hashName();
-            //             $filePath = $file->storeAs('uploads/images_room', $fileName);
-            //             $imgRoomUrl = Storage::url($filePath);
-                        
-            //             dump($key);
-            //             // Perform database operations inside a transaction
-            //             DB::transaction(function () use ($imgRoomUrl, $request) {
-            //                 Room_Images::updateOrCreate(
-            //                     ['rid' =>  $request->room_id, 'img_category' => 'เช่าอยู่'],
-            //                     ['img_path' => $imgRoomUrl, 'img_category' => 'เช่าอยู่']
-                                
-            //                 );
-            //             });
-            //         }
-            //     }
-            // }
-
-           
-
             if ($request->Contract_Status == 'ต่อสัญญา') {
                 // 1. update customer
-                $reNewContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
-                $reNewContract->Cancel_Date = date('Y-m-d');
-                $reNewContract->Contract_Status = $request->Contract_Status ?? NULL;
-                $reNewContract->save();
+                $CurrentContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
+                $CurrentContract->Cancel_Date = now()->toDateString();
+                $CurrentContract->Contract_Status = $request->Contract_Status ?? NULL;
+                $CurrentContract->save();
 
                 // 2. insert new customer new contract
                 $newContract = new Customer();
-                $newContract->Create_Date = date('Y-m-d');
+                $newContract->Create_Date = now()->toDateString();
                 $newContract->pid = $request->project_id;
                 $newContract->rid = $request->room_id;
                 $newContract->Cus_Name = $request->Cus_Name ?? NULL;
@@ -570,8 +559,9 @@ class RentalController extends Controller
                 $newContract->home_address = $request->cus_homeAddress ?? NULL;
                 $newContract->cust_soi = $request->cust_soi ?? NULL;
                 $newContract->cust_road = $request->cust_road ?? NULL;
-                $newContract->tumbon = $request->cus_tumbon ?? NULL;
-                $newContract->province = $request->cus_province ?? NULL;
+                $newContract->tumbon = $cus_tumbon ?? NULL;
+                $newContract->aumper = $cus_aumper ?? NULL;
+                $newContract->province = $cus_province ?? NULL;
                 $newContract->id_post = $request->cus_idPost ?? NULL;
                 $newContract->Phone = $request->cus_phone ?? NULL;
                 $newContract->Price = $request->Price ?? NULL;
@@ -794,8 +784,9 @@ class RentalController extends Controller
                 $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
                 $rental_customer->cust_soi = $request->cust_soi ?? NULL;
                 $rental_customer->cust_road = $request->cust_road ?? NULL;
-                $rental_customer->tumbon = $request->cus_tumbon ?? NULL;
-                $rental_customer->province = $request->cus_province ?? NULL;
+                $rental_customer->tumbon = $cus_tumbon ?? NULL;
+                $rental_customer->aumper = $cus_aumper ?? NULL;
+                $rental_customer->province = $cus_province ?? NULL;
                 $rental_customer->id_post = $request->cus_idPost ?? NULL;
                 $rental_customer->Phone = $request->cus_phone ?? NULL;
                 $rental_customer->Price = $request->Price ?? NULL;
@@ -809,29 +800,353 @@ class RentalController extends Controller
 
                 // insert report inout
                 if (date('m') == '01') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '1';
+                    $reportInOut->dateout1 = '1';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '02') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '1';
+                    $reportInOut->dateout2 = '1';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '03') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '1';
+                    $reportInOut->dateout3 = '1';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '04') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '1';
+                    $reportInOut->dateout4 = '1';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '05') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '1';
+                    $reportInOut->dateout5 = '1';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '06') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '1';
+                    $reportInOut->dateout6 = '1';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '07') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '1';
+                    $reportInOut->dateout7 = '1';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '08') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '1';
+                    $reportInOut->dateout8 = '1';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '09') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '1';
+                    $reportInOut->dateout9 = '1';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '10') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '1';
+                    $reportInOut->dateout10 = '1';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '11') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '1';
+                    $reportInOut->dateout11 = '1';
+                    $reportInOut->datein12 = '0';
+                    $reportInOut->dateout12 = '0';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }elseif (date('m') == '12') {
-                    # code...
+                    $reportInOut = new ReportInOut();
+                    $reportInOut->pid = $request->project_id;;
+                    $reportInOut->datein1 = '0';
+                    $reportInOut->dateout1 = '0';
+                    $reportInOut->datein2 = '0';
+                    $reportInOut->dateout2 = '0';
+                    $reportInOut->datein3 = '0';
+                    $reportInOut->dateout3 = '0';
+                    $reportInOut->datein4 = '0';
+                    $reportInOut->dateout4 = '0';
+                    $reportInOut->datein5 = '0';
+                    $reportInOut->dateout5 = '0';
+                    $reportInOut->datein6 = '0';
+                    $reportInOut->dateout6 = '0';
+                    $reportInOut->datein7 = '0';
+                    $reportInOut->dateout7 = '0';
+                    $reportInOut->datein8 = '0';
+                    $reportInOut->dateout8 = '0';
+                    $reportInOut->datein9 = '0';
+                    $reportInOut->dateout9 = '0';
+                    $reportInOut->datein10 = '0';
+                    $reportInOut->dateout10 = '0';
+                    $reportInOut->datein11 = '0';
+                    $reportInOut->dateout11 = '0';
+                    $reportInOut->datein12 = '1';
+                    $reportInOut->dateout12 = '1';
+                    $reportInOut->dateyear = now()->toDateString();
+                    $reportInOut->save();
                 }
             }else{
                 $rental_customer->Cus_Name = $request->Cus_Name ?? NULL;
@@ -842,8 +1157,9 @@ class RentalController extends Controller
                 $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
                 $rental_customer->cust_soi = $request->cust_soi ?? NULL;
                 $rental_customer->cust_road = $request->cust_road ?? NULL;
-                $rental_customer->tumbon = $request->cus_tumbon ?? NULL;
-                $rental_customer->province = $request->cus_province ?? NULL;
+                $rental_customer->tumbon = $cus_tumbon ?? NULL;
+                $rental_customer->aumper = $cus_aumper ?? NULL;
+                $rental_customer->province = $cus_province ?? NULL;
                 $rental_customer->id_post = $request->cus_idPost ?? NULL;
                 $rental_customer->Phone = $request->cus_phone ?? NULL;
                 $rental_customer->Price = $request->Price ?? NULL;
@@ -868,8 +1184,9 @@ class RentalController extends Controller
             $customer->home_address = $request->cus_homeAddress ?? NULL;
             $customer->cust_soi = $request->cust_soi ?? NULL;
             $customer->cust_road = $request->cust_road ?? NULL;
-            $customer->tumbon = $request->cus_tumbon ?? NULL;
-            $customer->province = $request->cus_province ?? NULL;
+            $customer->tumbon = $cus_tumbon ?? NULL;
+            $customer->aumper = $cus_aumper ?? NULL;
+            $customer->province = $cus_province ?? NULL;
             $customer->id_post = $request->cus_idPost ?? NULL;
             $customer->Phone = $request->cus_phone ?? NULL;
             $customer->Price = $request->Price ?? NULL;
@@ -880,10 +1197,8 @@ class RentalController extends Controller
             $customer->Contract_Reason = $request->Contract_Reason ?? NULL;
             $customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
             $customer->cust_remark = $request->cust_remark ?? NULL;
-            // dd($customer);
             
             $customer->save();
-            // dd($rental_customer);
         }
 
         // update table lease_auto_code
@@ -891,6 +1206,7 @@ class RentalController extends Controller
         if($lease_auto_code){
             $lease_auto_code->print_contract_manual = $request->date_print_contract_manual ?? NULL;
             $lease_auto_code->price_insurance = $request->price_insurance ?? NULL;
+            $lease_auto_code->save();
         }
         
         if($request->Contract == 1){
@@ -1158,9 +1474,7 @@ class RentalController extends Controller
             ->where('cid', $request->customer_id)
             ->count();
         if(!$payment){
-            // $Contract_Startdates = $request->start_paid_date;
-            // $Contract_StartdateNew = date("Y-m-d", strtotime("-1 day", strtotime($Contract_Startdates)));
-
+            
             $paymentNew = new Payment();
             $paymentNew->cid = $request->customer_id;
             $paymentNew->rid = $request->room_id;
@@ -1212,21 +1526,231 @@ class RentalController extends Controller
             $paymentNew->Owner_Due10_Date = $Owner_Due10_Date ?? NULL;
             $paymentNew->Owner_Due11_Date = $Owner_Due11_Date ?? NULL;
             $paymentNew->Owner_Due12_Date = $Owner_Due12_Date ?? NULL;
-
             $paymentNew->save();
 
         }else{
-
+            // update fileExpress in table payment
+            if (date('m') == '01') {
+                $payment->file_contract_express1 = $fileExpress;
+                // $payment->save();
+            }elseif (date('m') == '02') {
+                $payment->file_contract_express2 = $fileExpress;
+            }elseif (date('m') == '03') {
+                $payment->file_contract_express3 = $fileExpress;
+            }elseif (date('m') == '04') {
+                $payment->file_contract_express4 = $fileExpress;
+            }elseif (date('m') == '05') {
+                $payment->file_contract_express5 = $fileExpress;
+            }elseif (date('m') == '06') {
+                $payment->file_contract_express6 = $fileExpress;
+            }elseif (date('m') == '07') {
+                $payment->file_contract_express7 = $fileExpress;
+            }elseif (date('m') == '08') {
+                $payment->file_contract_express8 = $fileExpress;
+            }elseif (date('m') == '09') {
+                $payment->file_contract_express9 = $fileExpress;
+            }elseif (date('m') == '10') {
+                $payment->file_contract_express10 = $fileExpress;
+            }elseif (date('m') == '11') {
+                $payment->file_contract_express11 = $fileExpress;
+            }elseif (date('m') == '12') {
+                $payment->file_contract_express12 = $fileExpress;
+            }
+            // $payment->save();
         }
         // insert and update quarantee
+        $selecte_null_row = DB::table('quarantees')
+            ->where('pid', $request->project_id)
+            ->orderBy('id', 'desc')
+            ->limit(1)
+            ->count('create_date');
 
-        // update product and rooms
+        $selecte_create = DB::table('quarantees')
+            ->select('create_date', 'pid')
+            ->where('pid', $request->project_id)
+            ->orderByDesc('id')
+            ->first();
 
-        // insert log
+        $start_quarantee = DB::table('quarantees')
+            ->select('pid', 'create_date', 'amount_fix', 'due_date')
+            ->where('pid', $request->project_id)
+            ->where('create_date', $selecte_create->create_date)
+            ->orderBy('id')
+            ->first();
 
+        $end_quarantee = DB::table('quarantees')
+            ->select('pid', 'create_date', 'amount_fix', 'due_date')
+            ->where('pid', $request->project_id)
+            ->where('create_date', $selecte_create->create_date)
+            ->orderByDesc('id')
+            ->first();
+
+        $num_month = $this->search_month($request->gauranteestart, $request->gauranteeend);
+        if(($request->gauranteestart == $request->chk_satrt) && ($request->gauranteeend == $request->chk_end) && ($selecte_null_row != 0)){
+            $createDate = DB::table('quarantees')
+                ->select('create_date')
+                ->where('pid', $request->project_id)
+                ->orderByDesc('id')
+                ->first();
+
+            $groupId = DB::table('quarantees')
+                ->select('id')
+                ->where('create_date', $createDate->create_date)
+                ->get();
+            
+            foreach ($groupId as $item) {
+                DB::table('quarantees')
+                    ->where('id', $item->id)
+                    ->update([
+                        'amount_fix' => $request->gauranteeamount,
+                        'due_date_amount' => $request->gauranteeamount
+                    ]);
+            }
+
+            DB::table('products')
+                ->update([
+                    'gauranteestart' => $request->gauranteestart,
+                    'gauranteeend' => $request->gauranteeend
+                ]);
+            
+            
+        }elseif (($request->gauranteestart > $end_quarantee->due_date) || ($selecte_null_row == 0)) {
+            for ($i=0; $i < $num_month; $i++) { 
+                $Due_Dates = Carbon::parse($request->gauranteestart)->addMonths($i)->toDateString();
+                $d = explode('-', $Due_Dates); 
+                if ($i == 0) {
+                    $Due_Dates = $request->gauranteestart;
+                } elseif ($i >= 1) {
+                    $Due_Dates = $d[0] . '' . $d[1] . '01';
+                }
+
+                $quarantee = new Quarantee();
+                $quarantee->pid = $request->project_id;
+                $quarantee->due_date = $Due_Dates;
+                $quarantee->amount_fix = $request->gauranteestart;
+                $quarantee->due_date_amount = $request->gauranteeamount;
+                $quarantee->save();
+            }
+        }
+
+        // update product 
+        DB::table('products')
+            ->where('pid', $request->project_id)
+            ->update([
+                'gauranteestart' => $request->gauranteestart,
+                'gauranteeend' => $request->gauranteeend,
+                'gauranteeamount' => $request->gauranteeamount
+            ]);
+            
+        // insert log rental room
+        $logRental = new Log_Rental();
+        $logRental->Create_Date = now()->toDateString();
+        $logRental->pid = $request->project_id ?? NULL;
+        $logRental->RoomNo = $request->RoomNo ?? NULL;
+        $logRental->HomeNo = $request->HomeNo ?? NULL;
+        $logRental->Owner = $request->onwername ?? NULL;
+        $logRental->Phone = $request->ownerphone ?? NULL;
+        $logRental->Transfer_date = $request->transfer_date ?? NULL;
+        $logRental->RoomType = $request->room_type ?? NULL;
+        $logRental->Location = $request->Location ?? NULL;
+        $logRental->Building = $request->Building ?? NULL;
+        $logRental->Floor = $request->Floor ?? NULL;
+        $logRental->Size = $request->room_size ?? NULL;
+        $logRental->Key_front = $request->room_key_front ?? NULL;
+        $logRental->Key_bed = $request->room_key_bed ?? NULL;
+        $logRental->Key_balcony = $request->room_key_balcony ?? NULL;
+        $logRental->Key_mailbox = $request->room_key_mailbox ?? NULL;
+        $logRental->KeyCard = $request->room_card ?? NULL;
+        $logRental->KeyCard_P = $request->room_card_p ?? NULL;
+        $logRental->KeyCard_B = $request->room_card_b ?? NULL;
+        $logRental->KeyCard_C = $request->room_card_c ?? NULL;
+        $logRental->Guarantee_Startdate = $request->gauranteestart ?? NULL;
+        $logRental->Guarantee_Enddate = $request->gauranteeend ?? NULL;
+        $logRental->Guarantee_Amount = $request->gauranteeamount ?? NULL;
+        $logRental->DefectStatus = $request->DefectStatus ?? NULL;
+        $logRental->Status_Room = $request->Status_Room ?? NULL;
+        $logRental->Bed = $request->room_Bed ?? NULL;
+        $logRental->Beding = $request->room_Beding ?? NULL;
+        $logRental->Bedroom_Curtain = $request->room_Bedroom_Curtain ?? NULL;
+        $logRental->Livingroom_Curtain = $request->Livingroom_Curtain ?? NULL;
+        $logRental->Wardrobe = $request->room_Wardrobe ?? NULL;
+        $logRental->Sofa = $request->room_Sofa ?? NULL;
+        $logRental->TV_Table = $request->room_TV_Table ?? NULL;
+        $logRental->Dining_Table = $request->room_Dining_Table ?? NULL;
+        $logRental->Center_Table = $request->room_Center_Table ?? NULL;
+        $logRental->Chair = $request->room_Chair ?? NULL;
+        $logRental->Bedroom_Air = $request->room_Bedroom_Air ?? NULL;
+        $logRental->Livingroom_Air =  $request->room_Livingroom_Air ?? NULL;
+        $logRental->Water_Heater = $request->room_Water_Heater ?? NULL;
+        $logRental->TV = $request->room_TV ?? NULL;
+        $logRental->Refrigerator =$request->room_Refrigerator ?? NULL;
+        $logRental->microwave = $request->room_microwave ?? NULL;
+        $logRental->wash_machine =  $request->room_wash_machine ?? NULL;
+        $logRental->Other = $request->Other ?? NULL;
+        $logRental->Activeby = Session::get('code');
+        $logRental->Process_Status = 'Status_Update';
+        $logRental->Electric_Contract =  $request->Electric_Contract ?? NULL;
+        $logRental->Meter_Code = $request->Meter_Code ?? NULL;
+        $logRental->rental_status = $request->rental_status ?? NULL;
+        $logRental->save();
+
+        // insert log customer
+        $logCustomer = new Log_Customer();
+        $logCustomer->id_main = $request->customer_id;
+        $logCustomer->Create_Date = now()->toDateString();
+        $logCustomer->pid = $request->project_id;
+        $logCustomer->rid = $request->room_id;
+        $logCustomer->RoomNo = $request->RoomNo ?? NULL;
+        $logCustomer->Building = $request->Building ?? NULL;
+        $logCustomer->Floor = $request->Floor ?? NULL;
+        $logCustomer->Size = $request->room_size ?? NULL;
+        $logCustomer->Cus_Name = $request->Cus_Name ?? NULL;
+        $logCustomer->IDCard = $request->IDCard ?? NULL;
+        $logCustomer->Phone = $request->cus_phone ?? NULL;
+        $logCustomer->Price = $request->Price ?? NULL;
+        $logCustomer->Contract = $request->Contract ?? NULL;
+        $logCustomer->Contract_Startdate = $request->Contract_Startdate ?? null;
+        $logCustomer->Contract_Enddate = $request->Contract_Enddate ?? null;
+        $logCustomer->Contract_Reason =  $request->Contract_Reason ?? NULL;
+        $logCustomer->Contract_Status = $request->Contract_Status ?? NULL;
+        $logCustomer->Cancle_Date = $request->Cancle_Date ?? NULL;
+        $logCustomer->Activeby = Session::get('code');;
+        $logCustomer->Process_Status = 'Status_Update';
+        $logCustomer->cust_remark = $request->cust_remark ?? NULL;
+        $logCustomer->file_id_path_cus = $request->file('file_id_path_cus') ?? NULL;
+        $logCustomer->file_contract_path = $request->file('file_contract_path') ?? NULL;
+        $logCustomer->save();
+        
 
         Alert::success('Success', 'อัพเดทข้อมูลสำเร็จ!');
         return redirect(route('rental'));
+    }
+
+    function search_month($s_month,$e_month){
+        $start_day = $s_month;
+        $end_day = $e_month;
+        
+        list($byear, $bmonth, $bday)= explode("-",$start_day);     
+        list($tyear, $tmonth, $tday)= explode("-",$end_day);              
+         
+        $mbirthday = mktime(0, 0, 0, $bmonth, $bday, $byear); 
+        $mnow = mktime(0, 0, 0, $tmonth, $tday, $tyear );
+        $mage = ($mnow - $mbirthday);
+       
+        $u_y=date("Y", $mage)-1970;
+        $u_m=date("m",$mage)-1;
+        $u_d=date("d",$mage)-1;
+     
+     
+        if ($u_y=='0') {
+            $result = 0;
+        }else{ 
+            for($i=1 ; $i<=$u_y ; $i++){
+                $result = 12*$i;
+            }
+        }
+        return $result+$u_m;
+     
     }
 
     public function print(Request $request)
@@ -1985,5 +2509,48 @@ class RentalController extends Controller
 
         return view('rental.history', compact('dataLoginUser', 'rent', 'count','history','quarantees','dueDate','amountFix','amount','rows','sum'));
             dd($history);
+    }
+
+    public function getProvinces()
+    {
+        $provinces = Tambon::select('province', 'province_id')
+            ->distinct()
+            ->get();
+        return $provinces;
+    }
+    public function getAmphoes(Request $request)
+    {
+
+        $province = $request->get('province_id');
+        $amphoes = Tambon::select('amphoe_id', 'amphoe')
+            ->where('province_id', $province)
+            ->distinct()
+            ->get();
+        return $amphoes;
+    }
+    public function getTambons(Request $request)
+    {
+
+        $province = $request->get('province_id');
+        $amphoe = $request->get('amphoe_id');
+        $tambons = Tambon::select('tambon_id', 'tambon')
+            ->where('province_id', $province)
+            ->where('amphoe_id', $amphoe)
+            ->distinct()
+            ->get();
+        return $tambons;
+    }
+    public function getZipcodes(Request $request)
+    {
+
+        $province = $request->get('province_id');
+        $amphoe = $request->get('amphoe_id');
+        $tambon = $request->get('tambon_id');
+        $zipcodes = Tambon::select('zipcode')
+            ->where('province_id', $province)
+            ->where('amphoe_id', $amphoe)
+            ->where('tambon_id', $tambon)
+            ->get();
+        return $zipcodes;
     }
 }
