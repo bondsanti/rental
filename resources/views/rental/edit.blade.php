@@ -10,8 +10,9 @@
         <input type="hidden" name="room_id" value="{{ $item->rid ?? $item->room_id }}">
         <input type="hidden" name="customer_id" value="{{ $item->id }}">
         <input type="hidden" name="project_id" value="{{ $item->pid }}">
-        <input type="hidden" name="chk_satrt" value="{{ $item->Guarantee_Startdate }}">
-        <input type="hidden" name="chk_end" value="{{ $item->Guarantee_Enddate }}">
+        <input type="hidden" name="product_id" value="{{ $product_id }}">
+        <input type="hidden" name="chk_satrt" value="{{ $gauranteestart }}">
+        <input type="hidden" name="chk_end" value="{{ $gauranteeend }}">
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -178,22 +179,28 @@
                                         </div>
                                         <div class="col-sm-1"></div>
 
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2">                      
                                             <div class="form-group">
                                                 <label for="owner_province">จังหวัด</label>
-                                                {{-- <input class="form-control @error('owner_province') is-invalid @enderror" name="owner_province" type="text" value="{{ $item->owner_province ?? '' }}"
-                                                    placeholder="จังหวัด">
-                                                @error('owner_province')
-                                                    <div class="error text-danger">{{ $message }}</div>
-                                                @enderror --}}
-
-                                                <select name="owner_province" id="owner_province" class="form-control">
-                                                    @foreach ($provinces as $province)
-                                                        <option value="{{ $province->province_id }}"
-                                                            {{ $province->province == $item->owner_province ? 'selected' : '' }}>
-                                                            {{ $province->province }}
-                                                        </option>
-                                                    @endforeach
+                                                <select name="owner_province" id="owner_province" class="form-control @error('owner_province') is-invalid @enderror">
+                                                    @if (!$item->owner_province)
+                                                        <option value="">-- เลือก --</option>
+                                                    @endif
+                                                    @if (old('owner_province'))
+                                                        @foreach ($provinces as $province)
+                                                            <option value="{{ $province->province_id }}"
+                                                                {{ $province->province_id == old('owner_province') ? 'selected' : '' }}>
+                                                                {{ $province->province }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        @foreach ($provinces as $province)
+                                                            <option value="{{ $province->province_id }}"
+                                                                {{ $province->province == $item->owner_province ? 'selected' : '' }}>
+                                                                {{ $province->province }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
                                                 </select>
                                                 @error('owner_province')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -207,20 +214,29 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label for="owner_khet">เขต/อำเภอ</label>
-                                                {{-- <input class="form-control @error('owner_khet') is-invalid @enderror" name="owner_khet" type="text" value="{{ $item->owner_khet ?? '' }}"
-                                                    placeholder="เขต/อำเภอ">
+                                                <select name="owner_khet" id="owner_khet" class="form-control @error('owner_khet') is-invalid @enderror">
+                                                    @if (!$item->owner_khet)
+                                                        <option value="">-- เลือก --</option>
+                                                    @endif
+                                                    @if (old('owner_khet'))
+                                                        @foreach ($amphoes as $amphure)
+                                                            <option value="{{ $amphure->amphoe_id }}"
+                                                                {{ $amphure->amphoe_id == old('owner_khet') ? 'selected' : '' }}>
+                                                                {{ $amphure->amphoe }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        @foreach ($amphoes as $amphure)
+                                                            <option value="{{ $amphure->amphoe_id }}"
+                                                                {{ $amphure->amphoe == $item->owner_khet ? 'selected' : '' }}>
+                                                                {{ $amphure->amphoe }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
                                                 @error('owner_khet')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror --}}
-
-                                                <select name="owner_khet" id="owner_khet" class="form-control">
-                                                    @foreach ($amphoes as $amphure)
-                                                        <option value="{{ $amphure->amphoe_id }}"
-                                                            {{ $amphure->amphoe == $item->owner_khet ? 'selected' : '' }}>
-                                                            {{ $amphure->amphoe }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                @enderror
                                             </div>
                                             
                                         </div>
@@ -229,21 +245,29 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label for="owner_district">แขวง/ตำบล</label>
-                                                {{-- <input class="form-control @error('owner_district') is-invalid @enderror" name="owner_district" type="text" value="{{ $item->owner_district ?? '' }}"
-                                                    placeholder="แขวง/ตำบล">
+                                                <select name="owner_district" id="owner_district"class="form-control @error('owner_district') is-invalid @enderror">
+                                                    @if (!$item->owner_district)
+                                                        <option value="">-- เลือก --</option>
+                                                    @endif
+                                                    @if (old('owner_district'))
+                                                        @foreach ($tambons as $district)
+                                                            <option value="{{ $district->tambon_id }}"
+                                                                {{ $district->tambon_id == old('owner_district') ? 'selected' : '' }}>
+                                                                {{ $district->tambon }}
+                                                            </option>
+                                                        @endforeach
+                                                    @else
+                                                        @foreach ($tambons as $district)
+                                                            <option value="{{ $district->tambon_id }}"
+                                                                {{ $district->tambon == $item->owner_district ? 'selected' : '' }}>
+                                                                {{ $district->tambon }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
                                                 @error('owner_district')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror --}}
-
-                                                <select name="owner_district" id="owner_district"class="form-control">
-
-                                                    @foreach ($tambons as $district)
-                                                        <option value="{{ $district->tambon_id }}"
-                                                            {{ $district->tambon == $item->owner_district ? 'selected' : '' }}>
-                                                            {{ $district->tambon }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -274,7 +298,7 @@
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>เลขที่ห้อง</label>
+                                                <label class="text-danger"><b >*</b> เลขที่ห้อง</label>
                                                 <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->RoomNo ?? old('RoomNo') ?? '' }}"
                                                     placeholder="เลขที่ห้อง">
                                                 @error('RoomNo')
@@ -465,13 +489,13 @@
                                                     placeholder="สถานะห้อง">  --}}
                                                 <select class="form-control" name="Status_Room">
                                                     <option value="">-- เลือก --</option>
-                                                    <option value="รอตรวจ" {{ $item->Status_Room == 'รอตรวจ' ? 'selected' : '' }} {{ old('Status_Room') == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
-                                                    <option value="รอเฟอร์" {{ $item->Status_Room == 'รอเฟอร์' ? 'selected' : '' }} {{ old('Status_Room') == 'รอเฟอร์' ? 'selected' : '' }}>รอเฟอร์</option>
-                                                    <option value="รอคลีน" {{ $item->Status_Room == 'รอคลีน' ? 'selected' : '' }} {{ old('Status_Room') == 'รอคลีน' ? 'selected' : '' }}>รอคลีน</option>
-                                                    <option value="พร้อมอยู่" {{ $item->Status_Room == 'พร้อมอยู่' ? 'selected' : '' }} {{ old('Status_Room') == 'พร้อมอยู่' ? 'selected' : '' }}>พร้อมอยู่</option>
-                                                    <option value="อยู่แล้ว" {{ $item->Status_Room == 'อยู่แล้ว' ? 'selected' : '' }} {{ old('Status_Room') == 'อยู่แล้ว' ? 'selected' : '' }}>อยู่แล้ว</option>
-                                                    <option value="ห้องออฟฟิต" {{ $item->Status_Room == 'ห้องออฟฟิต' ? 'selected' : '' }} {{ old('Status_Room') == 'ห้องออฟฟิต' ? 'selected' : '' }}>ห้องออฟฟิต</option>
-                                                    <option value="ห้องตัวอย่าง" {{ $item->Status_Room == 'ห้องตัวอย่าง' ? 'selected' : '' }} {{ old('Status_Room') == 'ห้องตัวอย่าง' ? 'selected' : '' }}>ห้องตัวอย่าง</option>
+                                                    <option value="รอตรวจ" {{ $item->Status_Room == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
+                                                    <option value="รอเฟอร์" {{ $item->Status_Room == 'รอเฟอร์' ? 'selected' : '' }}>รอเฟอร์</option>
+                                                    <option value="รอคลีน" {{ $item->Status_Room == 'รอคลีน' ? 'selected' : '' }}>รอคลีน</option>
+                                                    <option value="พร้อมอยู่" {{ $item->Status_Room == 'พร้อมอยู่' ? 'selected' : '' }}>พร้อมอยู่</option>
+                                                    <option value="อยู่แล้ว" {{ $item->Status_Room == 'อยู่แล้ว' ? 'selected' : '' }}>อยู่แล้ว</option>
+                                                    <option value="ห้องออฟฟิต" {{ $item->Status_Room == 'ห้องออฟฟิต' ? 'selected' : '' }}>ห้องออฟฟิต</option>
+                                                    <option value="ห้องตัวอย่าง" {{ $item->Status_Room == 'ห้องตัวอย่าง' ? 'selected' : '' }}>ห้องตัวอย่าง</option>
                                                     <option value="จอง" {{ $item->Status_Room == 'จอง' ? 'selected' : '' }}>จอง</option>
                                                     <option value="สวัสดิการ" {{ $item->Status_Room == 'สวัสดิการ' ? 'selected' : '' }}>สวัสดิการ</option>
                                                 </select>
@@ -527,7 +551,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ประเภทห้องเช่า</label>
-                                                <select class="form-control" name="Status_Room">
+                                                <select class="form-control" name="rental_status">
                                                     <option value="การันตี" {{ $item->rental_status == 'การันตี' ? 'selected' : '' }}>การันตี</option>
                                                     <option value="เบิกจ่ายล่วงหน้า" {{ $item->rental_status == 'เบิกจ่ายล่วงหน้า' ? 'selected' : '' }}>เบิกจ่ายล่วงหน้า</option>
                                                     <option value="ฝากต่อหักภาษี" {{ $item->rental_status == 'ฝากต่อหักภาษี' ? 'selected' : '' }}>ฝากต่อหักภาษี</option>
@@ -751,7 +775,7 @@
                                         <div class="form-group">
                                             <label>เลขบัตรประชาชน</label>
                                             <input class="form-control @error('IDCard') is-invalid @enderror" name="IDCard" type="text" value="{{ $item->IDCard ?? ''}}"
-                                                placeholder="ลขบัตรประชาชน">
+                                                placeholder="เลขบัตรประชาชน">
                                             @error('IDCard')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
@@ -796,7 +820,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>ค่าประกันทรัพย์สิน</label>
-                                            <input class="form-control" name="price_insurance" type="text" value="{{ $lease_auto_code->price_insurance ?? ''}}"
+                                            <input class="form-control" name="price_insurance" type="text" value="{{ $item->price_insurance ?? ''}}"
                                                 placeholder="ค่าประกันทรัพย์สิน">
                                         </div>
                                     </div>
@@ -824,7 +848,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>บ้านเลขที่</label>
-                                            <input class="form-control @error('cus_homeAddress') is-invalid @enderror" name="cus_homeAddress" type="text" value="{{ $item->home_address ?? '' }}"
+                                            <input class="form-control @error('cus_homeAddress') is-invalid @enderror" name="cus_homeAddress" type="text" value="{{ $item->home_address ?? old('cus_homeAddress') ?? '' }}"
                                                 placeholder="บ้านเลขที่">
                                         </div>
                                         @error('cus_homeAddress')
@@ -836,7 +860,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>ซอย</label>
-                                            <input class="form-control" name="cust_soi" type="text" value="{{ $item->cust_soi ?? ''}}"
+                                            <input class="form-control" name="cust_soi" type="text" value="{{ $item->cust_soi ?? old('cust_soi') ?? '' }}"
                                                 placeholder="ซอย">
                                         </div>
                                     </div>
@@ -845,7 +869,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>ถนน</label>
-                                            <input class="form-control" name="cust_road" type="text" value="{{ $item->cust_road ?? '' }}"
+                                            <input class="form-control" name="cust_road" type="text" value="{{ $item->cust_road ?? old('cust_road') ?? '' }}"
                                                 placeholder="ถนน">
                                         </div>
                                     </div>
@@ -854,19 +878,25 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label for="cus_province">จังหวัด</label>
-                                            {{-- <input class="form-control @error('cus_province') is-invalid @enderror" name="cus_province" type="text" value="{{ $item->province ?? '' }}"
-                                                placeholder="จังหวัด">
-                                            @error('cus_province')
-                                                <div class="error text-danger">{{ $message }}</div>
-                                            @enderror --}}
-
-                                            <select name="cus_province" id="cus_province" class="form-control">
-                                                @foreach ($provinces as $province)
-                                                    <option value="{{ $province->province_id }}"
-                                                        {{ $province->province == $item->province ? 'selected' : '' }}>
-                                                        {{ $province->province }}
-                                                    </option>
-                                                @endforeach
+                                            <select name="cus_province" id="cus_province" class="form-control @error('cus_province') is-invalid @enderror">
+                                                @if (!$item->province)
+                                                    <option value="">-- เลือก --</option>
+                                                @endif
+                                                @if (old('cus_province'))
+                                                    @foreach ($provinces as $province)
+                                                        <option value="{{ $province->province_id }}"
+                                                            {{ $province->province_id == old('cus_province') ? 'selected' : '' }}>
+                                                            {{ $province->province }}
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    @foreach ($provinces as $province)
+                                                        <option value="{{ $province->province_id }}"
+                                                            {{ $province->province == $item->province ? 'selected' : '' }}>
+                                                            {{ $province->province }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
                                             @error('cus_province')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -880,15 +910,26 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label for="cus_aumper">เขต/อำเภอ</label>
-                                            {{-- <input class="form-control @error('cus_aumper') is-invalid @enderror" name="cus_aumper" type="text" value="{{ $item->cus_tumbon ?? '' }}"
-                                                placeholder="เขต/อำเภอ"> --}}
-                                            <select name="cus_aumper" id="cus_aumper" class="form-control">
-                                                @foreach ($amphoes as $amphure)
-                                                    <option value="{{ $amphure->amphoe_id }}"
-                                                        {{ $amphure->amphoe == $item->aumper ? 'selected' : '' }}>
-                                                        {{ $amphure->amphoe }}
-                                                    </option>
-                                                @endforeach
+                                            <select name="cus_aumper" id="cus_aumper" class="form-control @error('cus_aumper') is-invalid @enderror">
+                                                @if (!$item->aumper)
+                                                    <option value="">-- เลือก --</option>
+                                                @endif
+                                                @if(old('cus_aumper'))
+                                                    @foreach ($amphoes as $amphure)
+                                                        <option value="{{ $amphure->amphoe_id }}"
+                                                            {{ $amphure->amphoe_id == old('cus_aumper') ? 'selected' : '' }}>
+                                                            {{ $amphure->amphoe }}
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    @foreach ($amphoes as $amphure)
+                                                        <option value="{{ $amphure->amphoe_id }}"
+                                                            {{ $amphure->amphoe == $item->aumper ? 'selected' : '' }}>
+                                                            {{ $amphure->amphoe }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                                
                                             </select>
                                             @error('cus_aumper')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -898,19 +939,27 @@
                                     <div class="col-sm-1"></div>
 
                                     <div class="col-sm-2">
-                                        {{--  --}}
                                         <div class="form-group">
                                             <label for="cus_tumbon">แขวง/ตำบล</label>
-                                            {{-- <input class="form-control @error('cus_tumbon') is-invalid @enderror" name="cus_tumbon" type="text" value="{{ $item->tumbon ?? '' }}"
-                                                placeholder="แขวง/ตำบล"> --}}
-
-                                            <select name="cus_tumbon" id="cus_tumbon" class="form-control">
-                                                @foreach ($amphoes as $amphure)
-                                                    <option value="{{ $amphure->amphoe_id }}"
-                                                        {{ $amphure->amphoe == $item->tumbon ? 'selected' : '' }}>
-                                                        {{ $amphure->amphoe }}
-                                                    </option>
-                                                @endforeach
+                                            <select name="cus_tumbon" id="cus_tumbon" class="form-control @error('cus_tumbon') is-invalid @enderror">
+                                                @if (!$item->tumbon)
+                                                    <option value="">-- เลือก --</option>
+                                                @endif
+                                                @if(old('cus_tumbon'))
+                                                    @foreach ($tambons as $district)
+                                                        <option value="{{ $district->tambon_id }}"
+                                                            {{ $district->tambon_id == old('cus_tumbon') ? 'selected' : '' }}>
+                                                            {{ $district->tambon }}
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    @foreach ($tambons as $district)
+                                                        <option value="{{ $district->tambon_id }}"
+                                                            {{ $district->tambon == $item->tumbon ? 'selected' : '' }}>
+                                                            {{ $district->tambon }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
                                             @error('cus_tumbon')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -922,7 +971,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label for="cus_idPost">รหัสไปรษณีย์</label>
-                                            <input class="form-control @error('cus_idPost') is-invalid @enderror" name="cus_idPost" id="cus_idPost" type="text" value="{{ $item->id_post ?? ''}}"
+                                            <input class="form-control @error('cus_idPost') is-invalid @enderror" name="cus_idPost" id="cus_idPost" type="text" value="{{ $item->id_post ?? old('cus_idPost') ?? '' }}"
                                                 placeholder="รหัสไปรษณีย์">
                                             @error('cus_idPost')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -934,7 +983,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>เบอร์โทรศัพท์</label>
-                                            <input class="form-control @error('cus_phone') is-invalid @enderror" name="cus_phone" type="text" value="{{ $item->Phone ?? '' }}"
+                                            <input class="form-control @error('cus_phone') is-invalid @enderror" name="cus_phone" type="text" value="{{ $item->Phone ?? old('cus_phone') ?? '' }}"
                                                 placeholder="เบอร์โทรศัพท์">
                                             @error('cus_phone')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -953,11 +1002,11 @@
                                                     <input class="form-control datepicker" name="Contract_Startdate" type="hidden" value="{{ $item->Contract_Startdate }}">
                                                 </div>
                                                 <div class="date_rent">
-                                                    <input class="form-control datepicker" name="Contract_Startdate_Renew" type="text" value=""
+                                                    <input class="form-control datepicker" name="Contract_Startdate_Renew" type="text" value="{{ old('Contract_Startdate_Renew') ?? '' }}"
                                             placeholder="วันเริ่มสัญญา">
                                                 </div>
                                             @else
-                                                <input class="form-control datepicker @error('Contract_Startdate') is-invalid @enderror" name="Contract_Startdate" type="text" value=""
+                                                <input class="form-control datepicker @error('Contract_Startdate') is-invalid @enderror" name="Contract_Startdate" type="text" value="{{ old('Contract_Startdate') ?? '' }}"
                                             placeholder="วันเริ่มสัญญา">
                                                 @error('Contract_Startdate')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -977,11 +1026,11 @@
                                                     <input class="form-control datepicker" name="Contract_Enddate" type="hidden" value="{{ $item->Contract_Enddate }}">
                                                 </div>
                                                 <div  class="date_rent">
-                                                    <input class="form-control datepicker" name="Contract_Enddate_Renew" type="text" value=""
+                                                    <input class="form-control datepicker" name="Contract_Enddate_Renew" type="text" value="{{ old('Contract_Enddate_Renew') ?? '' }}"
                                             placeholder="วันสิ้นสุดสัญญา">
                                                 </div>
                                             @else
-                                                <input class="form-control datepicker @error('Contract_Enddate') is-invalid @enderror" name="Contract_Enddate" type="text" value=""
+                                                <input class="form-control datepicker @error('Contract_Enddate') is-invalid @enderror" name="Contract_Enddate" type="text" value="{{ old('Contract_Enddate') ?? '' }}"
                                             placeholder="วันสิ้นสุดสัญญา">
                                                 @error('Contract_Enddate')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -998,14 +1047,15 @@
                                             {{-- <p class="form-control"><font color="red">{{ $item->Contract ?? ''}}</font> เดือน <input name="Contract" type="text" value="{{ $item->Contract ?? 0}}" style="width: 15%"> วัน </p> --}}
                                             @if ($item->Contract)
                                             <div class="date_rent_show">
-                                                <p class="form-control"><font color="red">{{ $item->Contract ?? ''}}</font> เดือน <input name="Contract" type="text" value="{{ $item->Day ?? 0}}" style="width:25%; margin-left:10px;"> วัน </p>
+                                                <input class="form-control" name="Contract" type="hidden" value="{{ $item->Contract }}">
+                                                <p class="form-control"><font color="red">{{ $item->Contract }}</font> เดือน <input name="Day" type="text" value="{{ $item->Day ?? old('Day') ?? 0 }}" style="width:25%; margin-left:10px;"> วัน </p>
                                             </div>
                                             <div class="date_rent">
-                                                <p class="form-control"><input name="Contract_Renew" type="number" value="" style="width: 25%"> เดือน <input name="Day_Renew" type="number" value="" style="width:25%; margin-left:15px;"> วัน </p>
+                                                <p class="form-control"><input name="Contract_Renew" type="number" value="{{ old('Contract_Renew') ?? '' }}" style="width: 25%"> เดือน <input name="Day_Renew" type="number" value="{{ old('Day_Renew') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>
                                             </div>
                                                 
                                             @else
-                                                <p class="form-control @error('Contract') is-invalid @enderror"><input name="Contract" type="number" value="" style="width: 25%"> เดือน <input name="Day" type="number" value="" style="width:25%; margin-left:15px;"> วัน </p>
+                                                <p class="form-control @error('Contract') is-invalid @enderror"><input name="Contract" type="number" value="{{ old('Contract') ?? '' }}" style="width: 25%"> เดือน <input name="Day" type="number" value="{{ old('Day') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>
                                                 @error('Contract')
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
@@ -1023,11 +1073,11 @@
                                                     <input class="form-control" name="start_paid_date" type="hidden" value="{{ $item->start_paid_date }}">
                                                 </div>
                                                 <div class="date_rent">
-                                                    <input class="form-control datepicker" name="start_paid_date_Renew" type="text" value="" placeholder="วันที่เริ่มจ่ายงวดแรก">
+                                                    <input class="form-control datepicker" name="start_paid_date_Renew" type="text" value="{{ old('start_paid_date_Renew') ?? '' }}" placeholder="วันที่เริ่มจ่ายงวดแรก">
                                                 </div>
                                                 
                                             @else
-                                                <input class="form-control datepicker @error('start_paid_date') is-invalid @enderror" name="start_paid_date" type="text" value=""
+                                                <input class="form-control datepicker @error('start_paid_date') is-invalid @enderror" name="start_paid_date" type="text" value="{{ old('start_paid_date') ?? '' }}"
                                             placeholder="วันที่เริ่มจ่ายงวดแรก">
                                                 @error('start_paid_date')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -1051,7 +1101,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>ราคา</label>
-                                            <input class="form-control" name="Price" type="text" value="{{ $item->Price ?? '' }}"
+                                            <input class="form-control" name="Price" type="text" value="{{ $item->Price ?? old('Price') ?? '' }}"
                                                 placeholder="ราคา"> บาท
                                         </div>
                                     </div>
@@ -1062,6 +1112,31 @@
                                             <label>ใบเสร็จจาก express</label>
                                             <input class="form-control" name="fileUploadExpress" type="file" value="{{ $item->print_contract_manual ?? ''}}"
                                                 placeholder="ใบเสร็จจาก express">
+                                            @if (date("m") == '01')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '02')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '03')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '04')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '05')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '06')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '07')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '08')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '09')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '10')
+                                                <input type="hidden" name="filename" value="">
+                                            @elseif(date("m") == '11')
+                                                <input type="hidden" name="filename" value="">
+                                            @else
+                                                <input type="hidden" name="filename" value="">
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1069,8 +1144,6 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>สัญญา</label>
-                                            {{-- <input class="form-control" name="Contract_Reason" type="text" value="{{ $item->Contract_Reason ?? '' }}"
-                                                placeholder="สัญญา"> --}}
                                             <select class="form-control" name="Contract_Reason">
                                                 <option value="">--เลือก--</option>
                                                 <option value="เซ็นครบ-เอกสารสมบูรณ์" {{ $item->Contract_Reason == 'เซ็นครบ-เอกสารสมบูรณ์' ? 'selected' : '' }}>เซ็นครบ-เอกสารสมบูรณ์</option>
@@ -1090,8 +1163,6 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>สถานะเช่า</label>
-                                            {{-- <input class="form-control" name="Contract_Status" type="text" value="{{ $item->Contract_Status ?? '' }}"
-                                                placeholder="สถานะเช่า"> --}}
                                                 <select class="form-control" name="Contract_Status" id="ddl">
                                                     <option value="">-- เลือก --</option>
                                                     <option value="เช่าอยู่" {{ $item->Contract_Status === 'เช่าอยู่' ? 'selected' : ''}}>เช่าอยู่</option>
@@ -1108,7 +1179,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>วันออก</label>
-                                            <input class="form-control datepicker" name="Cancle_Date" id="Cancle_Date" value="{{ $item->date_firstget ?? '' }}"
+                                            <input class="form-control datepicker" name="Cancle_Date" id="Cancle_Date" value="{{ $item->date_firstget ?? old('Cancle_Date') ?? '' }}"
                                                 placeholder="วันออก">
                                         </div>
                                     </div>
@@ -1117,7 +1188,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>หมายเหตุ ลูกค้า</label>
-                                                <textarea class="form-control" name="cust_remark" id="" cols="5" rows="3">{{ $item->print_contract_manual ?? ''}}</textarea>
+                                                <textarea class="form-control" name="cust_remark" id="" cols="5" rows="3">{{ $item->cust_remark ?? old('cust_remark') ?? '' }}</textarea>
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1133,10 +1204,8 @@
                                     <div class="col-sm-1">
                                         <div class="form-group">
                                             <label style="margin-left: 20px;">รูปภาพปก</label>
-                                            {{-- <input class="form-control" id="filUploadMain" name="filUploadMain" type="file"
-                                                placeholder="รูปภาพปก"> --}}
-                                            {{-- <span><img src="{{ $item->image }}" height="50"/></span> --}}
-                                            <div class="mt-3"><img src="https://img.freepik.com/free-vector/hacker-anonymous-mask-server-room-with-multiple-computer-monitors-displaying-secret-information_33099-1629.jpg?w=1380&t=st=1712651282~exp=1712651882~hmac=d3f15efe0108fb807d63b90cfec27b9d88c04d955eafd4da8d9c906b00a0f390" height="160" style="border-radius: 10%; margin-top: 5px;"/></div>
+                                            <div class="mt-3"><img src="{{ asset($item->image) }}" height="160" style="border-radius: 10%; margin-top: 5px;"/></div>
+                                            {{-- <div class="mt-3"><img src="https://img.freepik.com/free-vector/hacker-anonymous-mask-server-room-with-multiple-computer-monitors-displaying-secret-information_33099-1629.jpg?w=1380&t=st=1712651282~exp=1712651882~hmac=d3f15efe0108fb807d63b90cfec27b9d88c04d955eafd4da8d9c906b00a0f390" height="160" style="border-radius: 10%; margin-top: 5px;"/></div> --}}
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -1144,17 +1213,13 @@
                                     <div class="col-sm-1">
                                         <div class="form-group">
                                             <label style="margin-left: 160px; width: 100%">รูปภาพห้อง</label>
-                                            {{-- <input class="form-control" id="filUpload" name="filUpload[]" type="file"
-                                                placeholder="รูปภาพห้อง" multiple="multiple"> --}}
-                                                {{-- <span><img src="{{ $item->image }}" height="50"/></span> --}}
-                                                {{-- <div class="mt-3"><img src="https://img.freepik.com/free-vector/hacker-anonymous-mask-server-room-with-multiple-computer-monitors-displaying-secret-information_33099-1629.jpg?w=1380&t=st=1712651282~exp=1712651882~hmac=d3f15efe0108fb807d63b90cfec27b9d88c04d955eafd4da8d9c906b00a0f390" height="160" style="border-radius: 10%; margin-top: 5px;"/></div> --}}
                                         </div>
                                     </div>
                                     @foreach ($images as $image)
                                     <div class="col-sm-1">
                                         <div class="form-group">
                                             <label></label>
-                                            <span><img src="https://img.freepik.com/free-vector/hacker-anonymous-mask-server-room-with-multiple-computer-monitors-displaying-secret-information_33099-1629.jpg?w=1380&t=st=1712651282~exp=1712651882~hmac=d3f15efe0108fb807d63b90cfec27b9d88c04d955eafd4da8d9c906b00a0f390" height="160" style="border-radius: 10%; margin-top: 30px;" height="50"/></span>
+                                            <span><img src="{{ asset($image->img_path) }}" height="160" style="border-radius: 10%; margin-top: 30px;" height="50"/></span>
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1264,11 +1329,9 @@
     function showAmphoes() {
             let input_province = document.querySelector("#owner_province");                    
             let url = "{{ url('../api/rental/amphoes') }}?province_id=" + input_province.value;
-            // console.log(url);
             fetch(url)
                 .then(response => response.json())
                 .then(result => {
-                    console.log(result);
                     let input_amphoe = document.querySelector("#owner_khet");
                     input_amphoe.innerHTML = '<option value="">กรุณาเลือกเขต/อำเภอ</option>';
                 for (let item of result) {
@@ -1286,11 +1349,9 @@
         let input_amphoe = document.querySelector("#owner_khet");
         let url = "{{ url('../api/rental/tambons') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
                 .value;
-        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 let input_tambon = document.querySelector("#owner_district");
                 input_tambon.innerHTML = '<option value="">กรุณาเลือกแขวง/ตำบล</option>';
                 for (let item of result) {
@@ -1306,11 +1367,9 @@
     function cusAmphoes() {
             let input_province = document.querySelector("#cus_province");                    
             let url = "{{ url('../api/rental/amphoes') }}?province_id=" + input_province.value;
-            // console.log(url);
             fetch(url)
                 .then(response => response.json())
                 .then(result => {
-                    console.log(result);
                     let input_amphoe = document.querySelector("#cus_aumper");
                     input_amphoe.innerHTML = '<option value="">กรุณาเลือกเขต/อำเภอ</option>';
                 for (let item of result) {
@@ -1328,11 +1387,9 @@
         let input_amphoe = document.querySelector("#cus_aumper");
         let url = "{{ url('../api/rental/tambons') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
                 .value;
-        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 let input_tambon = document.querySelector("#cus_tumbon");
                 input_tambon.innerHTML = '<option value="">กรุณาเลือกแขวง/ตำบล</option>';
                 for (let item of result) {
@@ -1353,7 +1410,6 @@
         let input_tambon = document.querySelector("#cus_tumbon");
         let url = "{{ url('../api/rental/zipcodes') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
             .value + "&tambon_id=" + input_tambon.value;
-        console.log(url);
         fetch(url)
             .then(response => response.json())
             .then(result => {
@@ -1370,9 +1426,9 @@
     document.querySelector('#owner_khet').addEventListener('change', (event) => {
         showTambons();
     });
-    document.querySelector('#owner_district').addEventListener('change', (event) => {
-        showZipcode();
-    });
+    // document.querySelector('#owner_district').addEventListener('change', (event) => {
+    //     showZipcode();
+    // });
 
     // EVENTS CUSTOMER
     document.querySelector('#cus_province').addEventListener('change', (event) => {

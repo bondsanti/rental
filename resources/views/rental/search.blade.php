@@ -303,10 +303,15 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($item->Contract_Enddate)
-                                                    {{ date('d/m/Y', strtotime($item->Contract_Enddate)) }}
-                                                @else
+                                                @if ($item->Contract_Enddate  == "0000-00-00" )
                                                     -
+                                                @else
+                                                    @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($item->Contract_Enddate))))
+                                                        <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($item->Contract_Enddate)) }}</div>
+                                                    @else
+                                                        {{ date('d/m/Y', strtotime($item->Contract_Enddate)) }}
+                                                    @endif
+                                                    
                                                 @endif
                                             </td>
                                             <td>
@@ -1043,7 +1048,7 @@
             $('#project_id').val(project_id);
             $('#customer_id').val(customer_id);
             $.get('../api/rental/getLeaseCode/' + project_id, function(data) {
-                // console.log(data);
+                console.log(data);
                 const lease_code_id = data.lease_code_id;
                 const lease_agr_code = data.lease_agr_code;
                 const sub_lease_code = data.sub_lease_code;

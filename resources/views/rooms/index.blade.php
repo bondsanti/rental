@@ -137,10 +137,17 @@
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> แขวง/ตำบล</label>
-                                            <input class="form-control @error('owner_district') is-invalid @enderror" name="owner_district" type="text"
-                                                placeholder="แขวง/ตำบล" value="{{ old('owner_district') }}">
-                                            @error('owner_district')
+                                            <label for="owner_province"><b class="text-danger">*</b> จังหวัด</label>
+                                            <select name="owner_province" id="owner_province" class="form-control @error('owner_province') is-invalid @enderror">
+                                                <option value="">-- เลือก --</option>
+                                                @foreach ($provinces as $province)
+                                                    <option value="{{ $province->province_id }}"
+                                                        {{ $province->province_id == old('owner_province') ? 'selected' : '' }}>
+                                                        {{ $province->province }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('owner_province')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -148,9 +155,19 @@
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> เขต/อำเภอ</label>
-                                            <input class="form-control @error('owner_khet') is-invalid @enderror" name="owner_khet" type="text"
-                                                placeholder="เขต/อำเภอ" value="{{ old('owner_khet') }}">
+                                            <label for="owner_khet"><b class="text-danger">*</b> เขต/อำเภอ</label>
+                                            <select name="owner_khet" id="owner_khet" class="form-control @error('owner_khet') is-invalid @enderror">
+                                                <option value="">-- เลือก --</option>
+                                                @if (old('owner_khet'))
+                                                    @foreach ($amphoes as $amphure)
+                                                        <option value="{{ $amphure->amphoe_id }}"
+                                                            {{ $amphure->amphoe_id == old('owner_khet') ? 'selected' : '' }}>
+                                                            {{ $amphure->amphoe }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                                
+                                            </select>
                                             @error('owner_khet')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
@@ -159,87 +176,19 @@
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> จังหวัด</label>
-                                            <select class="form-control @error('owner_province') is-invalid @enderror" name="owner_province">
+                                            <label for="owner_district"><b class="text-danger">*</b> แขวง/ตำบล</label>
+                                            <select name="owner_district" id="owner_district"class="form-control @error('owner_district') is-invalid @enderror">
                                                 <option value="">-- เลือก --</option>
-                                                <option value="กรุงเทพมหานคร" {{ old('owner_province') == 'กรุงเทพมหานคร' ? 'selected' : '' }}>กรุงเทพมหานคร</option>
-                                                <option value="กระบี่" {{ old('owner_province') == 'กระบี่' ? 'selected' : '' }}>กระบี่</option>
-                                                <option value="กาญจนบุรี" {{ old('owner_province') == 'กาญจนบุรี' ? 'selected' : '' }}>กาญจนบุรี</option>
-                                                <option value="กาฬสินธุ์" {{ old('owner_province') == 'กาฬสินธุ์' ? 'selected' : '' }}>กาฬสินธุ์</option>
-                                                <option value="กำแพงเพชร" {{ old('owner_province') == 'กำแพงเพชร' ? 'selected' : '' }}>กำแพงเพชร</option>
-                                                <option value="ขอนแก่น" {{ old('owner_province') == 'ขอนแก่น' ? 'selected' : '' }}>ขอนแก่น</option>
-                                                <option value="จันทบุรี" {{ old('owner_province') == 'จันทบุรี' ? 'selected' : '' }}>จันทบุรี</option>
-                                                <option value="ฉะเชิงเทรา" {{ old('owner_province') == 'ฉะเชิงเทรา' ? 'selected' : '' }}>ฉะเชิงเทรา</option>
-                                                <option value="ชัยนาท" {{ old('owner_province') == 'ชัยนาท' ? 'selected' : '' }}>ชัยนาท</option>
-                                                <option value="ชัยภูมิ" {{ old('owner_province') == 'ชัยภูมิ' ? 'selected' : '' }}>ชัยภูมิ</option>
-                                                <option value="ชุมพร" {{ old('owner_province') == 'ชุมพร' ? 'selected' : '' }}>ชุมพร</option>
-                                                <option value="ชลบุรี" {{ old('owner_province') == 'ชลบุรี' ? 'selected' : '' }}>ชลบุรี</option>
-                                                <option value="เชียงใหม่" {{ old('owner_province') == 'เชียงใหม่' ? 'selected' : '' }}>เชียงใหม่</option>
-                                                <option value="เชียงราย" {{ old('owner_province') == 'เชียงราย' ? 'selected' : '' }}>เชียงราย</option>
-                                                <option value="ตรัง" {{ old('owner_province') == 'ตรัง' ? 'selected' : '' }}>ตรัง</option>
-                                                <option value="ตราด" {{ old('owner_province') == 'ตราด' ? 'selected' : '' }}>ตราด</option>
-                                                <option value="ตาก" {{ old('owner_province') == 'ตาก' ? 'selected' : '' }}>ตาก</option>
-                                                <option value="นครนายก" {{ old('owner_province') == 'นครนายก' ? 'selected' : '' }}>นครนายก</option>
-                                                <option value="นครปฐม" {{ old('owner_province') == 'นครปฐม' ? 'selected' : '' }}>นครปฐม</option>
-                                                <option value="นครพนม" {{ old('owner_province') == 'นครพนม' ? 'selected' : '' }}>นครพนม</option>
-                                                <option value="นครราชสีมา" {{ old('owner_province') == 'นครราชสีมา' ? 'selected' : '' }}>นครราชสีมา</option>
-                                                <option value="นครศรีธรรมราช" {{ old('owner_province') == 'นครศรีธรรมราช' ? 'selected' : '' }}>นครศรีธรรมราช</option>
-                                                <option value="นครสวรรค์" {{ old('owner_province') == 'นครสวรรค์' ? 'selected' : '' }}>นครสวรรค์</option>
-                                                <option value="นราธิวาส" {{ old('owner_province') == 'นราธิวาส' ? 'selected' : '' }}>นราธิวาส</option>
-                                                <option value="น่าน" {{ old('owner_province') == 'น่าน' ? 'selected' : '' }}>น่าน</option>
-                                                <option value="นนทบุรี" {{ old('owner_province') == 'นนทบุรี' ? 'selected' : '' }}>นนทบุรี</option>
-                                                <option value="บึงกาฬ" {{ old('owner_province') == 'บึงกาฬ' ? 'selected' : '' }}>บึงกาฬ</option>
-                                                <option value="บุรีรัมย์" {{ old('owner_province') == 'บุรีรัมย์' ? 'selected' : '' }}>บุรีรัมย์</option>
-                                                <option value="ประจวบคีรีขันธ์" {{ old('owner_province') == 'ประจวบคีรีขันธ์' ? 'selected' : '' }}>ประจวบคีรีขันธ์</option>
-                                                <option value="ปทุมธานี" {{ old('owner_province') == 'ปทุมธานี' ? 'selected' : '' }}>ปทุมธานี</option>
-                                                <option value="ปราจีนบุรี" {{ old('owner_province') == 'ปราจีนบุรี' ? 'selected' : '' }}>ปราจีนบุรี</option>
-                                                <option value="ปัตตานี" {{ old('owner_province') == 'ปัตตานี' ? 'selected' : '' }}>ปัตตานี</option>
-                                                <option value="พะเยา" {{ old('owner_province') == 'พะเยา' ? 'selected' : '' }}>พะเยา</option>
-                                                <option value="พระนครศรีอยุธยา" {{ old('owner_province') == 'พระนครศรีอยุธยา' ? 'selected' : '' }}>พระนครศรีอยุธยา</option>
-                                                <option value="พังงา" {{ old('owner_province') == 'พังงา' ? 'selected' : '' }}>พังงา</option>
-                                                <option value="พิจิตร" {{ old('owner_province') == 'พิจิตร' ? 'selected' : '' }}>พิจิตร</option>
-                                                <option value="พิษณุโลก" {{ old('owner_province') == 'พิษณุโลก' ? 'selected' : '' }}>พิษณุโลก</option>
-                                                <option value="เพชรบุรี" {{ old('owner_province') == 'เพชรบุรี' ? 'selected' : '' }}>เพชรบุรี</option>
-                                                <option value="เพชรบูรณ์" {{ old('owner_province') == 'เพชรบูรณ์' ? 'selected' : '' }}>เพชรบูรณ์</option>
-                                                <option value="แพร่" {{ old('owner_province') == 'แพร่' ? 'selected' : '' }}>แพร่</option>
-                                                <option value="พัทลุง" {{ old('owner_province') == 'พัทลุง' ? 'selected' : '' }}>พัทลุง</option>
-                                                <option value="ภูเก็ต" {{ old('owner_province') == 'ภูเก็ต' ? 'selected' : '' }}>ภูเก็ต</option>
-                                                <option value="มหาสารคาม" {{ old('owner_province') == 'มหาสารคาม' ? 'selected' : '' }}>มหาสารคาม</option>
-                                                <option value="มุกดาหาร" {{ old('owner_province') == 'มุกดาหาร' ? 'selected' : '' }}>มุกดาหาร</option>
-                                                <option value="แม่ฮ่องสอน" {{ old('owner_province') == 'แม่ฮ่องสอน' ? 'selected' : '' }}>แม่ฮ่องสอน</option>
-                                                <option value="ยโสธร" {{ old('owner_province') == 'ยโสธร' ? 'selected' : '' }}>ยโสธร</option>
-                                                <option value="ยะลา" {{ old('owner_province') == 'ยะลา' ? 'selected' : '' }}>ยะลา</option>
-                                                <option value="ร้อยเอ็ด" {{ old('owner_province') == 'ร้อยเอ็ด' ? 'selected' : '' }}>ร้อยเอ็ด</option>
-                                                <option value="ระนอง" {{ old('owner_province') == 'ระนอง' ? 'selected' : '' }}>ระนอง</option>
-                                                <option value="ระยอง" {{ old('owner_province') == 'ระยอง' ? 'selected' : '' }}>ระยอง</option>
-                                                <option value="ราชบุรี" {{ old('owner_province') == 'ราชบุรี' ? 'selected' : '' }}>ราชบุรี</option>
-                                                <option value="ลพบุรี" {{ old('owner_province') == 'ลพบุรี' ? 'selected' : '' }}>ลพบุรี</option>
-                                                <option value="ลำปาง" {{ old('owner_province') == 'ลำปาง' ? 'selected' : '' }}>ลำปาง</option>
-                                                <option value="ลำพูน" {{ old('owner_province') == 'ลำพูน' ? 'selected' : '' }}>ลำพูน</option>
-                                                <option value="เลย" {{ old('owner_province') == 'เลย' ? 'selected' : '' }}>เลย</option>
-                                                <option value="ศรีสะเกษ" {{ old('owner_province') == 'ศรีสะเกษ' ? 'selected' : '' }}>ศรีสะเกษ</option>
-                                                <option value="สกลนคร" {{ old('owner_province') == 'สกลนคร' ? 'selected' : '' }}>สกลนคร</option>
-                                                <option value="สงขลา" {{ old('owner_province') == 'สงขลา' ? 'selected' : '' }}>สงขลา</option>
-                                                <option value="สมุทรสาคร" {{ old('owner_province') == 'สมุทรสาคร' ? 'selected' : '' }}>สมุทรสาคร</option>
-                                                <option value="สมุทรปราการ" {{ old('owner_province') == 'สมุทรปราการ' ? 'selected' : '' }}>สมุทรปราการ</option>
-                                                <option value="สมุทรสงคราม" {{ old('owner_province') == 'สมุทรสงคราม' ? 'selected' : '' }}>สมุทรสงคราม</option>
-                                                <option value="สระแก้ว" {{ old('owner_province') == 'สระแก้ว' ? 'selected' : '' }}>สระแก้ว</option>
-                                                <option value="สระบุรี" {{ old('owner_province') == 'สระบุรี' ? 'selected' : '' }}>สระบุรี</option>
-                                                <option value="สิงห์บุรี" {{ old('owner_province') == 'สิงห์บุรี' ? 'selected' : '' }}>สิงห์บุรี</option>
-                                                <option value="สุโขทัย" {{ old('owner_province') == 'สุโขทัย' ? 'selected' : '' }}>สุโขทัย</option>
-                                                <option value="สุพรรณบุรี" {{ old('owner_province') == 'สุพรรณบุรี' ? 'selected' : '' }}>สุพรรณบุรี</option>
-                                                <option value="สุราษฎร์ธานี" {{ old('owner_province') == 'สุราษฎร์ธานี' ? 'selected' : '' }}>สุราษฎร์ธานี</option>
-                                                <option value="สตูล" {{ old('owner_province') == 'สตูล' ? 'selected' : '' }}>สตูล</option>
-                                                <option value="หนองคาย" {{ old('owner_province') == 'หนองคาย' ? 'selected' : '' }}>หนองคาย</option>
-                                                <option value="หนองบัวลำภู" {{ old('owner_province') == 'หนองบัวลำภู' ? 'selected' : '' }}>หนองบัวลำภู</option>
-                                                <option value="อำนาจเจริญ" {{ old('owner_province') == 'อำนาจเจริญ' ? 'selected' : '' }}>อำนาจเจริญ</option>
-                                                <option value="อุดรธานี" {{ old('owner_province') == 'อุดรธานี' ? 'selected' : '' }}>อุดรธานี</option>
-                                                <option value="อุตรดิตถ์" {{ old('owner_province') == 'อุตรดิตถ์' ? 'selected' : '' }}>อุตรดิตถ์</option>
-                                                <option value="อุทัยธานี" {{ old('owner_province') == 'อุทัยธานี' ? 'selected' : '' }}>อุทัยธานี</option>
-                                                <option value="อุบลราชธานี" {{ old('owner_province') == 'อุบลราชธานี' ? 'selected' : '' }}>อุบลราชธานี</option>
-                                                <option value="อ่างทอง" {{ old('owner_province') == 'อ่างทอง' ? 'selected' : '' }}>อ่างทอง</option>
+                                                @if (old('owner_district'))
+                                                    @foreach ($tambons as $district)
+                                                        <option value="{{ $district->tambon_id }}"
+                                                            {{ $district->tambon_id == old('owner_district') ? 'selected' : '' }}>
+                                                            {{ $district->tambon }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
                                             </select>
-                                            @error('owner_province')
+                                            @error('owner_district')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -682,14 +631,58 @@
             format: 'yyyy-mm-dd', // รูปแบบวันที่
             autoclose: true,
         });
-
-        // $('#startdate').on('changeDate', function(e) {
-        //     var selectedStartDate = e.date;
-        //     $('#enddate').datepicker('setStartDate', selectedStartDate);
-        // });
     });
     function goBack() {
         window.history.back();
     }
+
+    function showAmphoes() {
+            let input_province = document.querySelector("#owner_province");                    
+            let url = "{{ url('../api/rental/amphoes') }}?province_id=" + input_province.value;
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    let input_amphoe = document.querySelector("#owner_khet");
+                    input_amphoe.innerHTML = '<option value="">กรุณาเลือกเขต/อำเภอ</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.amphoe;
+                    option.value = item.amphoe_id;
+                    input_amphoe.appendChild(option);
+                }
+                showTambons();
+            });
+    }
+
+    function showTambons() {
+        let input_province = document.querySelector("#owner_province");
+        let input_amphoe = document.querySelector("#owner_khet");
+        let url = "{{ url('../api/rental/tambons') }}?province_id=" + input_province.value + "&amphoe_id=" + input_amphoe
+                .value;
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                let input_tambon = document.querySelector("#owner_district");
+                input_tambon.innerHTML = '<option value="">กรุณาเลือกแขวง/ตำบล</option>';
+                for (let item of result) {
+                    let option = document.createElement("option");
+                    option.text = item.tambon;
+                    option.value = item.tambon_id;
+                    input_tambon.appendChild(option);
+                }
+                // showZipcode(); // เรียกใช้ showZipcode เมื่อมีการเลือกอำเภอและตำบลใหม่
+            });
+    }
+
+    // EVENTS RENT ROOM
+    document.querySelector('#owner_province').addEventListener('change', (event) => {
+        showAmphoes();
+    }); 
+    document.querySelector('#owner_khet').addEventListener('change', (event) => {
+        showTambons();
+    });
+    // document.querySelector('#owner_district').addEventListener('change', (event) => {
+    //     showZipcode();
+    // });
 </script>
 @endpush

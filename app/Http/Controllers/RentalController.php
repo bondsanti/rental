@@ -239,12 +239,10 @@ class RentalController extends Controller
 
     public function detail($id)
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
-        $projects = Project::where('rent', 1)
-            ->orderBy('Project_Name', 'asc')
-            ->get();
-
-        // $rental_room = Rental::where('id', $id)->first();
+        // $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        // $projects = Project::where('rent', 1)
+        //     ->orderBy('Project_Name', 'asc')
+        //     ->get();
 
         $rents = Room::select(
             'projects.Project_Name',
@@ -301,9 +299,6 @@ class RentalController extends Controller
             ->where('rooms.id', $id)
             ->first();
 
-        // $projects = Project::orderBy('name', 'asc')->where('active', 1)->get();
-        // dd($rents);
-        // return view('rental.detail', compact('dataLoginUser', 'rents'));
         return response()->json($rents, 200);
     }
 
@@ -340,15 +335,44 @@ class RentalController extends Controller
             })
             ->where('rooms.id', $id)
             ->get();
-
+        // dd($rents);
         foreach ($rents as $item) {
             $ref_cus_id = $item->customer_id;
+            $pid = $item->project_id;
+            $homeNo = $item->HomeNo;
+            $roomNo = $item->RoomNo;
         }
-
+       
+        $productId = DB::select("
+            SELECT products.pid 
+            FROM rooms 
+            INNER JOIN products ON ? = products.Homeno 
+                                AND ? = products.RoomNo 
+                                AND ? = products.project_id  
+            ORDER BY products.pid DESC 
+            LIMIT 1", [$homeNo, $roomNo, $pid]
+        );
+       
+        if ($productId) {
+            $product = DB::table('products')
+            ->select('gauranteestart', 'gauranteeend')
+            ->where('pid', $productId[0]->pid)
+            ->first();
+            
+            $product_id = $productId[0]->pid;
+            $gauranteestart = $product->gauranteestart;
+            $gauranteeend = $product->gauranteeend;
+        } else {
+            $product_id = '';
+            $gauranteestart = '';
+            $gauranteeend = '';
+        }
+        
+        
         $lease_auto_code = Lease_auto_code::where('ref_cus_id', $ref_cus_id)
             ->first();
 
-        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons'));
+        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons','product_id','gauranteestart','gauranteeend'));
     }
 
     public function update(UpdateRentalRequest $request)
@@ -356,6 +380,7 @@ class RentalController extends Controller
         
         $request->validated();
         // dd($request->all());
+
         $rental_room = Room::where('id', $request->room_id)->first();
 
         if($request->owner_province && $request->owner_khet && $request->owner_district){
@@ -371,28 +396,126 @@ class RentalController extends Controller
 
         // อัปโหลดไฟล์บัตรประชาชน
         if ($request->hasFile('filUploadPersonID')) {
+            $allowedfileExtension = ['jpg', 'jpeg','png','pdf'];
             $file = $request->file('filUploadPersonID');
             $extension = $file->getClientOriginalExtension();
-            $filename = 'Idcard' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-            $file->move('uploads/image_id/', $filename);
-            $rental_room->file_id_path = $filename;
+            $check = in_array($extension, $allowedfileExtension);
+            if ($check) {
+                $filename = 'Idcard' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                $file->move('uploads/image_id/', $filename);
+                $rental_room->file_id_path = $filename;
+            } else {
+                Alert::error('Error', 'Allowed types: jpg, jpeg, png','pdf');
+                return redirect()->back(); 
+            }
         }
         // อัปโหลดไฟล์สัญญา
         if ($request->hasFile('filUploadContract')) {
+            $allowedfileExtension = ['jpg', 'jpeg','png','pdf'];
             $file = $request->file('filUploadContract');
             $extension = $file->getClientOriginalExtension();
-            $filename = 'Idrent' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-            $file->move('uploads/image_rent/', $filename);
-            $rental_room->file_rent = $filename;
+            $check = in_array($extension, $allowedfileExtension);
+            if ($check) {
+                $filename = 'Idrent' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                $file->move('uploads/image_rent/', $filename);
+                $rental_room->file_rent = $filename;
+            } else {
+                Alert::error('Error', 'Allowed types: jpg, jpeg, png','pdf');
+                return redirect()->back(); 
+            }
         }
         // รูปภาพปก
         if ($request->hasFile('filUploadMain')) {
-            $URL = request()->getHttpHost();
+            $allowedfileExtension = ['jpg', 'jpeg','png'];
             $file = $request->file('filUploadMain');
             $extension = $file->getClientOriginalExtension();
-            $filename = 'main_' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-            $file->move('uploads/images_room/', $filename);
-            $rental_room->image = $URL . '/uploads/images_room/' . $filename;
+            $check = in_array($extension, $allowedfileExtension);
+            if ($check) {
+                $filename = 'main_' . $rental_room->id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                $file->move('uploads/images_room/', $filename);
+                $rental_room->image = 'uploads/images_room/' . $filename;
+            } else {
+                Alert::error('Error', 'Allowed types: jpg, jpeg, png','pdf');
+                return redirect()->back(); 
+            }
+        }
+
+        // รูปภาพห้อง
+        if ($request->hasFile('filUpload')) {
+            $allowedfileExtension = ['jpg', 'jpeg','png'];
+            $files = $request->file('filUpload');
+            $isImage = NULL;
+            $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
+            foreach ($files as $key => $file) {
+                $extension = $file->getClientOriginalExtension();
+                $check = in_array($extension, $allowedfileExtension);
+                if ($check) {
+                    $filename = $file->getClientOriginalName();
+                    $name =  $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
+                    $file->move('uploads/images_room', $name);
+                    $img_room[$key] = 'uploads/images_room/' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
+            
+                    if($isImage){
+                        $isImage->img_path = $img_room[$key];
+                        $isImage->img_category = 'เช่าอยู่';
+                        $isImage->save();
+                    }else{
+                        $image = new Room_Images();
+                        $image->rid = $request->room_id;
+                        $image->img_path = $img_room[$key];
+                        $image->img_category = 'เช่าอยู่';
+                        $image->save();
+                    }
+                }
+                else {
+                    Alert::error('Error', 'Allowed types: jpg, jpeg, png');
+                    return redirect()->back(); 
+                }
+            }
+        }
+
+        // หนังสือสัญญา
+        if ($request->hasFile('file_contract_path')) {
+            $allowedfileExtension = ['jpg', 'jpeg','png', 'pdf'];
+            $file = $request->file('file_contract_path');
+            $extension = $file->getClientOriginalExtension();
+            $check = in_array($extension, $allowedfileExtension);
+            if ($check) {
+                $filename = 'contract_' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                $file->move('uploads/image_custrent/', $filename);
+                // $rental_customer->file_contract_path = 'uploads/image_custrent/' . $filename;
+                $file_contract_path = 'uploads/image_custrent/' . $filename;
+            } else {
+                Alert::error('Error', 'Allowed types: jpg, jpeg, png, pdf');
+                return redirect()->back(); 
+            }  
+        }
+        // ใบเสร็จจาก express
+        if ($request->hasFile('fileUploadExpress')) {
+            $file = $request->file('fileUploadExpress');
+            $extension = $file->getClientOriginalExtension();
+            $fileExpress = $file->getClientOriginalName();
+            // $file->move('uploads/fileexpress/', $fileExpress);
+            // $rental_customer->file_contract_path = 'uploads/fileexpress/' . $filename;
+        }else{
+            $fileExpress = $request->filename ?? '';
+        }
+        // ไฟล์บัตรประชาชนลูกค้า
+        if ($request->hasFile('file_id_path_cus')) {
+            $allowedfileExtension = ['jpg', 'jpeg','png', 'pdf'];
+            $file = $request->file('file_id_path_cus');
+            $extension = $file->getClientOriginalExtension();
+            $check = in_array($extension, $allowedfileExtension);
+            if ($check) {
+                // $filename = $file->getClientOriginalName();
+                $filename = $request->customer_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+                $file->move('uploads/image_custrent/', $filename);
+                // $rental_customer->file_id_path_cus = 'uploads/image_custrent/' . $filename;
+                $file_id_path_cus = 'uploads/image_custrent/' . $filename;
+            } else {
+                Alert::error('Error', 'Allowed types: jpg, jpeg, png, pdf');
+                return redirect()->back(); 
+            }  
         }
 
         if (!$request->show_price) {
@@ -421,9 +544,9 @@ class RentalController extends Controller
         $rental_room->cardowner = $request->cardowner ?? NULL;
         $rental_room->owner_soi = $request->owner_soi ?? NULL;
         $rental_room->owner_road = $request->owner_road ?? NULL;
-        $rental_room->owner_district = $owner_district ?? NULL;
-        $rental_room->owner_khet = $owner_khet ?? NULL;
-        $rental_room->owner_province = $owner_province ?? NULL;
+        $rental_room->owner_district = $owner_district->tambon ?? NULL;
+        $rental_room->owner_khet = $owner_khet->amphoe ?? NULL;
+        $rental_room->owner_province = $owner_province->province  ?? NULL;
         $rental_room->Phone = $request->ownerphone ?? NULL;
         $rental_room->Transfer_Date = $request->transfer_date ?? NULL;
         $rental_room->RoomNo = $request->RoomNo ?? NULL;
@@ -472,71 +595,11 @@ class RentalController extends Controller
         $rental_room->Other = $request->Other ?? NULL;
         $rental_room->save();
 
-        // รูปภาพห้อง
-        if ($request->hasFile('filUpload')) {
-            $URL = request()->getHttpHost();
-            $allowedfileExtension = ['jpg', 'jpeg','png'];
-            $files = $request->file('filUpload');
-            $isImage = NULL;
-            $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
-            foreach ($files as $key => $file) {
-                $extension = $file->getClientOriginalExtension();
-                $check = in_array($extension, $allowedfileExtension);
-                if ($check) {
-                    $filename = $file->getClientOriginalName();
-                    $file->move('uploads/images_room', $filename);
-                    $img_room[$key] =  $URL . '/uploads/images_room/' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
-            
-                    if($isImage){
-                        $isImage->img_path = $img_room[$key];
-                        $isImage->img_category = 'เช่าอยู่';
-                        $isImage->save();
-                    }else{
-                        $image = new Room_Images();
-                        $image->rid = $request->room_id;
-                        $image->img_path = $img_room[$key];
-                        $image->img_category = 'เช่าอยู่';
-                        $image->save();
-                    }
-                }
-                else {
-                    Alert::error('Error', 'Allowed types: jpg, jpeg, png');
-                    return redirect()->back(); 
-                }
-            }
-        }
-
+        
         $rental_customer = Customer::where('rid', $request->room_id)->where('id', $request->customer_id)->first();
         // dd($rental_customer);
         if ($rental_customer) {
-            // หนังสือสัญญา
-            if ($request->hasFile('file_contract_path')) {
-                $file = $request->file('file_contract_path');
-                $extension = $file->getClientOriginalExtension();
-                $filename = 'contract_' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-                $file->move('uploads/image_custrent/', $filename);
-                $rental_customer->file_contract_path = 'uploads/image_custrent/' . $filename;
-            }
-            // ใบเสร็จจาก express
-            if ($request->hasFile('fileUploadExpress')) {
-                $file = $request->file('fileUploadExpress');
-                $extension = $file->getClientOriginalExtension();
-                $fileExpress = $file->getClientOriginalName();
-                // $file->move('uploads/fileexpress/', $fileExpress);
-                // $rental_customer->file_contract_path = 'uploads/fileexpress/' . $filename;
-            }else{
-                $fileExpress = $request->filename;
-            }
-            // ไฟล์บัตรประชาชนลูกค้า
-            if ($request->hasFile('file_id_path_cus')) {
-                $file = $request->file('file_id_path_cus');
-                $extension = $file->getClientOriginalExtension();
-                // $filename = $file->getClientOriginalName();
-                $filename = $request->customer_id . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-                $file->move('uploads/image_custrent/', $filename);
-                $rental_customer->file_id_path_cus = 'uploads/image_custrent/' . $filename;
-            }
-
+            
             if ($request->Contract_Status == 'ต่อสัญญา') {
                 // 1. update customer
                 $CurrentContract = Customer::where('rid', $request->room_id)->orderBy('id','desc')->first();
@@ -559,9 +622,9 @@ class RentalController extends Controller
                 $newContract->home_address = $request->cus_homeAddress ?? NULL;
                 $newContract->cust_soi = $request->cust_soi ?? NULL;
                 $newContract->cust_road = $request->cust_road ?? NULL;
-                $newContract->tumbon = $cus_tumbon ?? NULL;
-                $newContract->aumper = $cus_aumper ?? NULL;
-                $newContract->province = $cus_province ?? NULL;
+                $newContract->tumbon = $cus_tumbon->tambon ?? NULL;
+                $newContract->aumper = $cus_aumper->amphoe ?? NULL;
+                $newContract->province = $cus_province->province ?? NULL;
                 $newContract->id_post = $request->cus_idPost ?? NULL;
                 $newContract->Phone = $request->cus_phone ?? NULL;
                 $newContract->Price = $request->Price ?? NULL;
@@ -574,6 +637,8 @@ class RentalController extends Controller
                 $newContract->Contract_Reason = $request->Contract_Reason ?? NULL;
                 $newContract->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
                 $newContract->cust_remark = $request->cust_remark;
+                $newContract->file_id_path_cus = $file_id_path_cus ?? NULL;
+                $newContract->file_contract_path = $file_contract_path ?? NULL;
                 $newContract->save();
 
                 // 3. insert new payment
@@ -784,15 +849,17 @@ class RentalController extends Controller
                 $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
                 $rental_customer->cust_soi = $request->cust_soi ?? NULL;
                 $rental_customer->cust_road = $request->cust_road ?? NULL;
-                $rental_customer->tumbon = $cus_tumbon ?? NULL;
-                $rental_customer->aumper = $cus_aumper ?? NULL;
-                $rental_customer->province = $cus_province ?? NULL;
+                $rental_customer->tumbon = $cus_tumbon->tambon ?? NULL;
+                $rental_customer->aumper = $cus_aumper->amphoe ?? NULL;
+                $rental_customer->province = $cus_province->province ?? NULL;
                 $rental_customer->id_post = $request->cus_idPost ?? NULL;
                 $rental_customer->Phone = $request->cus_phone ?? NULL;
                 $rental_customer->Price = $request->Price ?? NULL;
                 $rental_customer->Day = $request->Day ?? 0;
                 $rental_customer->Cancle_Date = $request->Cancle_Date ?? NULL;
                 $rental_customer->Contract_Status = $request->Contract_Status ?? NULL;
+                $rental_customer->Contract_Startdate = $request->Contract_Startdate ?? NULL;
+                $rental_customer->Contract_Enddate = $request->Contract_Enddate ?? NULL;
                 $rental_customer->Contract_Reason = $request->Contract_Reason ?? NULL;
                 $rental_customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
                 $rental_customer->cust_remark = $request->cust_remark;
@@ -1157,21 +1224,37 @@ class RentalController extends Controller
                 $rental_customer->home_address = $request->cus_homeAddress ?? NULL;
                 $rental_customer->cust_soi = $request->cust_soi ?? NULL;
                 $rental_customer->cust_road = $request->cust_road ?? NULL;
-                $rental_customer->tumbon = $cus_tumbon ?? NULL;
-                $rental_customer->aumper = $cus_aumper ?? NULL;
-                $rental_customer->province = $cus_province ?? NULL;
+                $rental_customer->tumbon = $cus_tumbon->tambon ?? NULL;
+                $rental_customer->aumper = $cus_aumper->amphoe ?? NULL;
+                $rental_customer->province = $cus_province->province ?? NULL;
                 $rental_customer->id_post = $request->cus_idPost ?? NULL;
                 $rental_customer->Phone = $request->cus_phone ?? NULL;
                 $rental_customer->Price = $request->Price ?? NULL;
                 $rental_customer->Day = $request->Day ?? 0;
                 $rental_customer->Contract_Status = $request->Contract_Status ?? NULL;
+                $rental_customer->Contract_Startdate = $request->Contract_Startdate ?? NULL;
+                $rental_customer->Contract_Enddate = $request->Contract_Enddate ?? NULL;
                 $rental_customer->Contract_Reason = $request->Contract_Reason ?? NULL;
                 $rental_customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
                 $rental_customer->cust_remark = $request->cust_remark;
+                $rental_customer->file_id_path_cus = $file_id_path_cus ?? NULL;
+                $rental_customer->file_contract_path = $file_contract_path ?? NULL;
                 $rental_customer->save();
             }
             
         } else {
+            $getLastId = DB::table('customers')
+                ->select('id')
+                ->orderBy('id', 'DESC')
+                ->limit(1)
+                ->first();
+
+            if ($getLastId) {
+                $lastId = $getLastId->id + 1;
+            } else {
+                
+                $lastId = 1;
+            }
             $customer = new Customer();
             $customer->rid = $request->room_id ?? NULL;
             $customer->pid = $request->project_id ?? NULL;
@@ -1184,9 +1267,9 @@ class RentalController extends Controller
             $customer->home_address = $request->cus_homeAddress ?? NULL;
             $customer->cust_soi = $request->cust_soi ?? NULL;
             $customer->cust_road = $request->cust_road ?? NULL;
-            $customer->tumbon = $cus_tumbon ?? NULL;
-            $customer->aumper = $cus_aumper ?? NULL;
-            $customer->province = $cus_province ?? NULL;
+            $customer->tumbon = $cus_tumbon->tambon ?? NULL;
+            $customer->aumper = $cus_aumper->amphoe ?? NULL;
+            $customer->province = $cus_province->province ?? NULL;
             $customer->id_post = $request->cus_idPost ?? NULL;
             $customer->Phone = $request->cus_phone ?? NULL;
             $customer->Price = $request->Price ?? NULL;
@@ -1194,15 +1277,19 @@ class RentalController extends Controller
             $customer->Day = $request->Day ?? 0;
             $customer->start_paid_date = $request->start_paid_date ?? NULL;
             $customer->Contract_Status = $request->Contract_Status ?? NULL;
+            $customer->Contract_Startdate = $request->Contract_Startdate ?? NULL;
+            $customer->Contract_Enddate = $request->Contract_Enddate ?? NULL;
             $customer->Contract_Reason = $request->Contract_Reason ?? NULL;
             $customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
             $customer->cust_remark = $request->cust_remark ?? NULL;
-            
+            $customer->file_id_path_cus = $file_id_path_cus ?? NULL;
+            $customer->file_contract_path = $file_contract_path ?? NULL;
             $customer->save();
         }
 
         // update table lease_auto_code
         $lease_auto_code = Lease_auto_code::where('ref_cus_id', $request->customer_id)->first();
+        // dd($lease_auto_code);
         if($lease_auto_code){
             $lease_auto_code->print_contract_manual = $request->date_print_contract_manual ?? NULL;
             $lease_auto_code->price_insurance = $request->price_insurance ?? NULL;
@@ -1530,118 +1617,149 @@ class RentalController extends Controller
 
         }else{
             // update fileExpress in table payment
-            if (date('m') == '01') {
-                $payment->file_contract_express1 = $fileExpress;
-                // $payment->save();
-            }elseif (date('m') == '02') {
-                $payment->file_contract_express2 = $fileExpress;
-            }elseif (date('m') == '03') {
-                $payment->file_contract_express3 = $fileExpress;
-            }elseif (date('m') == '04') {
-                $payment->file_contract_express4 = $fileExpress;
-            }elseif (date('m') == '05') {
-                $payment->file_contract_express5 = $fileExpress;
-            }elseif (date('m') == '06') {
-                $payment->file_contract_express6 = $fileExpress;
-            }elseif (date('m') == '07') {
-                $payment->file_contract_express7 = $fileExpress;
-            }elseif (date('m') == '08') {
-                $payment->file_contract_express8 = $fileExpress;
-            }elseif (date('m') == '09') {
-                $payment->file_contract_express9 = $fileExpress;
-            }elseif (date('m') == '10') {
-                $payment->file_contract_express10 = $fileExpress;
-            }elseif (date('m') == '11') {
-                $payment->file_contract_express11 = $fileExpress;
-            }elseif (date('m') == '12') {
-                $payment->file_contract_express12 = $fileExpress;
-            }
+            // if (date('m') == '01') {
+            //     $payment->file_contract_express1 = $fileExpress;
+            // }elseif (date('m') == '02') {
+            //     $payment->file_contract_express2 = $fileExpress;
+            // }elseif (date('m') == '03') {
+            //     $payment->file_contract_express3 = $fileExpress;
+            // }elseif (date('m') == '04') {
+            //     $payment->file_contract_express4 = $fileExpress;
+            // }elseif (date('m') == '05') {
+            //     $payment->file_contract_express5 = $fileExpress;
+            // }elseif (date('m') == '06') {
+            //     $payment->file_contract_express6 = $fileExpress;
+            // }elseif (date('m') == '07') {
+            //     $payment->file_contract_express7 = $fileExpress;
+            // }elseif (date('m') == '08') {
+            //     $payment->file_contract_express8 = $fileExpress;
+            // }elseif (date('m') == '09') {
+            //     $payment->file_contract_express9 = $fileExpress;
+            // }elseif (date('m') == '10') {
+            //     $payment->file_contract_express10 = $fileExpress;
+            // }elseif (date('m') == '11') {
+            //     $payment->file_contract_express11 = $fileExpress;
+            // }elseif (date('m') == '12') {
+            //     $payment->file_contract_express12 = $fileExpress;
+            // }
             // $payment->save();
         }
         // insert and update quarantee
-        $selecte_null_row = DB::table('quarantees')
-            ->where('pid', $request->project_id)
-            ->orderBy('id', 'desc')
-            ->limit(1)
-            ->count('create_date');
-
-        $selecte_create = DB::table('quarantees')
-            ->select('create_date', 'pid')
-            ->where('pid', $request->project_id)
-            ->orderByDesc('id')
-            ->first();
-
-        $start_quarantee = DB::table('quarantees')
-            ->select('pid', 'create_date', 'amount_fix', 'due_date')
-            ->where('pid', $request->project_id)
-            ->where('create_date', $selecte_create->create_date)
-            ->orderBy('id')
-            ->first();
-
-        $end_quarantee = DB::table('quarantees')
-            ->select('pid', 'create_date', 'amount_fix', 'due_date')
-            ->where('pid', $request->project_id)
-            ->where('create_date', $selecte_create->create_date)
-            ->orderByDesc('id')
-            ->first();
-
-        $num_month = $this->search_month($request->gauranteestart, $request->gauranteeend);
-        if(($request->gauranteestart == $request->chk_satrt) && ($request->gauranteeend == $request->chk_end) && ($selecte_null_row != 0)){
-            $createDate = DB::table('quarantees')
-                ->select('create_date')
-                ->where('pid', $request->project_id)
+        
+        if ($request->product_id) {
+            $selecte_null_row = DB::table('quarantees')
+                ->where('pid', $request->product_id)
+                ->orderBy('id', 'desc')
+                ->limit(1)
+                ->count('create_date');
+            // dd($selecte_null_row);
+            $selecte_create = DB::table('quarantees')
+                ->select('create_date', 'pid')
+                ->where('pid', $request->product_id)
                 ->orderByDesc('id')
                 ->first();
 
-            $groupId = DB::table('quarantees')
-                ->select('id')
-                ->where('create_date', $createDate->create_date)
-                ->get();
-            
-            foreach ($groupId as $item) {
-                DB::table('quarantees')
-                    ->where('id', $item->id)
-                    ->update([
-                        'amount_fix' => $request->gauranteeamount,
-                        'due_date_amount' => $request->gauranteeamount
-                    ]);
-            }
+            $start_quarantee = DB::table('quarantees')
+                ->select('pid', 'create_date', 'amount_fix', 'due_date')
+                ->where('pid', $request->product_id)
+                ->where('create_date', $selecte_create->create_date)
+                ->orderBy('id')
+                ->first();
 
-            DB::table('products')
-                ->update([
-                    'gauranteestart' => $request->gauranteestart,
-                    'gauranteeend' => $request->gauranteeend
-                ]);
+            $end_quarantee = DB::table('quarantees')
+                    ->select('pid', 'create_date', 'amount_fix', 'due_date')
+                    ->where('pid', $request->product_id)
+                    ->where('create_date', $selecte_create->create_date)
+                    ->orderByDesc('id')
+                    ->first();
             
-            
-        }elseif (($request->gauranteestart > $end_quarantee->due_date) || ($selecte_null_row == 0)) {
-            for ($i=0; $i < $num_month; $i++) { 
-                $Due_Dates = Carbon::parse($request->gauranteestart)->addMonths($i)->toDateString();
-                $d = explode('-', $Due_Dates); 
-                if ($i == 0) {
-                    $Due_Dates = $request->gauranteestart;
-                } elseif ($i >= 1) {
-                    $Due_Dates = $d[0] . '' . $d[1] . '01';
+
+            $num_month = $this->search_month($request->gauranteestart, $request->gauranteeend);
+            if (($request->gauranteestart == '' && $request->gauranteeend == '') || ($request->gauranteestart == null && $request->gauranteeend == null)) {
+                # code...
+            }
+            elseif(($request->gauranteestart == $request->chk_satrt) && ($request->gauranteeend == $request->chk_end) && ($selecte_null_row != 0)){
+                $createDate = DB::table('quarantees')
+                    ->select('create_date')
+                    ->where('pid', $request->product_id)
+                    ->orderByDesc('id')
+                    ->first();
+
+                $groupId = DB::table('quarantees')
+                    ->select('id')
+                    ->where('create_date', $createDate->create_date)
+                    ->get();
+                
+                foreach ($groupId as $item) {
+                    DB::table('quarantees')
+                        ->where('id', $item->id)
+                        ->update([
+                            'amount_fix' => $request->gauranteeamount,
+                            'due_date_amount' => $request->gauranteeamount
+                        ]);
                 }
 
-                $quarantee = new Quarantee();
-                $quarantee->pid = $request->project_id;
-                $quarantee->due_date = $Due_Dates;
-                $quarantee->amount_fix = $request->gauranteestart;
-                $quarantee->due_date_amount = $request->gauranteeamount;
-                $quarantee->save();
+                // update product
+                DB::table('products')
+                    ->where('pid', $request->product_id)
+                    ->update([
+                        'gauranteestart' => $request->gauranteestart,
+                        'gauranteeend' => $request->gauranteeend,
+                        'gauranteeamount' => $request->gauranteeamount
+                    ]);
+
+                // update room 
+                DB::table('rooms')
+                    ->where('HomeNo', $request->HomeNo)
+                    ->where('RoomNo', $request->RoomNo)
+                    ->where('pid', $request->project_id)
+                    ->update([
+                        'Guarantee_Amount' => $request->gauranteeamount,
+                        'Guarantee_Startdate' => $request->gauranteestart,
+                        'Guarantee_Enddate' => $request->gauranteeend
+                    ]);  
+            }
+            elseif (($request->gauranteestart > $end_quarantee->due_date) || ($selecte_null_row == 0)) {
+                for ($i=0; $i < $num_month; $i++) { 
+                    $Due_Dates = Carbon::parse($request->gauranteestart)->addMonths($i)->toDateString();
+                    $d = explode('-', $Due_Dates); 
+                    if ($i == 0) {
+                        $Due_Dates = $request->gauranteestart;
+                    } elseif ($i >= 1) {
+                        $Due_Dates = $d[0] . '' . $d[1] . '01';
+                    }
+
+                    $quarantee = new Quarantee();
+                    $quarantee->pid = $request->product_id;
+                    $quarantee->due_date = $Due_Dates;
+                    $quarantee->amount_fix = $request->gauranteeamount;
+                    $quarantee->due_date_amount = $request->gauranteeamount;
+                    $quarantee->save();
+                }
+
+                // update product 
+                DB::table('products')
+                    ->where('pid', $request->product_id)
+                    ->update([
+                        'gauranteestart' => $request->gauranteestart,
+                        'gauranteeend' => $request->gauranteeend,
+                        'gauranteeamount' => $request->gauranteeamount
+                    ]);
+
+                // update room 
+                DB::table('rooms')
+                    ->where('HomeNo', $request->HomeNo)
+                    ->where('RoomNo', $request->RoomNo)
+                    ->where('pid', $request->project_id)
+                    ->update([
+                        'Guarantee_Amount' => $request->gauranteeamount,
+                        'Guarantee_Startdate' => $request->gauranteestart,
+                        'Guarantee_Enddate' => $request->gauranteeend
+                    ]);
             }
         }
+        
 
-        // update product 
-        DB::table('products')
-            ->where('pid', $request->project_id)
-            ->update([
-                'gauranteestart' => $request->gauranteestart,
-                'gauranteeend' => $request->gauranteeend,
-                'gauranteeamount' => $request->gauranteeamount
-            ]);
-            
         // insert log rental room
         $logRental = new Log_Rental();
         $logRental->Create_Date = now()->toDateString();
@@ -1755,9 +1873,9 @@ class RentalController extends Controller
 
     public function print(Request $request)
     {
+        // dd($request->all());
         $strNowdate = date("Y-m-d H:i:s");
-        $Y = date("Y") + 543;
-        $Y = substr($Y, 2, 2);
+
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         //เช็คเลขที่สัญญา ใน rooms
         $check_room = Room::select('contract_cus', 'contract_owner', 'id')->where('id', $request->room_id)->first();
@@ -1768,35 +1886,21 @@ class RentalController extends Controller
         $YearTH = ((int)$Contract_Startdate) + 543;
         $StrYear = substr($YearTH, 2, 2);
         $getCode = Lease_code::where('pid', $request->project_id)->first();
-        // DB::raw('(SELECT * FROM customers WHERE Contract_Status
-        // $genCode = Lease_auto_code::select(DB::raw('RIGHT(code_contract_owner,3) + 1 as newcode'))->where('code_contract_owner', 'LIKE', '%'.$getCode->lease_agr_code-$StrYear.'%')->where('code_contract_cus', 'LIKE', '%'.$getCode->sub_lease_code-$StrYear.'%')->orderBy('id', 'desc')->take(1)->toSql();
-        //     $genCode =  DB::table('lease_auto_code')
-        //     ->selectRaw('RIGHT(code_contract_owner, 3) + 1 as newcode')
-        //     ->where('code_contract_owner', 'LIKE', "%$getCode->lease_agr_code-$StrYear%")
-        //     ->where('code_contract_cus', 'LIKE', "%$getCode->sub_lease_code-$StrYear%")
-        //     ->orderBy('id', 'DESC')
-        //     ->limit(1)
-        //     ->first();
-        // dd($genCode->newcode);
-        if (!empty($check_room->contract_owner) && !empty($check_customer->contract_cus)) {
+       
+        if (!empty($check_customer->contract_owner) && !empty($check_customer->contract_cus)) {
             $auto_code = Lease_auto_code::where('ref_rental_room_id', $request->room_id)->first();
             $auto_code->print_contract_owner = $strNowdate;
             $auto_code->save();
         } else {
             $getCode = Lease_code::where('pid', $request->project_id)->first();
-            // dd($getCode);
-            // DB::raw('(SELECT * FROM customers WHERE Contract_Status
-            // $genCode = Lease_auto_code::select(DB::raw('RIGHT(code_contract_owner,3) + 1 as newcode'))->where('code_contract_owner', 'LIKE', '%'.$getCode->lease_agr_code-$StrYear.'%')->where('code_contract_cus', 'LIKE', '%'.$getCode->sub_lease_code-$StrYear.'%')->orderBy('id', 'desc')->take(1)->toSql();
-            // $genCode = DB::table('Lease_auto_code')->select(DB::raw('RIGHT(code_contract_owner,3) + 1 as newcode'))->where('code_contract_owner', 'LIKE', '%'.$getCode->lease_agr_code-$StrYear.'%')->where('code_contract_cus', 'LIKE', '%'.$getCode->sub_lease_code-$StrYear.'%')->orderBy('id', 'desc')->take(1)->toSql();
             $genCode =  DB::table('lease_auto_code')
                 ->selectRaw('RIGHT(code_contract_owner, 3) + 1 as newcode')
                 ->where('code_contract_owner', 'LIKE', "%$getCode->lease_agr_code-$StrYear%")
                 ->where('code_contract_cus', 'LIKE', "%$getCode->sub_lease_code-$StrYear%")
                 ->orderBy('id', 'DESC')
                 ->limit(1)
-                // ->pluck('newcode')
                 ->first();
-            // dd($genCode);
+
             if (!$genCode) {
                 $codeID0 = $getCode->lease_agr_code . "-" . $StrYear . "-" . "001";
                 $codeID1 = $getCode->sub_lease_code . "-" . $StrYear . "-" . "001";
@@ -1810,9 +1914,9 @@ class RentalController extends Controller
             }
 
             $lease_auto_code = new Lease_auto_code();
-            $lease_auto_code->ref_lease_code_id = $getCode->ref_lease_code_id ?? NULL;
-            $lease_auto_code->ref_rental_room_id = $getCode->ref_rental_room_id ?? NULL;
-            $lease_auto_code->ref_cus_id = $getCode->ref_cus_id ?? NULL;
+            $lease_auto_code->ref_lease_code_id = $getCode->lease_code_id ?? NULL;
+            $lease_auto_code->ref_rental_room_id = $request->room_id ?? NULL;
+            $lease_auto_code->ref_cus_id = $request->customer_id ?? NULL;
             $lease_auto_code->code_contract_owner = $codeID0 ?? NULL;
             $lease_auto_code->code_contract_cus = $codeID1 ?? NULL;
             $lease_auto_code->code_contract_insurance = $codeID2 ?? NULL;
@@ -1836,17 +1940,13 @@ class RentalController extends Controller
             $customer->contract_cus = $codeID1;
             $customer->save();
 
-            $customer = Customer::where('id', $request->customer_id)->first();
-            $customer->contract_owner = $codeID0;
-            $customer->contract_cus = $codeID1;
-            $customer->save();
+            $lease_auto = Lease_auto_code::where('ref_rental_room_id', $request->room_id)->first();
+            $lease_auto->print_contract_cus = $strNowdate;
+            $lease_auto->save();
         }
-        // dd($request->phayarn1);
 
         $phayarn1 = $request->phayarn1 ?? '';
         $phayarn2 = $request->phayarn2 ?? '';
-
-        $getCode = Lease_code::where('pid', $request->project_id)->first();
 
         $rents = Room::select(
             'projects.Project_Name',
@@ -1904,6 +2004,7 @@ class RentalController extends Controller
             'rooms.microwave',
             'rooms.wash_machine',
             'rooms.Other',
+            'rooms.date_print_contract_manual',
             'customers.id',
             'customers.Cus_Name',
             'customers.IDCard',
@@ -1935,12 +2036,8 @@ class RentalController extends Controller
             })
             ->join('lease_auto_code', 'lease_auto_code.ref_cus_id', '=', 'customers.id')
             ->where('rooms.id', $request->room_id)
-            // ->where('lease_auto_code.ref_rental_room_id',$request->room_id)
             ->first();
 
-        // dd($rents);
-        if ($rents->print_contract_manual) {
-        }
 
         if ($rents->Price) {
             $customer_price = $this->convertAmount($rents->Price);
@@ -1958,39 +2055,26 @@ class RentalController extends Controller
             $room_price = null;
         }
 
-
-        // dd($request->all());
         // สัญญาเช่าช่วงห้องชุด ห้องพักอาศัย
         if ($request->status_approve == 1) {
-            // return view('rental.print.sub_apartment',compact('dataLoginUser'));
-            // dd($request->status_approve);
-            // dd($rents);
             $pdf = Pdf::loadView('rental.print.sub_apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
-            // return $pdf->download();
             return $pdf->stream();
         }
 
         // สัญญาเฟอร์
         if ($request->status_approve == 2) {
-            // dd($request->status_approve);
             $pdf = Pdf::loadView('rental.print.furniture', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
-            // return $pdf->download('invoice.pdf');
             return $pdf->stream();
-            // dd($request->status_approve);
         }
         // สัญญาแต่งตั้งตัวแทน
         if ($request->status_approve == 3) {
-            // dd($request->status_approve);
             $pdf = Pdf::loadView('rental.print.representative', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
             return $pdf->stream();
-            // dd($request->status_approve);
         }
         // สัญญาเช่าห้องชุด
         if ($request->status_approve == 4) {
-            // dd($request->status_approve);
             $pdf = Pdf::loadView('rental.print.apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'room_price' => $room_price, 'price_insurance' => $price_insurance]);
             return $pdf->stream();
-            // dd($request->status_approve);
         }
     }
 

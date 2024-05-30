@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Role_user;
 use App\Models\Room;
 use App\Models\Room_Images;
+use App\Models\Tambon;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -21,10 +22,17 @@ class RoomController extends Controller
             ->orderBy('Project_Name', 'asc')
             ->get();
 
+        $provinces = Tambon::select('province', 'province_id')->distinct()->get();
+        $amphoes = Tambon::select('amphoe', 'amphoe_id')->distinct()->get();
+        $tambons = Tambon::select('tambon', 'tambon_id')->distinct()->get();
+
         return view('rooms.index',compact(
             'dataLoginUser',
             'isRole',
-            'projects'
+            'projects',
+            'provinces',
+            'amphoes',
+            'tambons'
         ));
 
     }
@@ -45,6 +53,12 @@ class RoomController extends Controller
                 $lastId = 1;
             }
 
+            if($request->owner_province && $request->owner_khet && $request->owner_district){
+                $owner_province = Tambon::select('province')->distinct()->where('province_id',$request->owner_province)->first();
+                $owner_khet = Tambon::select('amphoe')->distinct()->where('amphoe_id',$request->owner_khet)->first();
+                $owner_district = Tambon::select('tambon')->distinct()->where('tambon_id',$request->owner_district)->first();
+            }
+
             $room = new Room();
             $room->Create_Date = now();
             $room->pid = $request->project_id;
@@ -55,9 +69,9 @@ class RoomController extends Controller
             $room->cardowner = $request->cardowner ?? NULL;
             $room->owner_soi = $request->owner_soi ?? NULL;
             $room->owner_road = $request->owner_road ?? NULL;
-            $room->owner_district = $request->owner_district ?? NULL;
-            $room->owner_khet = $request->owner_khet ?? NULL;
-            $room->owner_province = $request->owner_province ?? NULL;
+            $room->owner_district = $owner_district->tambon ?? NULL;
+            $room->owner_khet = $owner_khet->amphoe ?? NULL;
+            $room->owner_province = $owner_province->province ?? NULL;
             $room->Phone = $request->ownerphone ?? NULL;
             $room->Transfer_Date = $request->transfer_date ?? NULL;
             $room->RoomType = $request->room_type ?? NULL;
@@ -91,17 +105,15 @@ class RoomController extends Controller
             }
             // รูปภาพปก
             if ($request->hasFile('filUploadMain')) {
-                $URL = request()->getHttpHost();
                 $file = $request->file('filUploadMain');
                 $extension = $file->getClientOriginalExtension();
                 $filename = 'main_' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
                 $file->move('uploads/images_room/', $filename);
-                $room->image = $URL . '/uploads/images_room/' . $filename;
+                $room->image = 'uploads/images_room/' . $filename;
             }
             // รูปภาพห้อง
             if ($request->hasFile('filUpload')) {
-                $URL = request()->getHttpHost();
-                $allowedfileExtension = ['jpg', 'png'];
+                $allowedfileExtension = ['jpg', 'jpeg', 'png'];
                 $files = $request->file('filUpload');
                 $isImage = Room_Images::where('rid', $lastId)->where('img_category', 'เช่าอยู่')->first();
                 foreach ($files as $key => $file) {
@@ -109,9 +121,9 @@ class RoomController extends Controller
                     $check = in_array($extension, $allowedfileExtension);
                     if ($check) {
                         $filename = $file->getClientOriginalName();
-                        $name =  $lastId . '_' . $request->project_id. '_' .$filename;
+                        $name =  $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
                         $file->move('uploads/images_room', $name);
-                        $img_room[$key] =  $URL . '/uploads/images_room/' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
+                        $img_room[$key] = 'uploads/images_room/' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
                         if($isImage){
                             $isImage->img_path = $img_room[$key];
                             $isImage->img_category = 'เช่าอยู่';

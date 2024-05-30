@@ -39,7 +39,7 @@
 
                 <td align="right" style="line-height: 5px">
                     <h2>ทำที่ บริษัท วีบียอนด์ แมเนจเม้นท์ จำกัด</h2>
-                    <h2> วันที่ {{ thaidate('j F พ.ศ. Y',$rents->print_contract_manual) }}</h2>
+                    <h2> วันที่ {{ thaidate('j F พ.ศ. Y',$rents->date_print_contract_manual) }}</h2>
                 </td>
             </tr>
             <tr>
