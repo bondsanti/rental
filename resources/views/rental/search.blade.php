@@ -16,7 +16,7 @@
     #table tbody td {
         font-size: 13px; /* ปรับขนาดตามที่คุณต้องการ */
     }
-  
+
     input[type="radio"] {
         display: none;
     }
@@ -39,7 +39,7 @@
         border: 2px solid #D8D9DC;
         border-radius: 5px;
         /* padding: 1rem; */
-        padding-bottom: 0.8rem; 
+        padding-bottom: 0.8rem;
         text-align: center;
         /* margin: 2rem; */
         margin: 0 auto;
@@ -149,8 +149,8 @@
                                         <div class="form-group">
                                             <label>เลือกประเภทวันที่</label>
                                             <select name="dateselect" id="dateselect" class="form-control">
-                                                <option value="all">ทั้งหมด</option> 
-                                                <option value="transfer_date">วันรับห้อง</option> 
+                                                <option value="all">ทั้งหมด</option>
+                                                <option value="transfer_date">วันรับห้อง</option>
                                                 <option value="Guarantee_Startdate">วันเริ่มสัญญา</option>
                                                 <option value="Guarantee_Enddate">วันสิ้นสุดสัญญา</option>
                                                 <option value="Contract_Startdate">วันเริ่มเช่า</option>
@@ -384,12 +384,12 @@
                             {{-- <input type="hidden" class="form-control" id="user_id" name="user_id"
                                 value="{{ $dataLoginUser->id }}"> --}}
                             <div class="modal-body">
-                                
+
                                 {{-- <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header card-outline card-info">
                                             <h3 class="card-title">ข้อมูลห้อง</h3>
-                
+
                                         </div>
                                         <div class="card-body">
 
@@ -405,7 +405,7 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-    
+
                                                         <div class="form-group">
                                                             <label>โครงการ</label>
                                                             <input type="text" readonly class="form-control" value="" name="projectName" id="projectName">
@@ -430,7 +430,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
@@ -457,7 +457,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label>แขวง/ตำบล</label>
@@ -480,10 +480,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
-    
+
                                                         <div class="form-group">
                                                             <label>วันรับห้อง</label>
                                                             <input type="text" readonly class="form-control" value="" name="transferDate" id="transferDate">
@@ -508,10 +508,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
-    
+
                                                         <div class="form-group">
                                                             <label>ทิศ/ฝั่ง</label>
                                                             <input type="text" readonly class="form-control" value="" name="location" id="location">
@@ -536,10 +536,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
-    
+
                                                         <div class="form-group">
                                                             <label>ราคาห้องเช่า</label>
                                                             <input type="text" readonly class="form-control" value="" name="roomPrice" id="roomPrice">
@@ -564,10 +564,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-    
+
                                                 <div class="row">
                                                     <div class="col-sm-3">
-    
+
                                                         <div class="form-group">
                                                             <label>สถานะห้อง</label>
                                                             <input type="text" readonly class="form-control" value="" name="roomStatus" id="roomStatus">
@@ -682,7 +682,7 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>เตียง</label>
                                                         </div>
@@ -700,7 +700,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>ม่านห้องรับแขก</label>
                                                         </div>
@@ -718,7 +718,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>โต๊ะวางโทรทัศน์</label>
                                                         </div>
@@ -736,7 +736,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>เก้าอี้</label>
                                                         </div>
@@ -760,7 +760,7 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <p><label> แอร์ห้องนอน </label> 1</p>
                                                         </div>
@@ -778,7 +778,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>ทีวี</label>
                                                         </div>
@@ -796,7 +796,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-4">
-            
+
                                                         <div class="form-group">
                                                             <label>เครื่องซักผ้า</label>
                                                         </div>
@@ -867,7 +867,7 @@
                                                 <img src="../uploads/images/furniture.svg" width="35" height="35">&nbsp;<br><span>สัญญาตั้งตัวเเทน</span>
                                             </label>
                                         </div>
-                                       
+
                                     </div>
                                     <br><br>
                                     <div class="row text-center">
@@ -905,11 +905,11 @@
                                         <div class="col-sm-12">
                                             <button type="submit" name="submit" value="approve" class="button btnApprove
                                                 {{-- <?php echo ($lease_agr_code == null ? "button-dis":"button");?> button1 fontGoogle"
-                                                <?php echo ($lease_agr_code == null ? "disabled":"");?> 
-                                                <?php echo ($sub_lease_code == null ? "disabled":"");?> 
-                                                <?php echo ($insurance_code == null ? "disabled":"");?> 
+                                                <?php echo ($lease_agr_code == null ? "disabled":"");?>
+                                                <?php echo ($sub_lease_code == null ? "disabled":"");?>
+                                                <?php echo ($insurance_code == null ? "disabled":"");?>
                                                 <?php echo ($agent_contract_code == null ? "disabled":"");?>--}}
-                                                "> 
+                                                ">
                                                 {{-- <?php echo ($lease_agr_code == null ? "ไม่สามารถปริ้นเอกสารได้ เนื่องจากไม่ได้กำหนดรูปแบบ<br>กรุณาติดต่อ IT":"ยืนยันการปริ้นเอกสาร");?>  --}}
                                                 ยืนยันการปริ้นเอกสาร
                                             </button>
@@ -1060,7 +1060,7 @@
                     $('.btnApprove').css({
                         'background-color': 'gray',
                         'cursor': 'not-allowed',
-                        
+
                     });
                 }else{
                     $('.btnApprove').prop('disabled', false);
@@ -1068,12 +1068,12 @@
                     $('.btnApprove').css({
                         'background-color': 'green',
                         'cursor': 'pointer',
-                        
+
                     });
                 }
 
                 console.log(lease_code_id);
-                
+
             });
         });
 
