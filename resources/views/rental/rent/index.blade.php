@@ -6,10 +6,10 @@
 @section('content')
 <form method="post" action="{{ route('rental.recordRent') }}" enctype="multipart/form-data">
     @csrf
-    <input type="hidden" name="payment_id" value="{{ $result->payment_id }}">
+    <input type="hidden" name="paymentId" value="{{ $result->payment_id }}">
     <input type="hidden" name="project_id" value="{{ $result->project_id }}">
     <input type="hidden" name="customer_id" value="{{ $result->customer_id }}">
-    <input type="hidden" name="room_id" value="{{ $result->room_id }}">
+    <input type="hidden" name="roomId" value="{{ $result->room_id }}">
     <input type="hidden" name="projectName" value="{{ $result->Project_Name }}">
     <input type="hidden" name="roomNo" value="{{ $result->RoomNo }}">
     <input type="hidden" name="owner" value="{{ $result->Owner }}">
@@ -131,6 +131,7 @@
                                     <th scope="col" class="bg-success text-white">ค่าเช่า</th>
                                     @for ($i = 1; $i <= $result->Contract; $i++)
                                         <th scope="col" class="bg-success text-white">{{ $result->{"Due{$i}_Date"} }}</th>
+                                        <input type="hidden" name="Due{{$i}}_Date" value="{{ $result->{"Due{$i}_Date"} }}" >
                                     @endfor
                                 </tr>
                             </thead>
@@ -162,7 +163,11 @@
                                                     <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->{"slip{$i}"} }}" title="ดูสลิป">
                                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                                     </button>
-                                                    <a href="{{ url('rental/download/' . $result->room_id . '/' . $result->{"Due{$i}_Date"}) }}" class="btn btn-primary">Print <i class="fa fa-print" aria-hidden="true"></i></a>
+                                                    <a href="{{ url('rental/download/' . $result->room_id . '/' .$result->customer_id. '/'. $result->{"Due{$i}_Date"} .'/'. $result->{"Payment_Date{$i}"}) }}" class="btn btn-primary">Print 
+                                                        @if ($result->Contract < 12)
+                                                            <i class="fa fa-print" aria-hidden="true"></i>
+                                                        @endif
+                                                    </a>    
                                                 @elseif($result->{"status_approve{$i}"} == 2)
                                                     <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
                                                 @else
@@ -171,7 +176,10 @@
                                                         
                                                         {{-- modal approve for admin --}}
                                                         <button type="button" class="btn bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip{$i}"} }}" data-index="{{ $i }}"  title="รออนุมัติ">
-                                                            รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                            รออนุมัติ 
+                                                            @if ($result->Contract < 12)
+                                                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                            @endif
                                                         </button>
                                                         {{-- check role if not admin show text --}}
                                                         {{-- <button type="button" class="btn bg-gradient-danger" title="รออนุมัติ">
@@ -181,9 +189,7 @@
                                                     {{-- @endif --}}
                                                 @endif
                                             @else
-                                                {{-- @if (!$result->{"slip{$i}"} && !$result->{"status_approve{$i}"}) --}}
-                                                    <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
-                                                {{-- @endif --}}
+                                                <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
                                             @endif
                                             
                                         </td>
@@ -193,17 +199,25 @@
                                     <td>สลิป Express</td>
                                     @for ($i = 1; $i <= $result->Contract; $i++)
                                         <td>
-                                            @if ($result->{"slip{16 + $i}"})
-                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->{"slip{16 + $i}"} }}" title="ดูสลิป">
-                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                </button>
-                                            @endif
-                                            @if ($result->{"status_approve{16 + $i}"})
-                                                <a href="{{ url('rental/download/' . $result->room_id . '/' . $result->{"Due{$i}_Date"}) }}" class="btn btn-primary">Print</a>
-                                            @endif
-                                            @if (!$result->{"slip{16 + $i}"} && !$result->{"status_approve{16 + $i}"})
+                                            @if ($result->{"slip".(16 + $i)})
+                                                @if ($result->{"status_approve".(16 + $i)} == 1)
+                                                    <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->{"slip{16 + $i}"} }}" title="ดูสลิป">
+                                                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @elseif($result->{"status_approve".(16 + $i)} == 2)
+                                                    <input type="file" class="form-control" style="width:120px;" name="slips{{ 16 + $i }}">
+                                                @else
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip".(16 + $i)} }}" data-index="{{ 16 + $i }}"  title="รออนุมัติ">
+                                                        รออนุมัติ 
+                                                        @if ($result->Contract < 12)
+                                                            <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                        @endif
+                                                    </button>
+                                                @endif
+                                            @else
                                                 <input type="file" class="form-control" style="width:120px;" name="slips{{ 16 + $i }}">
                                             @endif
+                                           
                                         </td>
                                     @endfor
                                 </tr>
@@ -239,11 +253,11 @@
                                 <tr>
                                     <td>ชำระวันที่</td>
                                     <td>
-                                        <input type="text" class="form-control" id="calendar_input26" name="Payment_before" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}">
+                                        <input type="text" class="form-control datepicker" id="calendar_input26" name="Payment_before" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}">
                                     </td>
-                                    <td><input type="text" class="form-control" id="calendar_input27" name="Payment_reservation" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
-                                    <td><input type="text" class="form-control" id="calendar_input28" name="Payment_guarantee" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
-                                    <td><input type="text" class="form-control" id="calendar_input28" name="Payment_guarantee" value="{{ ($result->Payment_before == null || $result->Payment_before == '0000-00-00') ? '' : $result->Payment_before }}"></td>
+                                    <td><input type="text" class="form-control datepicker" id="calendar_input27" name="Payment_reservation" value="{{ ($result->Payment_reservation == null || $result->Payment_reservation == '0000-00-00') ? '' : $result->Payment_reservation }}"></td>
+                                    <td><input type="text" class="form-control datepicker" id="calendar_input28" name="Payment_guarantee" value="{{ ($result->Payment_guarantee == null || $result->Payment_guarantee == '0000-00-00') ? '' : $result->Payment_guarantee }}"></td>
+                                    <td><input type="text" class="form-control datepicker" id="calendar_input28" name="Payment_Prorate" value="{{ ($result->Payment_Prorate == null || $result->Payment_Prorate == '0000-00-00') ? '' : $result->Payment_Prorate }}"></td>
                                 </tr>
                                 <tr>
                                     <td>หมายเหตุ</td>
@@ -253,11 +267,78 @@
                                     <td><textarea name="Remarkpay4" class="form-control" style="height: 50px;">{{ $result->Remarkpay4 }}</textarea></td>
                                 </tr>
                                 <tr>
+                                    @php
+                                        $currentDate = now()->format('Y-m-d');
+                                    @endphp
                                     <td>สลิป</td>
-                                    <td><input type="file" class="form-control" style="width:120px;" name="slips13"></td>
-                                    <td><input type="file" class="form-control" style="width:120px;" name="slips14"></td>
-                                    <td><input type="file" class="form-control" style="width:120px;" name="slips15"></td>
-                                    <td><input type="file" class="form-control" style="width:120px;" name="slips16"></td>
+                                    <td>
+                                        @if ($result->slip13)
+                                            @if ($result->status_approve13 == 1)
+                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->slip13 }}" title="ดูสลิป">
+                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @elseif($result->status_approve13 == 2)
+                                                <input type="file" class="form-control" style="width:120px;" name="slips13">
+                                            @else
+                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip13 }}" data-index="13"  title="รออนุมัติ">
+                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                        @else
+                                            <input type="file" class="form-control" style="width:120px;" name="slips13">
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($result->slip14)
+                                            @if ($result->status_approve14 == 1)
+                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->slip14 }}" title="ดูสลิป">
+                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @elseif($result->status_approve14 == 2)
+                                                <input type="file" class="form-control" style="width:120px;" name="slips14">
+                                            @else
+                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip14 }}" data-index="14"  title="รออนุมัติ">
+                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                        @else
+                                            <input type="file" class="form-control" style="width:120px;" name="slips14">
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($result->slip15)
+                                            @if ($result->status_approve15 == 1)
+                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->slip15 }}" title="ดูสลิป">
+                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @elseif($result->status_approve15 == 2)
+                                                <input type="file" class="form-control" style="width:120px;" name="slips15">
+                                            @else
+                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip15 }}" data-index="15"  title="รออนุมัติ">
+                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                        @else
+                                            <input type="file" class="form-control" style="width:120px;" name="slips15">
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($result->slip16)
+                                            @if ($result->status_approve16 == 1)
+                                                <button type="button" class="btn bg-gradient-info view-slip" data-id="{{ $result->id }}" data-src="{{ $result->slip16 }}" title="ดูสลิป">
+                                                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @elseif($result->status_approve16 == 2)
+                                                <input type="file" class="form-control" style="width:120px;" name="slips16">
+                                            @else
+                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip16 }}" data-index="16"  title="รออนุมัติ">
+                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                        @else
+                                            <input type="file" class="form-control" style="width:120px;" name="slips16">
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -346,7 +427,7 @@
                                         {{-- <label for="code" class="col-form-label">รูปสลิป</label> --}}
                                         {{-- <img src="" class="form-control" id="slip_img" name="slip_img"> --}}
                                         <div class="mt-3">
-                                            <p class="text-bold">รูปสลิป</p>
+                                            <p class="text-bold">รูปสลิป <span id="slipName" name="slipName"></span></p>
                                             <img id="slip_img" src="" alt="sliper" class="img-fluid rounded">
                                         </div>
                                     </div>
@@ -383,9 +464,7 @@
 </form>
 
 @endsection
-{{-- @php
-    // $src = $(this).data('src');
-@endphp --}}
+
 @push('script')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
@@ -394,11 +473,6 @@
             format: 'yyyy-mm-dd', // รูปแบบวันที่
             autoclose: true,
         });
-
-        // $('#startdate').on('changeDate', function(e) {
-        //     var selectedStartDate = e.date;
-        //     $('#enddate').datepicker('setStartDate', selectedStartDate);
-        // });
 
         $('#closeApprove').click(function() {
             $('#editForm').trigger("reset");
@@ -419,13 +493,11 @@
 
         const id = $(this).data('id');
         const src = $(this).data('src');
-        console.log(id,src);
+        // console.log(id,src);
         $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
         // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
         $('#modal-view-slip').modal('show');
-        // $.get('../api/rental/detail/' + id, function(data) {
-        //     console.log(data);
-        // });
+  
     });
 
     //modal approve
@@ -435,27 +507,43 @@
         const date = $(this).data('date');
         const src = $(this).data('src');
         const index = $(this).data('index');
+        let name = '';
         const d = new Date(date)
-        console.log(index);
+        if (index == 13) {
+            name = 'เงินล่วงหน้า';
+        }else if(index == 14){
+            name = 'ค่าจอง';
+        }else if(index == 15){
+            name = 'เงินประกัน(2เดือน)';
+        }else if(index == 16){
+            name = 'เงิน Prorate';
+        }else{
+            name = index > 12 ? 'Express' : 'ค่าเช่า';
+        }
+        
+        console.log(name);
         let month_full = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const year = d.getFullYear()+543;;
         const month = month_full[d.getMonth()];
         const monthYear = month + ' ' + year;
         console.log(monthYear);
+        console.log(index);
         $('#modal-status-approve').modal('show');
         $.get('../../api/rental/rent/preapprove/' + id, function(data) {
-            console.log('payment id = ',data.payment_id);
-            console.log(data.RoomNo);
+            // console.log('payment id = ',data.payment_id);
+            // console.log(data.room_id);
              
             $('#payment_id').val(data.payment_id);
+            $('#room_id').val(data.room_id);
             $('#projectName').val(data.Project_Name);
             $('#roomNo').val(data.RoomNo);
             $('#owner').val(data.Owner);
             $('#cus_name').val(data.Cus_Name);
             $('#monthly').val(monthYear);
-            $('#slip_img').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
-            // $('#slip_img').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+            // $('#slip_img').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+            $('#slip_img').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
             $('#index').val(index);
+            $('#slipName').html(name);
         });
     });
 
@@ -480,10 +568,7 @@
                     url: "../../api/rental/rent/approve/" + id + "/" + status + "/" + index,
                     type: "POST",
                     dataType: 'json',
-                    // console.log();
-                    // alert(url),
                     success: function(data) {
-                        // console.log(url);
                         if (data.success = true) {
 
                             if ($.isEmptyObject(data.error)) {
@@ -496,9 +581,6 @@
                                 });
                                 $('#modal-status-approve').trigger("reset");
                                 $('#modal-status-approve').modal('hide');
-                                //tableUser.draw();
-                                // setTimeout("location.href = '{{ url('rental/rent') }}'+ '/' + room_id;",
-                                //     1500);
                                 setTimeout(function() {
                                     location.href = '{{ url('rental/rent') }}' + '/' + room_id;
                                 }, 1500);
@@ -506,7 +588,6 @@
 
                                 $('#update').html('ลองอีกครั้ง');
 
-                                //$('#userFormEdit').trigger("reset");
                                 Swal.fire({
                                     position: 'top-center',
                                     icon: 'error',
@@ -526,8 +607,6 @@
                             });
                             $('#editForm').trigger("reset");
                         }
-
-
                     },
 
                 });

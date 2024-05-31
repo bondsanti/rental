@@ -1243,18 +1243,18 @@ class RentalController extends Controller
             }
             
         } else {
-            $getLastId = DB::table('customers')
-                ->select('id')
-                ->orderBy('id', 'DESC')
-                ->limit(1)
-                ->first();
+            // $getLastId = DB::table('customers')
+            //     ->select('id')
+            //     ->orderBy('id', 'DESC')
+            //     ->limit(1)
+            //     ->first();
 
-            if ($getLastId) {
-                $lastId = $getLastId->id + 1;
-            } else {
+            // if ($getLastId) {
+            //     $lastId = $getLastId->id + 1;
+            // } else {
                 
-                $lastId = 1;
-            }
+            //     $lastId = 1;
+            // }
             $customer = new Customer();
             $customer->rid = $request->room_id ?? NULL;
             $customer->pid = $request->project_id ?? NULL;
@@ -2168,23 +2168,13 @@ class RentalController extends Controller
         // dd($result);
     }
 
-    public function download(Request $request, $id, $date)
+    public function download($rid, $cid, $Due_Date, $Payment_Date)
     {
-        // dd($date);
-        // Determine the absolute path to the file
-        // $absoluteFilePath = storage_path('app/public/uploads/' . $filePath);
-
-        // Check if the file exists
-        // if (file_exists($absoluteFilePath)) {
-        //     // Set headers for file download
-        //     return response()->download($absoluteFilePath);
-        // } else {
-        //     // Handle if the file does not exist
-        //     abort(404);
-        // }
-        // $Due = explode('-',$date); 
-        $monthY = thaidate('F Y', $date);
-        // dd($monthY);
+        $Payment = explode('-', $Payment_Date);
+        $year = $Payment[0]+543;
+        $Payment_Dates = $Payment[2].' / '.$Payment[1].' / '.$year;
+        $date_check = $Payment[0].'-'.$Payment[1].'-01';
+        $monthY = thaidate('F Y', $Due_Date);
         $result = Room::select(
             'projects.Project_Name',
             'projects.address_full',
@@ -2203,56 +2193,159 @@ class RentalController extends Controller
                     ->on('rooms.id', '=', 'customers.rid');
             })
             ->join('payments', 'payments.cid', '=', 'customers.id')
-            ->where('rooms.id', $request->id)
+            ->where('rooms.id', $rid)
             ->first();
 
-        $pdf = Pdf::loadView('rental.rent.print', ['result' => $result, 'monthY' => $monthY]);
+        $rent = DB::table('customers')
+            ->select('customers.Cus_Name', 'customers.Contract_Status', 'customers.price','customers.pid', 'customers.rid', 'rooms.HomeNo', 'rooms.RoomNo', 'projects.Project_Name', 'projects.address_full')
+            ->leftJoin('rooms', 'customers.rid', '=', 'rooms.id')
+            ->leftJoin('projects', 'customers.pid', '=', 'projects.pid')
+            ->where('customers.rid', $rid)
+            ->where('customers.Contract_Status', 'เช่าอยู่')
+            ->get();
+
+        foreach ($rent as $item) {
+            $Cus_Name = $item->Cus_Name;
+            $price = $item->price;
+        }
+
+        $bill = DB::table('list_bills')
+            ->where('rid', $rid)
+            ->where('cid', $cid)
+            ->where('payment_date', $Payment_Date)
+            ->first();
+
+        $billLimit = DB::table('list_bills')
+            ->where('date_check', $date_check)
+            ->orderBy('id', 'DESC')
+            ->limit(1)
+            ->get();
+
+        $check=0;
+        foreach ($billLimit as $item) {
+            $check++;
+            if (is_object($item) && property_exists($item, 'bill_id')) {
+                $bill_id = $item->bill_id + 1;
+            } else {
+                // Handle the case when $item is not an object or 'invoce_id' property doesn't exist
+                // You can set a default value for $invoice_id or handle the error accordingly
+            }
+        }
+
+        if (!$bill){
+            if ($check == '0') {
+                DB::table('list_bills')->insert([
+                    'cid' => $cid,
+                    'rid' => $rid,
+                    'bill_id' => 1,
+                    'cus_name' => $Cus_Name,
+                    'amount' => $price,
+                    'payment_date' => $Payment_Date,
+                    'date_check' => $date_check
+                ]);
+            }else{
+                DB::table('list_bills')->insert([
+                    'cid' => $cid,
+                    'rid' => $rid,
+                    'bill_id' => $bill_id,
+                    'cus_name' => $Cus_Name,
+                    'amount' => $price,
+                    'payment_date' => $Payment_Date,
+                    'date_check' => $date_check,
+                ]);
+            }
+        }
+        $getBill = DB::table('list_bills')
+            ->select('bill_id')
+            ->where('rid', $rid)
+            ->where('cid', $cid)
+            ->where('payment_date', $Payment_Date)
+            ->first();
+
+        $REC = substr($year, -2).'/'.$Payment[1].'/'. str_pad($getBill->bill_id, 4, '0', STR_PAD_LEFT);
+        
+        if ($price) {
+            $convert_price = $this->convertAmount($price);
+        } else {
+            $convert_price = null;
+        } 
+        $pdf = Pdf::loadView('rental.rent.print', ['result' => $result, 'monthY' => $monthY, 'Payment_Dates' => $Payment_Dates, 'REC' => $REC, 'price' => $price, 'convert_price' => $convert_price]);
         return $pdf->stream();
     }
 
     public function recordRent(Request $request)
     {
         // dd($request->all());
-       
-        $payment = Payment::where('id', $request->payment_id)->first();
+        $host = $request->getHost();
+        $directory = 'uploads/image_slip';
+        $allowedfileExtension = ['jpg', 'jpeg','png', 'pdf']; 
+        $payment = Payment::where('id', $request->paymentId)->first();
+        // $payment = Payment::where('cid', $request->customer_id)->first();
         for ($i = 1; $i <= 28; $i++) {
             if ($request->hasFile("slips{$i}")) {
-                $num = ($i > 12 ? $i - 16 : $i);
-                // dd($num);
+                if($i == 13){
+                    $subJect = 'สลิปเงินล่วงหน้า';
+                    $month = str_replace("'", '', str_replace('-', '', $request->Payment_before));
+                    $monthY = $request->Payment_before;
+                }elseif ($i == 14) {
+                    $subJect = 'สลิปค่าจอง';
+                    $month = str_replace("'", '', str_replace('-', '', $request->Payment_reservation));
+                    $monthY = $request->Payment_reservation;
+                }elseif ($i == 15) {
+                    $subJect = 'สลิปเงินประกัน (2 เดือน)';
+                    $month = str_replace("'", '', str_replace('-', '', $request->Payment_guarantee));
+                    $monthY = $request->Payment_guarantee;
+                }elseif ($i == 16) {
+                    $subJect = 'สลิปเงิน Prorate';
+                    $month = str_replace("'", '', str_replace('-', '', $request->Payment_Prorate));
+                    $monthY = $request->Payment_Prorate;
+                }   
+                else{
+                    $subJect = $i > 12 ? 'สลิป Express' : 'สลิปค่าเช่า';
+                    $month = str_replace("'", '', str_replace('-', '', $request->{"Payment_Date{$i}"}));
+                    $monthY = $request->{"Due{$i}_Date"};
+                }
+                // $num = ($i > 12 ? $i - 16 : $i);
+                
                 $file = $request->file("slips{$i}");
                 $extension = $file->getClientOriginalExtension();
-                $month = str_replace("'", '', str_replace('-', '', $request->{"Payment_Date{$num}"}));
-                $filename = 'slip_' . $i . '_' . $request->project_id . '_' . $month . '_'.rand().'.' . $extension;
-                // dd($filename);
-                // $file->move('uploads/image_slip/', $filename);
-                $payment->{"slip{$i}"} = $filename ?? null;
-                // dd($payment->{"slip{$i}"});
-                $url = "https://property.vbeyond.co.th";
-                $toEmail = ['sakeerin.k@vbeyond.co.th'];
-                $toCC = ['santi.c@vbeyond.co.th'];
-                $toBCC = ['noreply@vbeyond.co.th'];
-
-                Mail::send(
-                    'rental.rent.mail',
-                    ['Link' => $url, 'roomNo' => $request->roomNo, 'project' => $request->projectName, 'owner' => $request->owner, 'monthY' => $request->{"Payment_Date{$num}"}],
-                    function (Message $message) use ($toEmail, $toCC, $toBCC) {
-                        $message->to($toEmail)
-                            ->cc($toCC)
-                            ->bcc($toBCC)
-                            ->subject('สลิปรอการอนุมัติ');
+                $check = in_array($extension, $allowedfileExtension);
+                if ($check) {
+                    
+                    $filename = 'slip_' . $i . '_' . $request->project_id . '_' . $month . '_'.rand().'.' . $extension;
+                    // is file exists 
+                    if (Storage::disk('public')->exists($directory.'/'.$filename)) {
+                        Storage::disk('public')->delete($directory.'/'.$filename);
                     }
-                );
-                
-                // update status approve
-                $payment->{"status_approve{$i}"} = 0;
-
-                dd($filename);
+                    $file->move('uploads/image_slip/', $filename);
+                    $payment->{"slip{$i}"} = $filename;
+                    $url = "http://127.0.0.1:8000/rental/rent/".$request->roomId;
+                    $toEmail = ['sakeerin.k@vbeyond.co.th'];
+                    $toCC = ['santi.c@vbeyond.co.th'];
+                    $toBCC = ['noreply@vbeyond.co.th'];
+                    Mail::send(
+                        'rental.rent.mail',
+                        ['Link' => $url, 'roomNo' => $request->roomNo, 'project' => $request->projectName, 'owner' => $request->owner, 'monthY' => $monthY, 'subJect' => $subJect],
+                        function (Message $message) use ($toEmail, $toCC, $toBCC) {
+                            $message->to($toEmail)
+                                ->cc($toCC)
+                                ->bcc($toBCC)
+                                ->subject('สลิปรอการอนุมัติ');
+                        }
+                    );
+                    
+                    // update status approve
+                    $payment->{"status_approve{$i}"} = 0;
+                } else {
+                    Alert::error('Error', 'Allowed types: jpg, jpeg, png, pdf');
+                    return redirect()->back(); 
+                }
             }
         }
         $payment->Bail = $request->Bail ?? 0;
-        $payment->Bail_date = $request->Bail_date ?? null; // ***
-        $payment->Bail_slip = $request->Bail_slip ?? null;
-        $payment->Bail_status = $request->Bail_status ?? null;
+        if ($request->Bail) {
+            $payment->Bail_date = $request->Payment_guarantee;
+        }
         $payment->Deposit = $request->Deposit ?? 0;
         $payment->Deposit_date = $request->Deposit_date ?? null;
         $payment->Deposit_slip = $request->Deposit_slip ?? null;
@@ -2310,21 +2403,18 @@ class RentalController extends Controller
         $payment->Remarkpay1 = $request->Remarkpay1 ?? null;
         $payment->Remarkpay2 = $request->Remarkpay2 ?? null;
         $payment->Remarkpay3 = $request->Remarkpay3 ?? null;
-        // $payment->slip16 = $request->slip16 ?? null;
-        // $payment->slip17 = $request->slip17 ?? null;
-        // $payment->slip18 = $request->slip18 ?? null;
-        // $payment->slip19 = $request->slip19 ?? null;
-        // $payment->slip20 = $request->slip20 ?? null;
-        // $payment->slip21 = $request->slip21 ?? null;
-        // $payment->slip22 = $request->slip22 ?? null;
-        // $payment->slip23 = $request->slip23 ?? null;
-        // $payment->slip24 = $request->slip24 ?? null;
-        // $payment->slip25 = $request->slip25 ?? null;
-        // $payment->slip26 = $request->slip26 ?? null;
-        // $payment->slip27 = $request->slip27 ?? null;
-        // $payment->slip28 = $request->slip28 ?? null;
+        $payment->Remarkpay4 = $request->Remarkpay4 ?? null;
 
-        dd($payment);
+        $payment->Paymentbefore = $request->Paymentbefore ?? null;
+
+        $payment->Payment_before = $request->Payment_before ?? null;
+        $payment->Payment_reservation = $request->Payment_reservation ?? null;
+        $payment->Payment_guarantee = $request->Payment_guarantee ?? null;
+        $payment->Payment_Prorate = $request->Payment_Prorate ?? null;
+        $payment->save(); 
+
+        Alert::success('Success', 'บันทึกข้อมูลสำเร็จ!');
+        return redirect()->back(); 
     }
 
     public function preapprove($id) {
@@ -2365,7 +2455,6 @@ class RentalController extends Controller
         return response()->json([
             'data' => $payment,
             'message' => 'อัพเดทข้อมูลสำเร็จ'], 200);
-        // dd($payment);
     }
 
     public function history(Request $request, $id){

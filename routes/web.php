@@ -61,7 +61,7 @@ Route::middleware(['isLogin'])->group(function () {
     Route::post('/rental/print/sub_apartment', [RentalController::class, 'print'])->name('rental.print.sub_apartment');
     Route::post('/rental/print/furniture', [RentalController::class, 'print'])->name('rental.print.furniture');
     Route::get('/rental/rent/{id}', [RentalController::class, 'rent'])->name('rental.rent');
-    Route::get('/rental/download/{id}/{date}', [RentalController::class, 'download'])->name('rental.download');
+    Route::get('/rental/download/{rid}/{cid}/{date1}/{date2}', [RentalController::class, 'download'])->name('rental.download');
     Route::post('/rental/recordRent', [RentalController::class, 'recordRent'])->name('rental.recordRent');
     Route::get('/rental/history/{id}', [RentalController::class, 'history'])->name('rental.history');
 
