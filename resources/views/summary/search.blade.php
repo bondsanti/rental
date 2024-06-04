@@ -133,7 +133,6 @@
     </section>
 @endsection
 @push('script')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
 
@@ -148,18 +147,5 @@
             });
 
         });
-    </script>
-    <script>
-        // JavaScript สำหรับกำหนดค่าให้กับ input ของวันที่
-        // โดยใช้คำสั่ง new Date() เพื่อสร้างวัตถุ Date ที่เก็บวันที่และเวลาปัจจุบัน
-        var today = new Date();
-
-        // แปลงวัตถุ Date เป็นสตริงในรูปแบบที่ต้องการ (ในที่นี้เราใช้วิธีการกำหนดใน HTML)
-        // โดยเราจะให้สตริงนี้เป็นค่าของ value ของ input
-        var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
-
-        // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
-        document.getElementById('startdate').value = todayString;
-        document.getElementById('enddate').value = todayString;
     </script>
 @endpush

@@ -303,7 +303,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($item->Contract_Enddate  == "0000-00-00" )
+                                                @if ($item->Contract_Enddate  == "0000-00-00" || $item->Contract_Enddate < "1990-01-01")
                                                     -
                                                 @else
                                                     @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($item->Contract_Enddate))))
@@ -842,7 +842,6 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        {{-- <form id="createForm" name="createForm" class="form-horizontal" method="post"> --}}
                             <form id="createForm" name="createForm"  method="post" action="{{route('rental.print')}}" class="form-horizontal" target="_blank">
                             @csrf
 
@@ -903,14 +902,7 @@
                                     <br><br>
                                     <div class="row text-center">
                                         <div class="col-sm-12">
-                                            <button type="submit" name="submit" value="approve" class="button btnApprove
-                                                {{-- <?php echo ($lease_agr_code == null ? "button-dis":"button");?> button1 fontGoogle"
-                                                <?php echo ($lease_agr_code == null ? "disabled":"");?>
-                                                <?php echo ($sub_lease_code == null ? "disabled":"");?>
-                                                <?php echo ($insurance_code == null ? "disabled":"");?>
-                                                <?php echo ($agent_contract_code == null ? "disabled":"");?>--}}
-                                                ">
-                                                {{-- <?php echo ($lease_agr_code == null ? "ไม่สามารถปริ้นเอกสารได้ เนื่องจากไม่ได้กำหนดรูปแบบ<br>กรุณาติดต่อ IT":"ยืนยันการปริ้นเอกสาร");?>  --}}
+                                            <button type="submit" name="submit" value="approve" class="button btnApprove">
                                                 ยืนยันการปริ้นเอกสาร
                                             </button>
                                         </div>
@@ -922,8 +914,6 @@
                             <div class="modal-footer justify-contentend">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnPrint"><i
                                         class="fa fa-times"></i> ปิดหน้าต่าง</button>
-                                {{-- <button type="button" class="btn bg-gradient-success" id="savedata"
-                                    value="create"><i class="fa fa-save"></i> บันทึก</button> --}}
                             </div>
                         </form>
                     </div>
@@ -1028,7 +1018,7 @@
                 $('#cusContract').val(data.contract_cus ?? '-');
                 $('#cusPrice').val(data.Price ?? '-');
                 $('#contractStart').val(data.Contract_Startdate ?? '-');
-                $('#contractEnd').val(data.Contract_Status ?? '-');
+                $('#contractEnd').val(data.Contract_Enddate ?? '-');
                 $('#cancelDate').val(data.Cancle_Date ?? '-');
                 $('#contractStatus').val(data.Contract_Status ?? '-');
 

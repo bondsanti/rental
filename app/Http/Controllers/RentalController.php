@@ -840,7 +840,7 @@ class RentalController extends Controller
                 $paymentNew->Due12_Amount = $Price12 ?? NULL;
                 $paymentNew->save();
 
-            }elseif($request->Contract_Status == 'ออก'){
+            }elseif($request->Contract_Status == 'ออก'){ 
                 $rental_customer->Cus_Name = $request->Cus_Name ?? NULL;
                 $rental_customer->IDCard = $request->IDCard ?? NULL;
                 $rental_customer->RoomNo = $request->RoomNo ?? NULL;
@@ -1589,33 +1589,34 @@ class RentalController extends Controller
             $paymentNew->Due10_Amount = $Price10 ?? NULL;
             $paymentNew->Due11_Amount = $Price11 ?? NULL;
             $paymentNew->Due12_Amount = $Price12 ?? NULL;
-            $paymentNew->Owner_Due1_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due2_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due3_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due4_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due5_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due6_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due7_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due8_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due9_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due10_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due11_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due12_Amount = $request->gauranteeamount ?? NULL;
-            $paymentNew->Owner_Due1_Date = $Owner_Due1_Date ?? NULL;
-            $paymentNew->Owner_Due2_Date = $Owner_Due2_Date ?? NULL;
-            $paymentNew->Owner_Due3_Date = $Owner_Due3_Date ?? NULL;
-            $paymentNew->Owner_Due4_Date = $Owner_Due4_Date ?? NULL;
-            $paymentNew->Owner_Due5_Date = $Owner_Due5_Date ?? NULL;
-            $paymentNew->Owner_Due6_Date = $Owner_Due6_Date ?? NULL;
-            $paymentNew->Owner_Due7_Date = $Owner_Due7_Date ?? NULL;
-            $paymentNew->Owner_Due8_Date = $Owner_Due8_Date ?? NULL;
-            $paymentNew->Owner_Due9_Date = $Owner_Due9_Date ?? NULL;
-            $paymentNew->Owner_Due10_Date = $Owner_Due10_Date ?? NULL;
-            $paymentNew->Owner_Due11_Date = $Owner_Due11_Date ?? NULL;
-            $paymentNew->Owner_Due12_Date = $Owner_Due12_Date ?? NULL;
             $paymentNew->save();
 
         }else{
+            $payment->Owner_Due1_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due2_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due3_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due4_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due5_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due6_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due7_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due8_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due9_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due10_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due11_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due12_Amount = $request->gauranteeamount ?? NULL;
+            $payment->Owner_Due1_Date = $Owner_Due1_Date ?? NULL;
+            $payment->Owner_Due2_Date = $Owner_Due2_Date ?? NULL;
+            $payment->Owner_Due3_Date = $Owner_Due3_Date ?? NULL;
+            $payment->Owner_Due4_Date = $Owner_Due4_Date ?? NULL;
+            $payment->Owner_Due5_Date = $Owner_Due5_Date ?? NULL;
+            $payment->Owner_Due6_Date = $Owner_Due6_Date ?? NULL;
+            $payment->Owner_Due7_Date = $Owner_Due7_Date ?? NULL;
+            $payment->Owner_Due8_Date = $Owner_Due8_Date ?? NULL;
+            $payment->Owner_Due9_Date = $Owner_Due9_Date ?? NULL;
+            $payment->Owner_Due10_Date = $Owner_Due10_Date ?? NULL;
+            $payment->Owner_Due11_Date = $Owner_Due11_Date ?? NULL;
+            $payment->Owner_Due12_Date = $Owner_Due12_Date ?? NULL;
+            $payment->save();
             // update fileExpress in table payment
             // if (date('m') == '01') {
             //     $payment->file_contract_express1 = $fileExpress;
@@ -1644,120 +1645,119 @@ class RentalController extends Controller
             // }
             // $payment->save();
         }
+
         // insert and update quarantee
-        
-        if ($request->product_id) {
-            $selecte_null_row = DB::table('quarantees')
-                ->where('pid', $request->product_id)
-                ->orderBy('id', 'desc')
-                ->limit(1)
-                ->count('create_date');
-            // dd($selecte_null_row);
-            $selecte_create = DB::table('quarantees')
-                ->select('create_date', 'pid')
-                ->where('pid', $request->product_id)
-                ->orderByDesc('id')
-                ->first();
+        // if ($request->product_id) {
+        //     $selecte_null_row = DB::table('quarantees')
+        //         ->where('pid', $request->product_id)
+        //         ->orderBy('id', 'desc')
+        //         ->limit(1)
+        //         ->count('create_date');
+        //     $selecte_create = DB::table('quarantees')
+        //         ->select('create_date', 'pid')
+        //         ->where('pid', $request->product_id)
+        //         ->orderByDesc('id')
+        //         ->first();
 
-            $start_quarantee = DB::table('quarantees')
-                ->select('pid', 'create_date', 'amount_fix', 'due_date')
-                ->where('pid', $request->product_id)
-                ->where('create_date', $selecte_create->create_date)
-                ->orderBy('id')
-                ->first();
+        //     $start_quarantee = DB::table('quarantees')
+        //         ->select('pid', 'create_date', 'amount_fix', 'due_date')
+        //         ->where('pid', $request->product_id)
+        //         ->where('create_date', $selecte_create->create_date)
+        //         ->orderBy('id')
+        //         ->first();
 
-            $end_quarantee = DB::table('quarantees')
-                    ->select('pid', 'create_date', 'amount_fix', 'due_date')
-                    ->where('pid', $request->product_id)
-                    ->where('create_date', $selecte_create->create_date)
-                    ->orderByDesc('id')
-                    ->first();
+        //     $end_quarantee = DB::table('quarantees')
+        //             ->select('pid', 'create_date', 'amount_fix', 'due_date')
+        //             ->where('pid', $request->product_id)
+        //             ->where('create_date', $selecte_create->create_date)
+        //             ->orderByDesc('id')
+        //             ->first();
             
 
-            $num_month = $this->search_month($request->gauranteestart, $request->gauranteeend);
-            if (($request->gauranteestart == '' && $request->gauranteeend == '') || ($request->gauranteestart == null && $request->gauranteeend == null)) {
-                # code...
-            }
-            elseif(($request->gauranteestart == $request->chk_satrt) && ($request->gauranteeend == $request->chk_end) && ($selecte_null_row != 0)){
-                $createDate = DB::table('quarantees')
-                    ->select('create_date')
-                    ->where('pid', $request->product_id)
-                    ->orderByDesc('id')
-                    ->first();
+        //     $num_month = $this->search_month($request->gauranteestart, $request->gauranteeend);
+        //     if (($request->gauranteestart == '' && $request->gauranteeend == '') || ($request->gauranteestart == null && $request->gauranteeend == null)) {
+        //         # code...
+        //     }
+        //     elseif(($request->gauranteestart == $request->chk_satrt) && ($request->gauranteeend == $request->chk_end) && ($selecte_null_row != 0)){
+        //         $createDate = DB::table('quarantees')
+        //             ->select('create_date')
+        //             ->where('pid', $request->product_id)
+        //             ->orderByDesc('id')
+        //             ->first();
 
-                $groupId = DB::table('quarantees')
-                    ->select('id')
-                    ->where('create_date', $createDate->create_date)
-                    ->get();
+        //         $groupId = DB::table('quarantees')
+        //             ->select('id')
+        //             ->where('create_date', $createDate->create_date)
+        //             ->get();
                 
-                foreach ($groupId as $item) {
-                    DB::table('quarantees')
-                        ->where('id', $item->id)
-                        ->update([
-                            'amount_fix' => $request->gauranteeamount,
-                            'due_date_amount' => $request->gauranteeamount
-                        ]);
-                }
+        //         foreach ($groupId as $item) {
+        //             DB::table('quarantees')
+        //                 ->where('id', $item->id)
+        //                 ->update([
+        //                     'amount_fix' => $request->gauranteeamount,
+        //                     'due_date_amount' => $request->gauranteeamount
+        //                 ]);
+        //         }
 
-                // update product
-                DB::table('products')
-                    ->where('pid', $request->product_id)
-                    ->update([
-                        'gauranteestart' => $request->gauranteestart,
-                        'gauranteeend' => $request->gauranteeend,
-                        'gauranteeamount' => $request->gauranteeamount
-                    ]);
+        //         // update product
+        //         DB::table('products')
+        //             ->where('pid', $request->product_id)
+        //             ->update([
+        //                 'gauranteestart' => $request->gauranteestart,
+        //                 'gauranteeend' => $request->gauranteeend,
+        //                 'gauranteeamount' => $request->gauranteeamount
+        //             ]);
 
-                // update room 
-                DB::table('rooms')
-                    ->where('HomeNo', $request->HomeNo)
-                    ->where('RoomNo', $request->RoomNo)
-                    ->where('pid', $request->project_id)
-                    ->update([
-                        'Guarantee_Amount' => $request->gauranteeamount,
-                        'Guarantee_Startdate' => $request->gauranteestart,
-                        'Guarantee_Enddate' => $request->gauranteeend
-                    ]);  
-            }
-            elseif (($request->gauranteestart > $end_quarantee->due_date) || ($selecte_null_row == 0)) {
-                for ($i=0; $i < $num_month; $i++) { 
-                    $Due_Dates = Carbon::parse($request->gauranteestart)->addMonths($i)->toDateString();
-                    $d = explode('-', $Due_Dates); 
-                    if ($i == 0) {
-                        $Due_Dates = $request->gauranteestart;
-                    } elseif ($i >= 1) {
-                        $Due_Dates = $d[0] . '' . $d[1] . '01';
-                    }
+        //         // update room 
+        //         DB::table('rooms')
+        //             ->where('HomeNo', $request->HomeNo)
+        //             ->where('RoomNo', $request->RoomNo)
+        //             ->where('pid', $request->project_id)
+        //             ->update([
+        //                 'Guarantee_Amount' => $request->gauranteeamount,
+        //                 'Guarantee_Startdate' => $request->gauranteestart,
+        //                 'Guarantee_Enddate' => $request->gauranteeend
+        //             ]);  
+        //     }
+        //     elseif (($request->gauranteestart > $end_quarantee->due_date) || ($selecte_null_row == 0)) {
+        //         for ($i=0; $i < $num_month; $i++) { 
+        //             $Due_Dates = Carbon::parse($request->gauranteestart)->addMonths($i)->toDateString();
+        //             $d = explode('-', $Due_Dates); 
+        //             if ($i == 0) {
+        //                 $Due_Dates = $request->gauranteestart;
+        //             } elseif ($i >= 1) {
+        //                 $Due_Dates = $d[0] . '' . $d[1] . '01';
+        //             }
 
-                    $quarantee = new Quarantee();
-                    $quarantee->pid = $request->product_id;
-                    $quarantee->due_date = $Due_Dates;
-                    $quarantee->amount_fix = $request->gauranteeamount;
-                    $quarantee->due_date_amount = $request->gauranteeamount;
-                    $quarantee->save();
-                }
+        //             $quarantee = new Quarantee();
+        //             $quarantee->pid = $request->product_id;
+        //             $quarantee->due_date = $Due_Dates;
+        //             $quarantee->amount_fix = $request->gauranteeamount;
+        //             $quarantee->due_date_amount = $request->gauranteeamount;
+        //             $quarantee->save();
+        //         }
 
-                // update product 
-                DB::table('products')
-                    ->where('pid', $request->product_id)
-                    ->update([
-                        'gauranteestart' => $request->gauranteestart,
-                        'gauranteeend' => $request->gauranteeend,
-                        'gauranteeamount' => $request->gauranteeamount
-                    ]);
+        //         // update product 
+        //         DB::table('products')
+        //             ->where('pid', $request->product_id)
+        //             ->update([
+        //                 'gauranteestart' => $request->gauranteestart,
+        //                 'gauranteeend' => $request->gauranteeend,
+        //                 'gauranteeamount' => $request->gauranteeamount
+        //             ]);
 
-                // update room 
-                DB::table('rooms')
-                    ->where('HomeNo', $request->HomeNo)
-                    ->where('RoomNo', $request->RoomNo)
-                    ->where('pid', $request->project_id)
-                    ->update([
-                        'Guarantee_Amount' => $request->gauranteeamount,
-                        'Guarantee_Startdate' => $request->gauranteestart,
-                        'Guarantee_Enddate' => $request->gauranteeend
-                    ]);
-            }
-        }
+        //         // update room 
+        //         DB::table('rooms')
+        //             ->where('HomeNo', $request->HomeNo)
+        //             ->where('RoomNo', $request->RoomNo)
+        //             ->where('pid', $request->project_id)
+        //             ->update([
+        //                 'Guarantee_Amount' => $request->gauranteeamount,
+        //                 'Guarantee_Startdate' => $request->gauranteestart,
+        //                 'Guarantee_Enddate' => $request->gauranteeend
+        //             ]);
+        //     }
+        // }
         
 
         // insert log rental room
@@ -2564,123 +2564,44 @@ class RentalController extends Controller
             ->get();
 
         $count = $history->count();
-        // dd($count);
 
-        $productPid = Product::join('rooms', function ($join) use ($id) {
-            $join->on('rooms.HomeNo', '=', 'products.HomeNo')
-                 ->on('rooms.RoomNo', '=', 'products.RoomNo')
-                 ->on('rooms.pid', '=', 'products.project_id');
-        })
-        ->where('rooms.id', $id)
-        // ->where('product.HomeNo', '=', trim($result['HomeNo']))
-        // ->where('product.RoomNo', '=', trim($result['RoomNo']))
-        // ->where('product.project_id', '=', trim($result['pid']))
-        ->orderByDesc('id')
-        ->limit(1)
-        ->pluck('products.pid')
-        ->first();
+        // $productPid = Product::join('rooms', function ($join) use ($id) {
+        //     $join->on('rooms.HomeNo', '=', 'products.HomeNo')
+        //          ->on('rooms.RoomNo', '=', 'products.RoomNo')
+        //          ->on('rooms.pid', '=', 'products.project_id');
+        // })
+        // ->where('rooms.id', $id)
+        // ->orderByDesc('id')
+        // ->limit(1)
+        // ->pluck('products.pid')
+        // ->first();
 
-        $sum = Quarantee::where('pid', $productPid)
-                ->where('status_quarantee', 'enabled')
-                ->count('pid');
+        // $sum = Quarantee::where('pid', $productPid)
+        //         ->where('status_quarantee', 'enabled')
+        //         ->count('pid');
 
-        if($productPid){
-            $quaranteeIdASC = Quarantee::where('pid', $productPid)
-                ->where('status_quarantee', 'enabled')
-                ->where('due_date','!=', null)
-                ->where('amount_fix', '!=',null)
-                ->where('amount_fix', '!=',0)
-                ->orderBy('id', 'ASC')
-                ->get();
-                // ->pluck('id');
-            $quaranteeIdDESC = Quarantee::where('pid', $productPid)
-                ->where('status_quarantee', 'enabled')
-                ->orderBy('id', 'DESC')
-                ->pluck('id');
-            $rows = ceil($sum/12);
-        }
-        // dd($sum);
+        // if($productPid){
+        //     $quaranteeIdASC = Quarantee::where('pid', $productPid)
+        //         ->where('status_quarantee', 'enabled')
+        //         ->where('due_date','!=', null)
+        //         ->where('amount_fix', '!=',null)
+        //         ->where('amount_fix', '!=',0)
+        //         ->orderBy('id', 'ASC')
+        //         ->get();
 
-        $quarantees = Quarantee::where('pid', $productPid)
-        ->where('status_quarantee', 'enabled')
-        ->orderBy('due_date', 'ASC')
-        ->get();
-
-        // dd($quarantees);
-
-        $dueDate = array();
-        $amountFix = array();
-        $amount = array();
-        $paymentDate = array();
-        $count_krows=0;
-        // for($j=1; $j<= $sum; $j++){
-        //     // foreach ($quarantees as $key => $value) {
-        //     for($i=1; $i<= 12; $i++){
-        //         // if ($count_krows < 12*$j) {
-        //             // $final_id = ((int)$quaranteeIdASC[$count_krows])+$count_krows;
-        //             // $final_id = $quaranteeIdASC[$count_krows];
-        //             // if ($final_id) {
-        //             //     $data = Quarantee::where('id', $final_id)
-        //             //     ->where('status_quarantee', 'enabled')
-        //             //     ->first();
-        //             //     // $dueDate[$j][$i] = $data->due_date ?? '';
-        //             //     // $amountFix[$j][$i] = $data->amount_fix ?? '';
-        //             //     // $amount[$j][$i] = $data->amount ?? '';
-        //             //     // $paymentDate[$j][$i] = $data->payment_date ?? '';
-        //             //     // dump($final_id);
-        //             // }
-        //             // dump($quaranteeIdASC[$j]);
-        //             // $count_krows++;
-        //         // }
-        //     }
-        //  // }
-        // }
-        // if($count_krows <= $sum){
-        //     for ($i=1; $i <= $rows ; $i++) { 
-        //         for ($j=0; $j <= 11; $j++) { 
-        //             // $data = Quarantee::where('id', $quaranteeIdASC[$count_krows])
-        //             //     ->where('status_quarantee', 'enabled')
-        //             //     ->where('due_date','!=', null)
-        //             //     ->where('amount_fix', '!=',null)
-        //             //     ->where('amount_fix', '!=',0)
-        //             //     ->first();
-        //             // $dueDate[$i][$j] = $data->due_date ?? '';
-        //             // $amountFix[$i][$j] = $data->amount_fix ?? '';
-        //             // $amount[$i][$j] = $data->amount ?? '';
-        //             // $paymentDate[$i][$j] = $data->payment_date ?? '';
-        //             // dump($count_krows);
-        //             // $count_krows++;
-        //             foreach($quaranteeIdASC as $data){
-        //                 $dueDate[$i][$j] = $data->due_date ?? '';
-        //                 $amountFix[$i][$j] = $data->amount_fix ?? '';
-        //                 $amount[$i][$j] = $data->amount ?? '';
-        //                 $paymentDate[$i][$j] = $data->payment_date ?? '';
-        //                 // dump($count_krows);
-        //             }
-        //         }
-        //     }
-        // }
-        // foreach($quaranteeIdASC as $data){
-            // for ($i=1; $i <= $sum ; $i++) { 
-            //     for ($j=0; $j <= 11; $j++) { 
-            //         $dueDate[$i][$j] = $data->due_date ?? '';
-            //         $amountFix[$i][$j] = $data->amount_fix ?? '';
-            //         $amount[$i][$j] = $data->amount ?? '';
-            //         $paymentDate[$i][$j] = $data->payment_date ?? '';
-            //     }
-            // }
+        //     $quaranteeIdDESC = Quarantee::where('pid', $productPid)
+        //         ->where('status_quarantee', 'enabled')
+        //         ->orderBy('id', 'DESC')
+        //         ->pluck('id');
+        //     $rows = ceil($sum/12);
         // }
 
+        // $quarantees = Quarantee::where('pid', $productPid)
+        // ->where('status_quarantee', 'enabled')
+        // ->orderBy('due_date', 'ASC')
+        // ->get();
 
-        // dd($dueDate);
-
-        // foreach ($dueArr as $key => $value) {
-            
-        // }
-
-        // dd($dueDate);
-
-        return view('rental.history', compact('dataLoginUser', 'rent', 'count','history','quarantees','dueDate','amountFix','amount','rows','sum'));
+        return view('rental.history', compact('dataLoginUser', 'rent', 'count','history'));
             dd($history);
     }
 

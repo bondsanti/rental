@@ -279,7 +279,7 @@
         <div class="row">
         </div>
 
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-outline card-info">
@@ -291,10 +291,7 @@
                             $sum = 0; 
                             $index = 0;
                         @endphp 
-                        {{-- @while ($count > 0) --}}
-                            {{-- @foreach ($quarantees as $key => $item) --}}
                         @for ($i = 1; $i <= $rows; $i++)
-                            {{-- @for ($j = 0; $j < 12; $j++) --}}
                                 <table class="table table-bordered">
                                     <thead class="thead-dark">
                                         <tr>
@@ -350,19 +347,14 @@
                                     </tbody>
                                     <!-- Remaining rows -->
                                 </table>
-                                    {{-- @endfor --}}
                                 <br>
                                 @endfor
                                 <br>
-                            {{-- @endforeach --}}
                             <h5><b><u>สรุป </u></b> <span> : จำนวนเดือนที่เก็บค่าเช่าทั้งหมด </span>  <b><u>{{ $sum }}  เดือน</u></b><span> เป็นจำนวนเงิน  <b><u>{{ number_format($sum_money) }} บาท</u></b></span></h5>
-                           
-                        
-                        
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         
         {{-- view modal --}}
         <div class="modal fade" id="modal-view-slip">
@@ -400,14 +392,12 @@
     $('body').on('click', '.view-slip', function() {
         const id = $(this).data('id');
         const src = $(this).data('src');
-        console.log(id,src);
-        $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
-        // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+        // console.log(id,src);
+        // $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+        $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
         $('#modal-view-slip').modal('show');
-        // $.get('../api/rental/detail/' + id, function(data) {
-        //     console.log(data);
-        // });
-        });
+        
+    });
     function goBack() {
         window.history.back();
     }

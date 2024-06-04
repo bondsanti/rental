@@ -391,8 +391,7 @@ class RentalPaymentReportController extends Controller
                         'cus_name' => $Cus_Name,
                         'amount' => $price,
                         'payment_date' => $date,
-                        'date_check' => $date_check,
-                        'current_dates' => $current_date
+                        'date_check' => $date_check
                     ]);
                 }
             }
