@@ -14,17 +14,12 @@ class UserController extends Controller
 {
     public function index(){
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
-
-        //permission sub by dept
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-
         $users = Role_user::with('role:id,code,name_th,active,department_id')->orderBy('id', 'desc')->get();
 
         foreach ($users as $key => $value) {
             $deparment[$key] = Department::select('name')->where('id',$value->role->department_id)->first();
-            // dump($deparment[$key]->name);
         }
-        // dd($users);
         if ($isRole->role_type=="SuperAdmin") {
             return view('users.index', compact(
                 'dataLoginUser',
@@ -86,7 +81,7 @@ class UserController extends Controller
     {
 
         $users = Role_user::with('role:id,code,name_th,active','position:id,name')->where('id', $id)->first();
-       // dd($users);
+  
         return response()->json($users, 200);
     }
 

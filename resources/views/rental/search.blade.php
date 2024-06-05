@@ -357,7 +357,13 @@
                                                         </i>
                                                     </a>
                                                 @endif
-                                                
+                                                @if ($isRole->role_type=="SuperAdmin")
+                                                    <button class="btn bg-gradient-danger btn-sm delete-item {{ $item->cid ? 'd-none' : ''}}"
+                                                        data-id="{{ $item->id }}" title="ลบ">
+                                                        <i class="fa fa-trash">
+                                                        </i>
+                                                    </button>
+                                                @endif
                                                 
                                                 {{-- <a href=""
                                                     class="btn bg-gradient-warning btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="พิมพ์">
@@ -1076,6 +1082,51 @@
                 console.log(lease_code_id);
 
             });
+        });
+
+        //Delete
+        $('body').on('click', '.delete-item', function() {
+
+            const id = $(this).data("id");
+            //console.log(id);
+
+            Swal.fire({
+                title: 'คุณแน่ใจไหม? ',
+                text: "หากต้องการลบข้อมูลนี้ โปรดยืนยัน การลบข้อมูล",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยัน'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: '../api/rental/destroy/' + id,
+
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: true,
+                                timer: 2500
+                            });
+
+                            setTimeout(function(){
+                                    // "location.href = '{{ route('user') }}';",
+                                    location.reload();
+                                },
+                                1500);
+
+                        },
+
+                    });
+
+                }
+            });
+
         });
 
     </script>

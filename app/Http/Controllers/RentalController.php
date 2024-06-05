@@ -126,18 +126,12 @@ class RentalController extends Controller
                     ->on('rooms.RoomNo', '=', 'customers.RoomNo')
                     ->on('rooms.id', '=', 'customers.rid');
             })
-            // ->when($today, function (Builder $query, string $today) {
-            //     $query->where('rooms.Create_Date','<=', $today);
-            // })
-            // ->whereNotIn('rooms.Status_Room', ['คืนห้อง'])
             ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
             });
 
-
-        
         if ($request->pid != 'all') {
             $rents->where('rooms.pid', $request->pid);
         }
@@ -220,9 +214,6 @@ class RentalController extends Controller
         $rents = $rents
             ->orderBy('Project_Name', 'asc')
             ->get();
-            // ->toSql();
-
-        // dd($rents);
 
         $formInputs = $request->all();
 
@@ -239,11 +230,7 @@ class RentalController extends Controller
 
     public function detail($id)
     {
-        // $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
-        // $projects = Project::where('rent', 1)
-        //     ->orderBy('Project_Name', 'asc')
-        //     ->get();
-
+       
         $rents = Room::select(
             'projects.Project_Name',
             'rooms.id',
@@ -336,7 +323,7 @@ class RentalController extends Controller
             })
             ->where('rooms.id', $id)
             ->get();
-        // dd($rents);
+
         foreach ($rents as $item) {
             $ref_cus_id = $item->customer_id;
             $pid = $item->project_id;
@@ -378,9 +365,7 @@ class RentalController extends Controller
 
     public function update(UpdateRentalRequest $request)
     {
-        
         $request->validated();
-        // dd($request->all());
 
         $rental_room = Room::where('id', $request->room_id)->first();
 
@@ -1560,7 +1545,7 @@ class RentalController extends Controller
         // insert date to table rental_payment
         $payment = Payment::where('rid', $request->room_id)
             ->where('cid', $request->customer_id)
-            ->count();
+            ->first();
         if(!$payment){
             
             $paymentNew = new Payment();
@@ -2061,7 +2046,6 @@ class RentalController extends Controller
             $pdf = Pdf::loadView('rental.print.sub_apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
             return $pdf->stream();
         }
-
         // สัญญาเฟอร์
         if ($request->status_approve == 2) {
             $pdf = Pdf::loadView('rental.print.furniture', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
@@ -2136,13 +2120,9 @@ class RentalController extends Controller
 
     public function rent(Request $request)
     {
-        // dd($result);
+
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-        // $result = Room::select('rooms.*','projects.*')
-        // ->join('projects', 'projects.pid', '=', 'rooms.pid')
-        // ->where('rooms.id', '=', $request->id)
-        // ->first();
         $result = Room::select(
             'projects.*',
             'projects.pid as project_id',
@@ -2164,10 +2144,8 @@ class RentalController extends Controller
             ->join('payments', 'payments.cid', '=', 'customers.id')
             ->where('rooms.id', $request->id)
             ->first();
-        // dd($result);
 
         return view('rental.rent.index', compact('dataLoginUser', 'isRole', 'result'));
-        // dd($result);
     }
 
     public function download($rid, $cid, $Due_Date, $Payment_Date)
@@ -2460,7 +2438,6 @@ class RentalController extends Controller
     }
 
     public function history(Request $request, $id){
-        // dd($id);
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $rent = Room::select(
@@ -2469,8 +2446,6 @@ class RentalController extends Controller
             'rooms.HomeNo',
             'rooms.Owner',
             'rooms.Phone',
-            // 'customers.id as customer_id',
-            // 'payments.id as payment_id',
         )
             ->join('projects', 'projects.pid', '=', 'rooms.pid')
             ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
@@ -2485,9 +2460,6 @@ class RentalController extends Controller
 
         $history = Room::select(
             // 'rooms.*',
-            // 'rooms.id as room_id',
-            // 'rooms.Phone as phone',
-            // DB::raw('COUNT(customers.Contract) as count'),
             'customers.Cus_Name',
             'customers.contract_startdate',
             'customers.contract_enddate',
@@ -2605,19 +2577,25 @@ class RentalController extends Controller
         // ->get();
 
         return view('rental.history', compact('dataLoginUser', 'isRole', 'rent', 'count','history'));
-            dd($history);
+
     }
 
     public function destroy($id)
     {
 
         $room = Room::where('id', $id)->first();
-
         $room_old = $room->toArray();
+        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete Room : '.$roleUser);
 
-        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
-        $room->delete($id);
-
+        $imgRooms = Room_Images::where('rid', $id)->get();
+        $imgRoom_old = $imgRooms->toArray();
+        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete Image Room : '.$roleUser);
+        
+        $room->delete();
+        foreach ($imgRooms as $item) {
+            $item->delete();
+        }
+        
         return response()->json([
             'message' => 'ลบข้อมูลสำเร็จ'
         ], 201);

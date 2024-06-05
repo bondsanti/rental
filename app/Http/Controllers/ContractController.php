@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ContractController extends Controller
 {
@@ -39,6 +40,10 @@ class ContractController extends Controller
     }
     public function update(Request $request)
     {
+        if ($request->lease_agr_code == '' || $request->sub_lease_code == '' || $request->insurance_code == '' || $request->agent_contract_code == '') {
+            Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
+            return redirect()->back(); 
+        }
         $update_lcode = Lease_code::where('lease_code_id', $request->lease_code_id)->first();
         $update_lcode->lease_agr_code       = $request->lease_agr_code;
         $update_lcode->sub_lease_code       = $request->sub_lease_code;
@@ -48,15 +53,13 @@ class ContractController extends Controller
 
         // ตรวจสอบว่าการอัพเดทเสร็จสมบูรณ์หรือไม่
         if ($updated) {
-            // ถ้าเสร็จสมบูรณ์ ใช้ JavaScript เพื่อแสดง Alert ว่าอัพเดทสำเร็จ
-            echo '<script>alert("อัพเดทข้อมูลสำเร็จ!");</script>';
+            Alert::success('Success', 'บันทึกข้อมูลสำเร็จ!');
+            return redirect()->back(); 
         } else {
-            // ถ้าไม่เสร็จสมบูรณ์ ใช้ JavaScript เพื่อแสดง Alert ว่ามีปัญหาเกิดขึ้น
-            echo '<script>alert("มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้");</script>';
+            Alert::error('Error', 'มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้');
+            return redirect()->back(); 
         }
 
-        // หลังจากนั้นให้กลับไปยังหน้าเดิม
-        return redirect()->back();
     }
 
     public function out_index()
@@ -100,15 +103,9 @@ class ContractController extends Controller
     {
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-        // $projects = DB::connection('mysql_report')
-        //     ->table('project')
-        //     ->where('rent', 1)
-        //     ->orderBy('Project_Name', 'asc')
-        //     ->get();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
-
 
         return view(
             'contract.room_con.roomcon',
@@ -127,7 +124,6 @@ class ContractController extends Controller
             ->orderBy('Project_Name', 'asc')
             ->get();
 
-        // dd($request->dateselect, $request->startdate);
         $startdate = $request->startdate;
         $enddate = $request->enddate;
         $rents = Room::select(
@@ -168,86 +164,6 @@ class ContractController extends Controller
         ->from('rooms as rooms')
         ->join('projects', 'rooms.pid', '=', 'projects.pid')
         ->leftJoin('customers','rooms.id','=','customers.rid');
-        // ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
-        //     OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
-        //     $join
-        //         ->on('rooms.pid', '=', 'customers.pid')
-        //         ->on('rooms.RoomNo', '=', 'customers.RoomNo')
-        //         ->on('rooms.id', '=', 'customers.rid');
-        //     })
-            // ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
-            // ->where(function ($query) {
-            //     $query->where('rooms.Trans_Status', '=', '')
-            //         ->orWhereNull('rooms.Trans_Status');
-            // });
-
-            // $results = Customer::select(
-            //         'projects.Project_Name',
-            //         'rooms.id',
-            //         'rooms.pid',
-            //         'rooms.Create_Date',
-            //         'rooms.HomeNo',
-            //         'rooms.RoomNo',
-            //         'rooms.RoomType',
-            //         'rooms.rental_status',
-            //         'rooms.Size',
-            //         'rooms.Owner',
-            //         'rooms.Status_Room',
-            //         'rooms.Phone',
-            //         'rooms.price',
-            //         'rooms.Trans_Status',
-            //         'rooms.contract_owner',
-            //         'rooms.Owner',
-            //         'rooms.Guarantee_Startdate',
-            //         'rooms.Guarantee_Enddate',
-            //         'rooms.date_firstrend',
-            //         'rooms.date_endrend',
-            //         'customers.id as cid',
-            //         'customers.Contract_Status',
-            //         'customers.Contract_Startdate',
-            //         'customers.Contract_Enddate',
-            //         'customers.Cus_Name'
-            
-            //     )->from('customers')
-            //     ->leftJoin('rooms', 'customers.rid', '=', 'rooms.id')
-            //     ->join('projects','projects.pid', '=', 'projects.pid')
-            //     ->whereBetween('customers.Contract_Startdate', ['2024-01-01', '2024-05-14']);
-
-            // $results = Room::select(
-            //     'projects.Project_Name',
-            //     'rooms.id',
-            //     'rooms.pid',
-            //     'rooms.Create_Date',
-            //     'rooms.HomeNo',
-            //     'rooms.RoomNo',
-            //     'rooms.RoomType',
-            //     'rooms.rental_status',
-            //     'rooms.Size',
-            //     'rooms.Owner',
-            //     'rooms.Status_Room',
-            //     'rooms.Phone',
-            //     'rooms.price',
-            //     'rooms.Trans_Status',
-            //     'rooms.contract_owner',
-            //     'rooms.Owner',
-            //     'rooms.Guarantee_Startdate',
-            //     'rooms.Guarantee_Enddate',
-            //     'rooms.date_firstrend',
-            //     'rooms.date_endrend',
-            //     'customers.id as cid',
-            //     'customers.Contract_Status',
-            //     'customers.Contract_Startdate',
-            //     'customers.Contract_Enddate',
-            //     'customers.Cus_Name'
-            // )
-            // ->join('projects', 'rooms.pid', '=', 'projects.pid')
-            // ->leftJoin('customers', function ($join) {
-            //     $join->on('rooms.pid', '=', 'customers.pid')
-            //         ->where('customers.Contract_Status', '=', 'เช่าอยู่')
-            //         ->orWhereNull('customers.Contract_Status')
-            //         ->orWhere('customers.Contract_Status', '=', '');
-            // });
-        
 
         if ($request->pid != 'all') {
             $rents->where('rooms.pid', $request->pid);
@@ -286,9 +202,7 @@ class ContractController extends Controller
             ->orderBy('Project_Name', 'asc')
             ->orderBy('RoomNo', 'asc') 
             ->get();
-            // ->toSql();
 
-        // dd($rents);
         return view(
             'contract.room_con.room_search',
             compact(
@@ -312,9 +226,6 @@ class ContractController extends Controller
             ->where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
-
-
-
 
         return view(
             'contract.list_contract.list_lease_code',
@@ -357,8 +268,6 @@ class ContractController extends Controller
 
         $results = $query->orderByDesc('lease_auto_code.id')->get();
 
-
-        //dd($query);
         return view(
             'contract.list_contract.list_search',
             compact(

@@ -49,8 +49,8 @@
                                             <td>{{ $lcode->lease_agr_code }}</td>
                                             <td>{{ $lcode->agent_contract_code }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                                    data-target="#editmodal1{{$lcode->lease_code_id}}">แก้ไข</button>
+                                                <button type="button" class="btn btn-sm btn-warning edit-btn" data-toggle="modal"
+                                                    data-target="#editmodal1{{$lcode->lease_code_id}}" id="edit">แก้ไข</button>
                                             </td>
                                         </tr>
                                         <!-- Modal -->
@@ -75,12 +75,12 @@
                                                                 value="{{ $lcode->lease_code_id}}">
                                                             <input type="hidden" class="form-control" name="pid"
                                                                 value="{{ $lcode->pid }}">
-                                                            <div class="form-group">
-                                                                <label for="recipient-name"
+                                                            <div class="form-group" id="formGrup1">
+                                                                <label for="recipient-name" 
                                                                     class="col-form-label">สัญญาเช่าช่วง
                                                                     :</label>
                                                                 <input type="text" class="form-control text-danger"
-                                                                    name="sub_lease_code" id="sub_lease_code" value=" {{ $lcode->sub_lease_code }} ">
+                                                                    name="sub_lease_code" id="sub_lease_code" value="{{ $lcode->sub_lease_code ?? '' }}">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="recipient-name"
@@ -104,7 +104,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">ออก</button>
+                                                            data-dismiss="modal" id="btnClose">ออก</button>
                                                         <button type="submit" name="update"
                                                             class="btn btn-primary">บันทึก</button>
                                                     </div>
@@ -121,18 +121,76 @@
             </div>
         </div>
     </section>
+    @endsection
+    @push('script')
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('.edit-btn').click(function() {
+                    var modalId = $(this).data('target'); // Get the target modal ID
+                    var inputs = $(modalId).find('input');
+                    var sub_lease_code = $(modalId).find('#sub_lease_code').val().trim();
+                    var insurance_code = $(modalId).find('#insurance_code').val().trim();
+                    var lease_agr_code = $(modalId).find('#lease_agr_code').val().trim();
+                    var agent_contract_code = $(modalId).find('#agent_contract_code').val().trim();
 
-    <script>
-        $(function() {
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
+                    // Remove previous invalid feedback
+                    $(modalId).find('.is-invalid').removeClass('is-invalid');
+
+                    inputs.removeClass('is-invalid').on('input', function() {
+                        // Remove is-invalid class when user starts typing
+                        $(this).removeClass('is-invalid');
+                        $("button[name='update']").prop("disabled", false);
+                    });
+                    // Validation
+                    if (!sub_lease_code) {
+                        $(modalId).find('#sub_lease_code').addClass('is-invalid');
+                    }
+                    if (!insurance_code) {
+                        $(modalId).find('#insurance_code').addClass('is-invalid');
+                    }
+                    if (!lease_agr_code) {
+                        $(modalId).find('#lease_agr_code').addClass('is-invalid');
+                    }
+                    if (!agent_contract_code) {
+                        $(modalId).find('#agent_contract_code').addClass('is-invalid');
+                    }
+
+                    if (!sub_lease_code || !insurance_code || !lease_agr_code || !agent_contract_code) {
+                        $("button[name='update']").prop("disabled", true);
+                    }else{
+                        $("button[name='update']").prop("disabled", false);
+                    }
+                    
+                    console.log(sub_lease_code,insurance_code);
+                });
+
+                $('#close').click(function() {
+                    var modalId = $(this).data('target');
+                    $(modalId).trigger("reset");
+                    $(modalId).modal('hide');
+                });
+
+                $('#btnClose').click(function() {
+                    var modalId = $(this).data('target');
+                    $(modalId).trigger("reset");
+                    $(modalId).modal('hide');
+                });
+                
+            
             });
-        });
-    </script>
-@endsection
+            $(function() {
+                $('#example2').DataTable({
+                    "paging": true,
+                    "lengthChange": false,
+                    "searching": false,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                });
+            });
+        </script>                
+    @endpush
+    
+

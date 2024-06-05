@@ -26,6 +26,7 @@ Route::post('/rental/store',[RentalController::class,'store'])->name('rental.sto
 Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
 Route::get('/rental/getLeaseCode/{id}',[RentalController::class,'getLeaseCode'])->name('rental.getLeaseCode');
 Route::get('/rental/detail/{id}',[RentalController::class,'detail'])->name('rental.detail');
+Route::delete('/rental/destroy/{id}',[RentalController::class,'destroy'])->name('rental.destroy');
 
 Route::get('/rental/rent/preapprove/{id}',[RentalController::class,'preapprove'])->name('rental.rent.preapprove');
 Route::post('/rental/rent/approve/{id}/{status}/{index}',[RentalController::class,'approve'])->name('rental.rent.approve');
