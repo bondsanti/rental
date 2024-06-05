@@ -203,31 +203,29 @@
                                             <button type="button" class="btn bg-gradient-info btn-sm view-item" data-id="{{ $item->id }}" title="ดูรายละเอียด">
                                                 <i class="fa fa-eye"></i>
                                             </button>
-                                            <a href="{{ url('/rental/edit/' . $item->id) }}"
-                                                class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
-                                                <i class="fa fa-pencil-square">
-                                                </i>
+                                            @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Admin")
+                                                <a href="{{ url('/rental/edit/' . $item->id) }}"
+                                                    class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
+                                                    <i class="fa fa-pencil-square">
+                                                    </i>
 
-                                            </a>
-                                            {{-- <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
-                                                <i class="fa fa-print"></i>
-                                            </button> --}}
-                                            <a href="{{ url('/rental/rent/' . $item->id) }}"
-                                                class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
-                                                <i class="fa fa-credit-card-alt">
-                                                </i>
-
-                                            </a>
-                                            <a href="{{ url('/rental/history/' . $item->id) }}"
-                                            class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
-                                            <i class="fa fa-address-card"></i>
-                                            </a>
+                                                </a>
+                                                {{-- <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
+                                                    <i class="fa fa-print"></i>
+                                                </button> --}}
+                                                <a href="{{ url('/rental/rent/' . $item->id) }}"
+                                                    class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
+                                                    <i class="fa fa-credit-card-alt">
+                                                    </i>
+                                                </a>
+                                                <a href="{{ url('/rental/history/' . $item->id) }}"
+                                                    class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
+                                                    <i class="fa fa-address-card"></i>
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endforeach
-                                    {{-- <tr>
-                                        <td colspan="16"><center>Total: {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
-                                    </tr> --}}
                                 </tbody>
                             </table>
                             <table class="table table-hover table-striped text-center h6">
@@ -583,7 +581,6 @@
         //View modal
         $('body').on('click', '.view-item', function() {
             const id = $(this).data('id');
-            // console.log(id);
             $('#modal-view').modal('show');
             $.get('../../api/rental/detail/' + id, function(data) {
                 console.log(data);
@@ -623,16 +620,6 @@
                 $('#contractStatus').val(data.Contract_Status ?? '-');
             });
         });
-        // JavaScript สำหรับกำหนดค่าให้กับ input ของวันที่
-        // โดยใช้คำสั่ง new Date() เพื่อสร้างวัตถุ Date ที่เก็บวันที่และเวลาปัจจุบัน
-        var today = new Date();
-
-        // แปลงวัตถุ Date เป็นสตริงในรูปแบบที่ต้องการ (ในที่นี้เราใช้วิธีการกำหนดใน HTML)
-        // โดยเราจะให้สตริงนี้เป็นค่าของ value ของ input
-        var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
-
-        // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
-        // document.getElementById('startdate').value = todayString;
-        // document.getElementById('enddate').value = todayString;
+        
     </script>
 @endpush
