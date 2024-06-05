@@ -147,7 +147,6 @@
     </section>
 @endsection
 @push('script')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -156,19 +155,6 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            });
-            $('#my-table').DataTable({
-                'paging': false,
-                'lengthChange': false,
-                'searching': false,
-                'ordering': true,
-                'info': false,
-                'autoWidth': false,
-                "responsive": true,
-                "columnDefs": [{
-                    "orderable": false,
-                    "targets": [0, 1, 2, 3]
-                }]
             });
         });
     </script>

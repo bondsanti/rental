@@ -305,6 +305,7 @@ class RentalController extends Controller
     public function edit($id)
     {
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
@@ -372,7 +373,7 @@ class RentalController extends Controller
         $lease_auto_code = Lease_auto_code::where('ref_cus_id', $ref_cus_id)
             ->first();
 
-        return view('rental.edit', compact('dataLoginUser', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons','product_id','gauranteestart','gauranteeend'));
+        return view('rental.edit', compact('dataLoginUser', 'isRole', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons','product_id','gauranteestart','gauranteeend'));
     }
 
     public function update(UpdateRentalRequest $request)
@@ -2137,6 +2138,7 @@ class RentalController extends Controller
     {
         // dd($result);
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         // $result = Room::select('rooms.*','projects.*')
         // ->join('projects', 'projects.pid', '=', 'rooms.pid')
         // ->where('rooms.id', '=', $request->id)
@@ -2164,7 +2166,7 @@ class RentalController extends Controller
             ->first();
         // dd($result);
 
-        return view('rental.rent.index', compact('dataLoginUser', 'result'));
+        return view('rental.rent.index', compact('dataLoginUser', 'isRole', 'result'));
         // dd($result);
     }
 
@@ -2460,6 +2462,7 @@ class RentalController extends Controller
     public function history(Request $request, $id){
         // dd($id);
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $rent = Room::select(
             'projects.Project_Name',
             'rooms.RoomNo',
@@ -2601,8 +2604,24 @@ class RentalController extends Controller
         // ->orderBy('due_date', 'ASC')
         // ->get();
 
-        return view('rental.history', compact('dataLoginUser', 'rent', 'count','history'));
+        return view('rental.history', compact('dataLoginUser', 'isRole', 'rent', 'count','history'));
             dd($history);
+    }
+
+    public function destroy($id)
+    {
+
+        $room = Room::where('id', $id)->first();
+
+        $room_old = $room->toArray();
+
+        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
+        $room->delete($id);
+
+        return response()->json([
+            'message' => 'ลบข้อมูลสำเร็จ'
+        ], 201);
+
     }
 
     public function getProvinces()

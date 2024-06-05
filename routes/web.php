@@ -65,8 +65,6 @@ Route::middleware(['isLogin'])->group(function () {
     Route::post('/rental/recordRent', [RentalController::class, 'recordRent'])->name('rental.recordRent');
     Route::get('/rental/history/{id}', [RentalController::class, 'history'])->name('rental.history');
 
-
-
     //Route Contract สัญญา
     Route::get('/contract',[ContractController::class,'index'])->name('contract');
     Route::post('/contract/update',[ContractController::class,'update'])->name('contract.update');
@@ -76,9 +74,6 @@ Route::middleware(['isLogin'])->group(function () {
     Route::post('/room/contract/search',[ContractController::class,'search'])->name('contract.search');
     Route::get('/contract/list',[ContractController::class,'list_contracct'])->name('contract.list');
     Route::post('/list/search',[ContractController::class,'list_search'])->name('list.search');
-
-
-
 
     //Route ReportRoom รายงานสรุปห้องเช่า
     Route::get('/report/room',[ReportRoomController::class,'index'])->name('report.room');
@@ -110,5 +105,8 @@ Route::middleware(['isLogin'])->group(function () {
     // Summary Booking
     Route::get('/summary/booking',[SummaryBookingController::class,'index'])->name('summary.booking');
     Route::post('/summary/booking/search',[SummaryBookingController::class,'search'])->name('summary.booking.search');
+
+    // users
+    Route::get('/users',[UserController::class,'index'])->name('user');
 });
 

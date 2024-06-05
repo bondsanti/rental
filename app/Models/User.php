@@ -28,5 +28,4 @@ class User extends Model
         return $this->hasOne(Role_user::class, 'id', 'user_id');
     }
 
-
 }

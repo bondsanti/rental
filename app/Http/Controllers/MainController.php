@@ -19,6 +19,7 @@ class MainController extends Controller
     {
 
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
@@ -135,6 +136,7 @@ class MainController extends Controller
         return view('main.index', compact(
             'rents',
             'dataLoginUser',
+            'isRole',
             'projects',
             'status',
             'readyCount',

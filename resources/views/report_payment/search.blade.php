@@ -201,13 +201,17 @@
                                             <td>
                                                 <div class="h6 {{ $item->total_paid != '0' ? 'text-green text-bold' : '' }}">{{ $item->total_paid }}</div>
                                             </td>
-                                            <td>
-                                                @if ($item->paid ===  'ยังไม่จ่าย' && $monthly != '')
-                                                    <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $monthly. '/'. $item->paid) }}" class="btn btn-warning"><i class="fa fa-print" aria-hidden="true"></i></a>
-                                                @elseif($item->paid ===  'จ่ายแล้ว')
-                                                    <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $item->date_paid. '/'. $item->paid) }}" class="btn btn-success"><i class="fa fa-print" aria-hidden="true"></i></a>
-                                                @endif
-                                            </td>
+                                            @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Admin")
+                                                <td>
+                                                    @if ($item->paid ===  'ยังไม่จ่าย' && $monthly != '')
+                                                        <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $monthly. '/'. $item->paid) }}" class="btn btn-warning"><i class="fa fa-print" aria-hidden="true"></i></a>
+                                                    @elseif($item->paid ===  'จ่ายแล้ว')
+                                                        <a href="{{ url('report/payment/download/' . $item->rid . '/' . $item->cid. '/' . $item->date_paid. '/'. $item->paid) }}" class="btn btn-success"><i class="fa fa-print" aria-hidden="true"></i></a>
+                                                    @endif
+                                                </td>
+                                            @else
+                                               <td></td>
+                                            @endif
                                             
                                         </tr>
                                     @endforeach

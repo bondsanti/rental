@@ -141,7 +141,7 @@ class CustomAuthController extends Controller
 
     public function changePassword()
     {
-        return view('auth.password');
+        return view('auth.password'); 
     }
 
     public function updatePassword(Request $request)

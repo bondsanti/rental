@@ -330,31 +330,42 @@
                                                     </i>
                                                 </button> --}}
                                                 {{-- @elseif ($isRole->role_type == "User" && $isRole->dept == "Legal") --}}
-                                                <a href="{{ url('/rental/edit/' . $item->id) }}"
-                                                    class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
-                                                    <i class="fa fa-pencil-square">
-                                                    </i>
+                                                @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Admin")
+                                                    <a href="{{ url('/rental/edit/' . $item->id) }}"
+                                                        class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
+                                                        <i class="fa fa-pencil-square">
+                                                        </i>
 
-                                                </a>
+                                                    </a>
+                                                    <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
+                                                        <i class="fa fa-print"></i>
+                                                    </button>
+                                                    <a href="{{ url('/rental/rent/' . $item->id) }}"
+                                                        class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
+                                                        <i class="fa fa-credit-card-alt">
+                                                        </i>
+                                                    </a>
+                                                    <a href="{{ url('/rental/history/' . $item->id) }}"
+                                                    class="btn bg-gradient-info btn-sm edit-item {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
+                                                    <i class="fa fa-address-card"></i>
+                                                    </a>
+                                                @endif
+                                                @if ($isRole->role_type=="Account")
+                                                    <a href="{{ url('/rental/rent/' . $item->id) }}"
+                                                        class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
+                                                        <i class="fa fa-credit-card-alt">
+                                                        </i>
+                                                    </a>
+                                                @endif
+                                                
+                                                
                                                 {{-- <a href=""
                                                     class="btn bg-gradient-warning btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="พิมพ์">
                                                     <i class="fa fa-print">
                                                     </i>
 
                                                 </a> --}}
-                                                <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
-                                                    <i class="fa fa-print"></i>
-                                                </button>
-                                                <a href="{{ url('/rental/rent/' . $item->id) }}"
-                                                    class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
-                                                    <i class="fa fa-credit-card-alt">
-                                                    </i>
-
-                                                </a>
-                                                <a href="{{ url('/rental/history/' . $item->id) }}"
-                                                class="btn bg-gradient-info btn-sm edit-item {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
-                                                <i class="fa fa-address-card"></i>
-                                                </a>
+                                                
                                                 {{-- @endif --}}
                                             </td>
                                         </tr>
