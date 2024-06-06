@@ -24,14 +24,11 @@
                     <div class="card">
                         <div class="card-header card-outline card-info">
                             <h3 class="card-title">ค้นหา ห้อง</h3>
-
                         </div>
                         <form action="{{ route('rental.search') }}" method="post" id="searchForm">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
-
-
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>โครงการ</label>
@@ -49,8 +46,10 @@
                                             <select name="status" id="status" class="form-control">
                                                 <option value="all">สถานะห้องเช่า ทั้งหมด</option>
                                                 @foreach ($status as $item)
-                                                    <option value="{{ $item->name }}">{{ $item->name }} </option>
+                                                    <option value="{{ $item->status_room }}">{{ $item->status_room }} </option>
                                                 @endforeach
+                                                <option value="เช่าอยู่">เช่าอยู่</option>
+                                                <option value="คืนห้อง">คืนห้อง</option>
                                             </select>
                                         </div>
                                     </div>
@@ -60,7 +59,6 @@
                                             @php
                                                 $typerents = ['การันตี', 'การันตีรับร่วงหน้า', 'เบิกจ่ายล่วงหน้า', 'ฝากต่อหักภาษี', 'ฝากต่อไม่หักภาษี', 'ฝากเช่า', 'ติดต่อเจ้าของห้องไม่ได้'];
                                             @endphp
-
                                             <select name="typerent" id="typerent" class="form-control">
                                                 <option value="all">ประเภท ทั้งหมด</option>
                                                 @foreach ($typerents as $typerent)
@@ -69,8 +67,6 @@
                                             </select>
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -82,7 +78,7 @@
                                                 <option value="Guarantee_Startdate">วันเริ่มสัญญา</option>
                                                 <option value="Guarantee_Enddate">วันสิ้นสุดสัญญา</option>
                                                 <option value="Contract_Startdate">วันเริ่มเช่า</option>
-                                                <option value="Contract_Startdate">วันชำระเงินค่าเช่า</option>
+                                                <option value="Payment_date">วันชำระเงินค่าเช่า</option>
                                                 <option value="Cancle_Date">วันออก</option>
                                             </select>
                                         </div>
@@ -103,7 +99,6 @@
                                             type="text" value="" placeholder="วันที่สิ้นสุด" autocomplete="off">
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="row">
@@ -146,22 +141,15 @@
                                     <a href="{{ route('rental') }}" type="button"
                                         class="btn bg-gradient-danger"><i class="fa fa-refresh"></i> เคลียร์</a>
                                 </div>
-
-
-
                             </div>
                         </form>
-
                     </div>
 
                     <div class="row">
                         <div class="col-12">
-
-                            {{-- <h4 class="text-center mt-2"></h4> --}}
                             <button type="button" class="btn btn-info btn-block">
                                 <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา ห้องที่คุณต้องการ</h4>
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -190,5 +178,22 @@
                 $('#enddate').datepicker('setStartDate', selectedStartDate);
             });
         });
+    </script>
+    <script>
+        // JavaScript สำหรับกำหนดค่าให้กับ input ของวันที่
+        // โดยใช้คำสั่ง new Date() เพื่อสร้างวัตถุ Date ที่เก็บวันที่และเวลาปัจจุบัน
+        var today = new Date();
+
+        // getFirstDayOfMonth
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // Note: Month starts from 0
+        const formattedMonth = month < 10 ? '0' + month : month; 
+        // แปลงวัตถุ Date เป็นสตริงในรูปแบบที่ต้องการ (ในที่นี้เราใช้วิธีการกำหนดใน HTML)
+        // โดยเราจะให้สตริงนี้เป็นค่าของ value ของ input
+        var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
+
+        // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
+        document.getElementById('startdate').value = `${year}-${formattedMonth}-01`;
+        document.getElementById('enddate').value = todayString;
     </script>
 @endpush

@@ -94,14 +94,11 @@
                     <div class="card">
                         <div class="card-header card-outline card-info">
                             <h3 class="card-title">ค้นหา ห้อง</h3>
-
                         </div>
                         <form action="{{ route('rental.search') }}" method="post" id="searchForm">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
-
-
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>โครงการ</label>
@@ -119,10 +116,12 @@
                                             <select name="status" id="status" class="form-control">
                                                 <option value="all">ทั้งหมด</option>
                                                 @foreach ($status as $item)
-                                                    @if ($item->name)
-                                                        <option value="{{ $item->name }}">{{ $item->name }} </option>
+                                                    @if ($item->status_room)
+                                                        <option value="{{ $item->status_room }}">{{ $item->status_room }} </option>
                                                     @endif
                                                 @endforeach
+                                                <option value="เช่าอยู่">เช่าอยู่</option>
+                                                <option value="คืนห้อง">คืนห้อง</option>
                                             </select>
                                         </div>
                                     </div>
@@ -130,9 +129,8 @@
                                         <div class="form-group">
                                             <label>ประเภทห้องเช่า</label>
                                             @php
-                                            $typerents = ['การันตี', 'การันตีรับร่วงหน้า', 'เบิกจ่ายล่วงหน้า', 'ฝากต่อหักภาษี', 'ฝากต่อไม่หักภาษี', 'ฝากเช่า', 'ติดต่อเจ้าของห้องไม่ได้'];
+                                                $typerents = ['การันตี', 'การันตีรับร่วงหน้า', 'เบิกจ่ายล่วงหน้า', 'ฝากต่อหักภาษี', 'ฝากต่อไม่หักภาษี', 'ฝากเช่า', 'ติดต่อเจ้าของห้องไม่ได้'];
                                             @endphp
-
                                             <select name="typerent" id="typerent" class="form-control">
                                                 <option value="all">ประเภท ทั้งหมด</option>
                                                 @foreach ($typerents as $typerent)
@@ -141,8 +139,6 @@
                                             </select>
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -154,7 +150,7 @@
                                                 <option value="Guarantee_Startdate">วันเริ่มสัญญา</option>
                                                 <option value="Guarantee_Enddate">วันสิ้นสุดสัญญา</option>
                                                 <option value="Contract_Startdate">วันเริ่มเช่า</option>
-                                                <option value="Contract_Startdate">วันชำระเงินค่าเช่า</option>
+                                                <option value="Payment_date">วันชำระเงินค่าเช่า</option>
                                                 <option value="Cancle_Date">วันออก</option>
                                             </select>
                                         </div>
@@ -256,8 +252,36 @@
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
+                                @php
+                                    $totalgarantee = 0;
+                                    $totalgaranteebefore = 0;
+                                    $totalpaidbefore = 0;
+                                    $totalcontinvat = 0;
+                                    $totalcontexvat = 0;
+                                    $totalforrental = 0;
+                                    $totalcantcontact = 0;
+                                    $totalall = 0;
+                                @endphp
                                 <tbody>
                                     @foreach ($rents as $item)
+                                    @php
+                                        if ($item->rental_status === 'การันตี') {
+                                            $totalgarantee++;
+                                        }elseif ($item->rental_status === 'การันตีรับล่วงหน้า') {
+                                            $totalgaranteebefore++;
+                                        }elseif ($item->rental_status === 'เบิกจ่ายล่วงหน้า') {
+                                            $totalpaidbefore++;
+                                        }elseif ($item->rental_status === 'ฝากต่อหักภาษี') {
+                                            $totalcontinvat++;
+                                        }elseif ($item->rental_status === 'ฝากต่อไม่หักภาษี') {
+                                            $totalcontexvat++;
+                                        }elseif ($item->rental_status === 'ฝากเช่า') {
+                                            $totalforrental++;
+                                        }elseif ($item->rental_status === 'ติดต่อเจ้าของห้องไม่ได้') {
+                                            $totalcantcontact++;
+                                        }
+                                        $totalall++;
+                                    @endphp
                                         <tr>
                                             <td>
                                                 <div class="h6">{{ $loop->index + 1 }}</div>
@@ -315,27 +339,14 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{-- <a href="{{ url('/rental/detail/' . $item->id) }}"
-                                                class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ดูรายละเอียด">
-                                                <i class="fa fa-eye">
-                                                </i>
-
-                                                </a> --}}
                                                 <button type="button" class="btn bg-gradient-info btn-sm view-item" data-id="{{ $item->id }}" title="ดูรายละเอียด">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
-                                                {{-- <button class="btn bg-gradient-danger  btn-sm delete-item" data-toggle="tooltip" data-placement="top" title="ลบ"
-                                                    data-id="">
-                                                    <i class="fa fa-trash">
-                                                    </i>
-                                                </button> --}}
-                                                {{-- @elseif ($isRole->role_type == "User" && $isRole->dept == "Legal") --}}
                                                 @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Admin")
                                                     <a href="{{ url('/rental/edit/' . $item->id) }}"
                                                         class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
                                                         <i class="fa fa-pencil-square">
                                                         </i>
-
                                                     </a>
                                                     <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
                                                         <i class="fa fa-print"></i>
@@ -346,8 +357,8 @@
                                                         </i>
                                                     </a>
                                                     <a href="{{ url('/rental/history/' . $item->id) }}"
-                                                    class="btn bg-gradient-info btn-sm edit-item {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
-                                                    <i class="fa fa-address-card"></i>
+                                                        class="btn bg-gradient-info btn-sm edit-item {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
+                                                        <i class="fa fa-address-card"></i>
                                                     </a>
                                                 @endif
                                                 @if ($isRole->role_type=="Account")
@@ -364,20 +375,15 @@
                                                         </i>
                                                     </button>
                                                 @endif
-                                                
-                                                {{-- <a href=""
-                                                    class="btn bg-gradient-warning btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="พิมพ์">
-                                                    <i class="fa fa-print">
-                                                    </i>
-
-                                                </a> --}}
-                                                
-                                                {{-- @endif --}}
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
-
+                            </table>
+                            <table class="table table-hover table-striped text-center h6">
+                                <tr>
+                                    <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
+                                </tr>
                             </table>
                         </div>
                     </div>

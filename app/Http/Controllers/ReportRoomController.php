@@ -666,8 +666,8 @@ class ReportRoomController extends Controller
                     $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
                 }
             }elseif ($request->dateselect == "Payment_date") {
-                $new_date = date('Y-m-d', strtotime($request->enddate . ' -1 year'));
-                $new_date = date('Y-06-01', strtotime($new_date));
+                $new_date = date('Y-m-d', strtotime($request->startdate . ' -1 year'));
+                $new_date = date('Y-m-01', strtotime($new_date));
                 if ($request->enddate != null) {
                     $rents->whereBetween('customers.Contract_Startdate', [$new_date, $request->enddate]);
                 } else {
