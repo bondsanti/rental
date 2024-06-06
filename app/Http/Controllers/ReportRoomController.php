@@ -90,7 +90,7 @@ class ReportRoomController extends Controller
         ORDER BY a.Project_Name
         "))
             ->get();
-        //dd($reports);
+
         return view(
             'report_room.index',
             compact(
@@ -489,93 +489,6 @@ class ReportRoomController extends Controller
             and ifnull(r.Trans_status,'') != 'del'
             GROUP BY paid ORDER BY room DESC");
 
-
-        // $requests = DB::table('customers as c')
-        //     ->select(DB::raw('COUNT(project_name) AS room'), 'project_name', 'c.Roomno', 'r.HomeNo', 'r.status_room', 'c.cus_name', 'c.Phone', DB::raw('SUM(c.price) AS total'), 'pa.id AS room_id')
-        //     ->leftJoin('projects as p', 'p.pid', '=', 'c.pid')
-        //     ->leftJoin('payments as pa', 'pa.cid', '=', 'c.id')
-        //     ->leftJoin('rooms as r', 'c.rid', '=', 'r.id')
-        //     ->where(function ($where) use ($date1) {
-        //         $where->whereRaw("IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00'")
-        //             ->orWhere('r.status_room', '<>', 'สวัสดิการ')
-        //             ->orWhere(function ($where) {
-        //                 $where->where('r.status_room', '=', 'ไม่มีวันเซ็นต์สัญญา')
-        //                     ->orWhere('r.status_room', '=', 'ห้องสวัสดิการ');
-        //             });
-        //     })
-        //     ->orWhere('r.status_room', '=', 'สวัสดิการ')
-
-        //     ->orWhere(function ($where) use ($date1) {
-        //         $where->whereRaw("DATE_FORMAT(pa.due1_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date1, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due2_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date2, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due3_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date3, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due4_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date4, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due5_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date5, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due6_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date6, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due7_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date7, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due8_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date8, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due9_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date9, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due10_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date10, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due11_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date11, '') IS NULL")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due12_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date12, '') IS NULL")
-
-        //             ->orWhereRaw("DATE_FORMAT(pa.due1_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date1, '') NOT IN('', '0000-00-00') AND pa.due1_Date <= pa.Payment_Date1")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due2_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date2, '') NOT IN('', '0000-00-00') AND pa.due2_Date <= pa.Payment_Date2")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due3_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date3, '') NOT IN('', '0000-00-00') AND pa.due3_Date <= pa.Payment_Date3")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due4_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date4, '') NOT IN('', '0000-00-00') AND pa.due4_Date <= pa.Payment_Date4")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due5_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date5, '') NOT IN('', '0000-00-00') AND pa.due5_Date <= pa.Payment_Date5")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due6_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date6, '') NOT IN('', '0000-00-00') AND pa.due6_Date <= pa.Payment_Date6")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due7_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date7, '') NOT IN('', '0000-00-00') AND pa.due7_Date <= pa.Payment_Date7")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due8_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date8, '') NOT IN('', '0000-00-00') AND pa.due8_Date <= pa.Payment_Date8")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due9_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date9, '') NOT IN('', '0000-00-00') AND pa.due9_Date <= pa.Payment_Date9")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due10_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date10, '') NOT IN('', '0000-00-00') AND pa.due10_Date <= pa.Payment_Date10")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due11_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date11, '') NOT IN('', '0000-00-00') AND pa.due11_Date <= pa.Payment_Date11")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due12_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date12, '') NOT IN('', '0000-00-00') AND pa.due12_Date <= pa.Payment_Date12")
-
-        //             ->orWhereRaw("DATE_FORMAT(pa.due1_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date1, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due2_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date2, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due3_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date3, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due4_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date4, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due5_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date5, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due6_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date6, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due7_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date7, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due8_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date8, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due9_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date9, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due10_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date10, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due11_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date11, '') NOT IN('', '0000-00-00')")
-        //             ->orWhereRaw("DATE_FORMAT(pa.due12_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND IFNULL(pa.Payment_Date12, '') NOT IN('', '0000-00-00')");
-        //     })
-        //     ->selectRaw("CASE
-        //     WHEN IFNULL(contract_startdate, '') = '' OR contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ' THEN 'ยังไม่จ่าย'
-        //     WHEN r.status_room = 'สวัสดิการ' THEN 'ห้องสวัสดิการ'
-        //     WHEN (
-        //         DATE_FORMAT(due1_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date1 IS NULL
-        //         OR DATE_FORMAT(due2_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date2 IS NULL
-        //         OR DATE_FORMAT(due3_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date3 IS NULL
-        //         OR DATE_FORMAT(due4_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date4 IS NULL
-        //         OR DATE_FORMAT(due5_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date5 IS NULL
-        //         OR DATE_FORMAT(due6_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date6 IS NULL
-        //         OR DATE_FORMAT(due7_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date7 IS NULL
-        //         OR DATE_FORMAT(due8_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date8 IS NULL
-        //         OR DATE_FORMAT(due9_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date9 IS NULL
-        //         OR DATE_FORMAT(due10_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date10 IS NULL
-        //         OR DATE_FORMAT(due11_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date11 IS NULL
-        //         OR DATE_FORMAT(due12_Date, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m') AND Payment_Date12 IS NULL
-        //     ) THEN 'ยังไม่จ่าย'
-        // END AS STATUS")
-        //     ->orWhere(function ($where) use ($date1) {
-        //         $where->whereRaw("DATE_FORMAT(c.contract_startdate, '%Y%m') = DATE_FORMAT('" . $date1 . "', '%Y%m')")
-        //             ->orWhereRaw("DATE_FORMAT(c.Cancle_Date, '%Y%m') >= DATE_FORMAT('" . $date1 . "', '%Y%m')");
-        //     })
-        //     ->whereNotIn(DB::raw("IFNULL(r.Trans_status, '')"), ['del'])
-        //     ->whereIn('c.Contract_Status', ['เช่าอยู่', 'ต่อสัญญา'])
-        //     ->groupBy('project_name')
-        //     ->orderByDesc('room')
-        //     ->get();
-
-
-
-
         return view(
             'report_room.report_rental.retal_search',
             compact(
@@ -630,16 +543,6 @@ class ReportRoomController extends Controller
             ->where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
-        // Retrieve request parameters
-        // Retrieve request parameters
-        $date1 = request()->input('date1', Carbon::now()->startOfMonth()->toDateString());
-        $date2 = request()->input('date2', Carbon::now()->endOfMonth()->toDateString());
-
-        // Parse dates using Carbon
-        // กำหนดเวลาเริ่มต้นเป็น 00:00:00
-        $startDate = Carbon::createFromFormat('Y-m-d', $date1)->startOfMonth()->startOfDay();
-        // กำหนดเวลาสิ้นสุดเป็น 23:59:59
-        $endDate = Carbon::createFromFormat('Y-m-d', $date2)->endOfMonth()->endOfDay();
 
         $statuses = DB::table('rooms')
             ->select('status_room')
@@ -654,8 +557,6 @@ class ReportRoomController extends Controller
             compact(
                 'dataLoginUser',
                 'isRole',
-                'startDate',
-                'endDate',
                 'projects',
                 'statuses'
             )
@@ -674,15 +575,9 @@ class ReportRoomController extends Controller
             )
             ->orderBy('Project_Name', 'ASC')
             ->get();
-        // Retrieve request parameters
-        $date1 = request()->input('date1', Carbon::now()->startOfMonth()->toDateString());
-        $date2 = request()->input('date2', Carbon::now()->endOfMonth()->toDateString());
-
-        // Parse dates using Carbon
-        // กำหนดเวลาเริ่มต้นเป็น 00:00:00
-        $startDate = Carbon::createFromFormat('Y-m-d', $date1)->startOfMonth()->startOfDay();
-        // กำหนดเวลาสิ้นสุดเป็น 23:59:59
-        $endDate = Carbon::createFromFormat('Y-m-d', $date2)->endOfMonth()->endOfDay();
+    
+        $startDate = $request->startdate;
+        $endDate = $request->enddate;
 
         $statuses = DB::table('rooms')
             ->select('status_room')
@@ -691,104 +586,115 @@ class ReportRoomController extends Controller
             ->orderBy('status_room', 'ASC')
             ->get();
 
-        // $dt = request()->input('dt');
-        // $g = request()->input('g');
-        // $cn = request()->input('cn');
-        // $s = request()->input('s');
-        // $n = request()->input('n');
-        // $s1 = request()->input('s1');
-        // $rt = request()->input('rt');
-        // $f = request()->input('f');
-        // $b = request()->input('b');
-        // $order = request()->input('order', 'rooms.RoomNo');
-        // $sort = request()->input('sort');
-        // $todayDate = now()->format('Y-m-d');
+        $rents = Room::select(
+            'projects.Project_Name',
+            'rooms.*',
+            'customers.id as cid',
+            'customers.Cus_Name'
 
-        // $query = Room::select(
-        //             'rooms.price as txtprice',
-        //             'customers.price as txtcusprice',
-        //             'customers.id AS cus_id',
-        //             'rooms.Building AS Buile',
-        //             'rooms.Floor AS layers',
-        //             'rooms.*',
-        //             'projects.*',
-        //             'customers.*',
-        //             'rooms.RoomNo AS RoomNo1',
-        //             'rooms.Size AS Size1',
-        //             'rooms.id AS id1',
-        //             'customers.id AS id2'
-        //         )
-        //         ->join('projects', 'rooms.pid', '=', 'projects.pid')
-        //         ->leftJoin('customers', function ($join) {
-        //             $join->on('rooms.pid', '=', 'customers.pid')
-        //                 ->on('customers.RoomNo', '=', 'rooms.RoomNo')
-        //                 ->on('customers.rid', '=', 'rooms.id');
-        //         })
-        //         ->where(function ($query) use ($dt, $todayDate) {
-        //             if ($dt == 99) {
-        //                 $query->where('Guarantee_Startdate', '<=', $todayDate);
-        //             } elseif ($dt == 5) {
-        //                 $query->whereBetween('Contract_Startdate', [$date3, $date2]);
-        //             } else {
-        //                 $query->whereBetween('Contract_Startdate', [$date1, $date2]);
-        //             }
-        //         })
-        //         ->when($g, function ($query) use ($g) {
-        //             $query->where('Cus_Name', 'like', '%' . $g . '%');
-        //         })
-        //         ->when($cn, function ($query) use ($cn) {
-        //             $query->where('rooms.RoomNo', 'like', '%' . $cn . '%');
-        //         })
-        //         ->when($s, function ($query) use ($s) {
-        //             if ($s == 99) {
-        //                 $query->where('rooms.pid', $s);
-        //             }
-        //         })
-        //         ->when($n, function ($query) use ($n) {
-        //             $query->where('Owner', 'like', '%' . $n . '%');
-        //         })
-        //         ->when($s1 == "ALL", function ($query) use ($s1) {
-        //             $query->where(function ($query) {
-        //                 $query->where('status_room', '<>', 'คืนห้อง');
-        //                 if ($dt != 6) {
-        //                     $query->where(function ($query) {
-        //                         $query->where('Contract_Status', 'เช่าอยู่')
-        //                             ->orWhereNull('Contract_Status')
-        //                             ->orWhere('Contract_Status', '');
-        //                     });
-        //                 }
-        //             });
-        //         })
-        //         ->when($s1 == "เช่าอยู่", function ($query) use ($s1) {
-        //             $query->where('Contract_Status', 'เช่าอยู่');
-        //         })
-        //         ->when($s1 == "ห้องว่าง", function ($query) use ($s1) {
-        //             $query->where(function ($query) {
-        //                 $query->where('Contract_Status', '!=', 'เช่าอยู่')
-        //                     ->orWhereNull('Contract_Status');
-        //             });
-        //         })
-        //         // ->when($s1 != "ALL" && $s1 != "เช่าอยู่" && $s1 != "ห้องว่าง", function ($query) use ($s1) {
-        //         //     $query->where('status_room', 'like', '%' . $s1 . '%');
-        //         //     if ($dt != 6) {
-        //         //         $query->where(function ($query) {
-        //         //             $query->where('Contract_Status', 'เช่าอยู่')
-        //         //                 ->orWhereNull('Contract_Status')
-        //         //                 ->orWhere('Contract_Status', '');
-        //         //         });
-        //         //     }
-        //         // })
-        //         ->when($rt != "ALL", function ($query) use ($rt) {
-        //             $query->where('rooms.rental_status', $rt);
-        //         })
-        //         ->orderByRaw($order, $sort);
+        )
+            ->from('rooms as rooms')
+            ->join('projects', 'rooms.pid', '=', 'projects.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+        OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
+            // ->whereRaw("IFNULL(status_room, '') <> 'คืนห้อง'")
+            ->where(function ($query) {
+                $query->where('rooms.Trans_Status', '=', '')
+                    ->orWhereNull('rooms.Trans_Status');
+            });
 
-        //         $result = $query->get();
+        if ($request->pid != 'all') {
+            $rents->where('rooms.pid', $request->pid);
+        }
+        if ($request->Owner) {
+            $rents->where('rooms.Owner', 'LIKE', '%' . $request->Owner . '%');
+        }
+        if ($request->RoomNo) {
+            $rents->where('rooms.RoomNo', 'LIKE', '%' . $request->RoomNo . '%');
+        }
+        if ($request->Cusmoter) {
+            $rents->where('customers.Cus_Name', 'LIKE', '%' . $request->Cusmoter . '%');
+        }
+        if ($request->typerent != 'all') {
+            $rents->where('rooms.rental_status', $request->typerent);
+        }
+        if ($request->status != 'all') {
+            // if ($request->status == "ไม่พร้อมอยู่") {
+            //     $rents->whereIn('rooms.Status_Room', ['ไม่พร้อมอยู่', 'รอคลีน', 'รอตรวจ', 'รอเฟอร์']);
+            // } elseif ($request->status == "อยู่แล้ว") {
+            //     $rents->whereIn('rooms.Status_Room', ['สวัสดิการ', 'ห้องออฟฟิต', 'เช่าอยู่', 'อยู่แล้ว']);
+            // } else {
+            //     $rents->where('rooms.Status_Room', $request->status);
+            // }
+            if ($request->status == "เช่าอยู่") {
+                $rents->where('customers.Contract_Status', $request->status);
+            }else{
+                $rents->where('rooms.Status_Room', 'LIKE', '%' .$request->status. '%');
+            }
+        }else{
+            $rents->whereRaw("IFNULL(status_room, '') <> 'คืนห้อง'");
+        }
 
 
+        if ($request->dateselect && $request->startdate) {
+            if ($request->dateselect == "transfer_date") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Transfer_Date', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Transfer_Date', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Guarantee_Startdate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Guarantee_Startdate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Guarantee_Startdate', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Guarantee_Enddate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('rooms.Guarantee_Enddate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('rooms.Guarantee_Enddate', [$request->startdate, $request->startdate]);
+                }
+            } elseif ($request->dateselect == "Contract_Startdate") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
+                }
+            }elseif ($request->dateselect == "Payment_date") {
+                $new_date = date('Y-m-d', strtotime($request->enddate . ' -1 year'));
+                $new_date = date('Y-06-01', strtotime($new_date));
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Contract_Startdate', [$new_date, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Contract_Startdate', [$request->startdate, $request->startdate]);
+                }
+            }elseif ($request->dateselect == "Cancle_Date") {
+                if ($request->enddate != null) {
+                    $rents->whereBetween('customers.Cancle_Date', [$request->startdate, $request->enddate]);
+                } else {
+                    $rents->whereBetween('customers.Cancle_Date', [$request->startdate, $request->startdate]);
+                }
+            }
+            else{
+                $rents->where('rooms.Create_Date', '<=',$request->enddate);
+            }
+        }
+        // elseif ($request->startdate  && $request->enddate) {
+        //     $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
+        // }
 
+        $rentsCount = $rents->count();
 
+        $rents = $rents
+            ->orderBy('Project_Name', 'asc')
+            ->get();
 
+        $formInputs = $request->all();
 
         return view(
             'report_room.listRoom.list_inroom_search',
@@ -798,8 +704,10 @@ class ReportRoomController extends Controller
                 'startDate',
                 'endDate',
                 'projects',
-                'statuses'
-                // 'result'
+                'statuses',
+                'rents',
+                'rentsCount',
+                'formInputs',
             )
         );
     }

@@ -24,7 +24,6 @@
                 <div class="col-sm-6">
                     <h1>
                         Asset ห้องเช่า
-
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -62,28 +61,15 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label for="">วันที่</label>
-                                            <select name="dt" id="dt" class="form-control text-center">
-                                                <option value="99"
-                                                    {{ request()->input('dt') == '99' ? 'selected' : '' }}>------- All Date
-                                                    -------</option>
-                                                <option value="1"
-                                                    {{ request()->input('dt') == '1' ? 'selected' : '' }}>วันรับห้อง
-                                                </option>
-                                                <option value="2"
-                                                    {{ request()->input('dt') == '2' ? 'selected' : '' }}>วันเริ่มการันตี
-                                                </option>
-                                                <option value="3"
-                                                    {{ request()->input('dt') == '3' ? 'selected' : '' }}>วันสิ้นสุดการันตี
-                                                </option>
-                                                <option value="4"
-                                                    {{ request()->input('dt') == '4' ? 'selected' : '' }}>วันเริ่มเช่า
-                                                </option>
-                                                <option value="5"
-                                                    {{ request()->input('dt') == '5' ? 'selected' : '' }}>วันชำระเงินค่าเช่า
-                                                </option>
-                                                <option value="6"
-                                                    {{ request()->input('dt') == '6' ? 'selected' : '' }}>วันออก</option>
+                                            <label>เลือกประเภทวันที่</label>
+                                            <select name="dateselect" id="dateselect" class="form-control">
+                                                <option value="all">ทั้งหมด</option>
+                                                <option value="transfer_date">วันรับห้อง</option>
+                                                <option value="Guarantee_Startdate">วันเริ่มการันตี</option>
+                                                <option value="Guarantee_Enddate">วันสิ้นสุดการันตี</option>
+                                                <option value="Contract_Startdate">วันเริ่มเช่า</option>
+                                                <option value="Payment_date">วันชำระเงินค่าเช่า</option>
+                                                <option value="Cancle_Date">วันออก</option>
                                             </select>
                                         </div>
                                     </div>
@@ -116,14 +102,14 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อลูกค้า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Owner" type="text" value=""
                                                 placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อคนเช่า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Cusmoter" type="text" value=""
                                                 placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>
@@ -132,8 +118,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="">สถานะห้อง</label>
-                                            <select name="s1" id="s1" class="form-control">
-                                                <option value="All">--- All Status ---</option>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="all">สถานะห้อง ทั้งหมด</option>
                                                 @foreach ($statuses as $status)
                                                     <option value="{{ $status->status_room }}">{{ $status->status_room }}
                                                     </option>
@@ -146,8 +132,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="">ประเภทห้องเช่า</label>
-                                            <select name="rt" id="rt" class="form-control">
-                                                <option value="All">--- All Status ---</option>
+                                            <select name="typerent" id="typerent" class="form-control">
+                                                <option value="all">ประเภท ทั้งหมด</option>
                                                 <option value="การันตี">การันตี</option>
                                                 <option value="การันตีรับล่วงหน้า">การันตีรับล่วงหน้า</option>
                                                 <option value="เบิกจ่ายล่วงหน้า">เบิกจ่ายล่วงหน้า</option>
@@ -173,7 +159,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">จำนวน <b class="text-red">0</b> Assetห้องเช่า </h3>
+                                    <h3 class="card-title">จำนวน <b class="text-red">{{ $rentsCount }}</b> Asset ห้องเช่า </h3>
                                 </div>
                                 <div class="card-body">
                                     <table id="my-table" class="display table table-bordered table-font table-sm"
@@ -183,7 +169,7 @@
                                                 <th rowspan=2>
                                                     <div align="center">No.</div>
                                                 </th>
-                                                <th rowspan=2>
+                                                <th rowspan=2 width="6%">
                                                     <div align="center">โครงการ</div>
                                                 </th>
                                                 <th rowspan=2>
@@ -201,8 +187,8 @@
                                                 <th colspan=7>
                                                     <div align="center">เครื่องใช้ไฟฟ้า</div>
                                                 </th>
-                                                <th rowspan=2>
-                                                    <div align="center">ลูกค้า</div>
+                                                <th rowspan=2 width="9%">
+                                                    <div align="center" >ลูกค้า</div>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -236,73 +222,177 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{-- @foreach ($result as $key=>$data) --}}
+                                            @php
+                                                $sum_key_front = 0;
+                                                $sum_Key_bed = 0;
+                                                $sum_Key_balcony = 0;
+                                                $sum_Key_mailbox = 0;
+                                                $sum_KeyCard = 0;
+                                                $sum_KeyCard_P = 0;
+                                                $sum_KeyCard_B = 0;
+                                                $sum_KeyCard_C = 0;
+                                                $sum_Bed = 0;
+                                                $sum_Beding = 0;
+                                                $sum_Bedroom_Curtain = 0;
+                                                $sum_Livingroom_Curtain = 0;
+                                                $sum_Wardrobe = 0;
+                                                $sum_Sofa = 0;
+                                                $sum_TV_Table = 0;
+                                                $sum_Dining_Table = 0;
+                                                $sum_Center_Table = 0;
+                                                $sum_Chair = 0;
+                                                $sum_Bedroom_Air = 0;
+                                                $sum_Livingroom_Air = 0;
+                                                $sum_Water_Heater = 0;
+                                                $sum_TV = 0;
+                                                $sum_Refrigerator = 0;
+                                                $sum_microwave = 0;
+                                                $sum_wash_machine = 0;
+                                            @endphp
+                                            @foreach ($rents as $item)
                                                 <tr>
-                                                    {{-- <td>{{ $key + 1 }}</td>
-                                                    <td>{{ $data->Project_Name }}</td> --}}
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td>{{ $loop->index + 1 }}</td>
+                                                    <td>{{ $item->Project_Name }}</td>
+                                                    <td>{{ $item->RoomNo }}</td>
+                                                    <td>{{ $item->HomeNo }}</td>
 
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td class="text-center">{{ $item->Key_front }}</td>
+                                                    <td class="text-center">{{ $item->Key_bed }}</td>
+                                                    <td class="text-center">{{ $item->Key_balcony }}</td>
+                                                    <td class="text-center">{{ $item->Key_mailbox }}</td>
+                                                    <td class="text-center">{{ $item->KeyCard }}</td>
+                                                    <td class="text-center">{{ $item->KeyCard_P }}</td>
+                                                    <td class="text-center">{{ $item->KeyCard_B }}</td>
+                                                    <td class="text-center">{{ $item->KeyCard_C }}</td>
 
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td class="text-center">{{ $item->Bed }}</td>
+                                                    <td class="text-center">{{ $item->Beding }}</td>
+                                                    <td class="text-center">{{ $item->Bedroom_Curtain }}</td>
+                                                    <td class="text-center">{{ $item->Livingroom_Curtain }}</td>
+                                                    <td class="text-center">{{ $item->Wardrobe }}</td>
+                                                    <td class="text-center">{{ $item->Sofa }}</td>
+                                                    <td class="text-center">{{ $item->TV_Table }}</td>
+                                                    <td class="text-center">{{ $item->Dining_Table }}</td>
+                                                    <td class="text-center">{{ $item->Center_Table }}</td>
+                                                    <td class="text-center">{{ $item->Chair }}</td>
 
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td class="text-center">{{ $item->Bedroom_Air }}</td>
+                                                    <td class="text-center">{{ $item->Livingroom_Air }}</td>
+                                                    <td class="text-center">{{ $item->Water_Heater }}</td>
+                                                    <td class="text-center">{{ $item->TV }}</td>
+                                                    <td class="text-center">{{ $item->Refrigerator }}</td>
+                                                    <td class="text-center">{{ $item->microwave }}</td>
+                                                    <td class="text-center">{{ $item->wash_machine }}</td>
 
-                                                    <td></td>
+                                                    <td>{{ $item->Owner }}</td>
                                                 </tr>
-                                            {{-- @endforeach --}}
+                                                @php
+                                                    if ($item->Key_front) {
+                                                        $sum_key_front += (int)$item->Key_front;
+                                                    }
+                                                    if ($item->Key_bed) {
+                                                        $sum_Key_bed += (int)$item->Key_bed;
+                                                    }
+                                                    if ($item->Key_balcony) {
+                                                        $sum_Key_balcony += (int)$item->Key_balcony;
+                                                    }
+                                                    if ($item->Key_mailbox) {
+                                                        $sum_Key_mailbox += (int)$item->Key_mailbox;
+                                                    }
+                                                    if ($item->KeyCard) {
+                                                        $sum_KeyCard += (int)$item->KeyCard;
+                                                    }
+                                                    if ($item->KeyCard_P) {
+                                                        $sum_KeyCard_P += (int)$item->KeyCard_P;
+                                                    }
+                                                    if ($item->KeyCard_B) {
+                                                        $sum_KeyCard_B += (int)$item->KeyCard_B;
+                                                    }
+                                                    if ($item->KeyCard_C) {
+                                                        $sum_KeyCard_C += (int)$item->KeyCard_C;
+                                                    }
+                                                    if ($item->Bed) {
+                                                        $sum_Bed += (int)$item->Bed;
+                                                    }
+                                                    if ($item->Beding) {
+                                                        $sum_Beding += (int)$item->Beding;
+                                                    }
+                                                    if ($item->Bedroom_Curtain) {
+                                                        $sum_Bedroom_Curtain += (int)$item->Bedroom_Curtain;
+                                                    }
+                                                    if ($item->Livingroom_Curtain) {
+                                                        $sum_Livingroom_Curtain += (int)$item->Livingroom_Curtain;
+                                                    }
+                                                    if ($item->Wardrobe) {
+                                                        $sum_Wardrobe += (int)$item->Wardrobe;
+                                                    }
+                                                    if ($item->Sofa) {
+                                                        $sum_Sofa += (int)$item->Sofa;
+                                                    }
+                                                    if ($item->TV_Table) {
+                                                        $sum_TV_Table += (int)$item->TV_Table;
+                                                    }
+                                                    if ($item->Dining_Table) {
+                                                        $sum_Dining_Table += (int)$item->Dining_Table;
+                                                    }
+                                                    if ($item->Center_Table) {
+                                                        $sum_Center_Table += (int)$item->Center_Table;
+                                                    }
+                                                    if ($item->Chair) {
+                                                        $sum_Chair += (int)$item->Chair;
+                                                    }
+                                                    if ($item->Bedroom_Air) {
+                                                        $sum_Bedroom_Air += (int)$item->Bedroom_Air;
+                                                    }
+                                                    if ($item->Livingroom_Air) {
+                                                        $sum_Livingroom_Air += (int)$item->Livingroom_Air;
+                                                    }
+                                                    if ($item->Water_Heater) {
+                                                        $sum_Water_Heater += (int)$item->Water_Heater;
+                                                    }
+                                                    if ($item->TV) {
+                                                        $sum_TV += (int)$item->TV;
+                                                    }
+                                                    if ($item->Refrigerator) {
+                                                        $sum_Refrigerator += (int)$item->Refrigerator;
+                                                    }
+                                                    if ($item->microwave) {
+                                                        $sum_microwave += (int)$item->microwave;
+                                                    }
+                                                    if ($item->wash_machine) {
+                                                        $sum_wash_machine += (int)$item->wash_machine;
+                                                    }
+                                                @endphp
+                                            @endforeach
                                         </tbody>
                                         <tfoot class="table-success">
                                             <tr align=center>
                                                 <th colspan=4>Total</th>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>{{$sum_key_front}}</td>
+                                                <td>{{$sum_Key_bed}}</td>
+                                                <td>{{$sum_Key_balcony}}</td>
+                                                <td>{{$sum_Key_mailbox}}</td>
+                                                <td>{{$sum_KeyCard}}</td>
+                                                <td>{{$sum_KeyCard_P}}</td>
+                                                <td>{{$sum_KeyCard_B}}</td>
+                                                <td>{{$sum_KeyCard_C}}</td>
+                                                <td>{{$sum_Bed}}</td>
+                                                <td>{{$sum_Beding}}</td>
+                                                <td>{{$sum_Bedroom_Curtain}}</td>
+                                                <td>{{$sum_Livingroom_Curtain}}</td>
+                                                <td>{{$sum_Wardrobe}}</td>
+                                                <td>{{$sum_Sofa}}</td>
+                                                <td>{{$sum_TV_Table}}</td>
+                                                <td>{{$sum_Dining_Table}}</td>
+                                                <td>{{$sum_Center_Table}}</td>
+                                                <td>{{$sum_Chair}}</td>
+                                                <td>{{$sum_Bedroom_Air}}</td>
+                                                <td>{{$sum_Livingroom_Air}}</td>
+                                                <td>{{$sum_Water_Heater}}</td>
+                                                <td>{{$sum_TV}}</td>
+                                                <td>{{$sum_Refrigerator}}</td>
+                                                <td>{{$sum_microwave}}</td>
+                                                <td>{{$sum_wash_machine}}</td>
                                                 <td></td>
                                             </tr>
                                         </tfoot>
@@ -336,7 +426,7 @@
                 "responsive": true,
                 "columnDefs": [{
                     "orderable": false,
-                    "targets": [0, 1, 2, 3]
+                    "targets": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
                 }]
             });
         });
@@ -360,4 +450,19 @@
             });
         });
     </script>
+    <!-- Return Form-->
+    @if (isset($formInputs))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var formInputs = @json($formInputs);
+
+                Object.keys(formInputs).forEach(function(key) {
+                    var input = document.querySelector('[name="' + key + '"]');
+                    if (input) {
+                        input.value = formInputs[key];
+                    }
+                });
+            });
+        </script>
+    @endif
 @endpush

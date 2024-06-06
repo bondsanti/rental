@@ -49,28 +49,15 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label for="">วันที่</label>
-                                            <select name="dt" class="form-control text-center">
-                                                <option value="99"
-                                                    {{ request()->input('dt') == '99' ? 'selected' : '' }}>------- All Date
-                                                    -------</option>
-                                                <option value="1"
-                                                    {{ request()->input('dt') == '1' ? 'selected' : '' }}>วันรับห้อง
-                                                </option>
-                                                <option value="2"
-                                                    {{ request()->input('dt') == '2' ? 'selected' : '' }}>วันเริ่มการันตี
-                                                </option>
-                                                <option value="3"
-                                                    {{ request()->input('dt') == '3' ? 'selected' : '' }}>วันสิ้นสุดการันตี
-                                                </option>
-                                                <option value="4"
-                                                    {{ request()->input('dt') == '4' ? 'selected' : '' }}>วันเริ่มเช่า
-                                                </option>
-                                                <option value="5"
-                                                    {{ request()->input('dt') == '5' ? 'selected' : '' }}>วันชำระเงินค่าเช่า
-                                                </option>
-                                                <option value="6"
-                                                    {{ request()->input('dt') == '6' ? 'selected' : '' }}>วันออก</option>
+                                            <label>เลือกประเภทวันที่</label>
+                                            <select name="dateselect" id="dateselect" class="form-control">
+                                                <option value="all">ทั้งหมด</option>
+                                                <option value="transfer_date">วันรับห้อง</option>
+                                                <option value="Guarantee_Startdate">วันเริ่มการันตี</option>
+                                                <option value="Guarantee_Enddate">วันสิ้นสุดการันตี</option>
+                                                <option value="Contract_Startdate">วันเริ่มเช่า</option>
+                                                <option value="Payment_date">วันชำระเงินค่าเช่า</option>
+                                                <option value="Cancle_Date">วันออก</option>
                                             </select>
                                         </div>
                                     </div>
@@ -78,7 +65,7 @@
                                         <div class="form-group">
                                             <label>วันที่เริ่มต้น</label>
                                             <input class="form-control datepicker" name="startdate" id="startdate"
-                                                type="text" value="{{ $startDate }}" placeholder="วันที่เริ่มต้น"
+                                                type="text" value="" placeholder="วันที่เริ่มต้น"
                                                 autocomplete="off">
                                         </div>
                                     </div>
@@ -87,7 +74,7 @@
                                         <div class="form-group">
                                             <label>วันที่สิ้นสุด</label>
                                             <input class="form-control datepicker" name="enddate" id="enddate"
-                                                type="text" value="{{ $endDate }}" placeholder="วันที่สิ้นสุด"
+                                                type="text" value="" placeholder="วันที่สิ้นสุด"
                                                 autocomplete="off">
                                         </div>
                                     </div>
@@ -103,14 +90,14 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อลูกค้า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Owner" type="text" value=""
                                                 placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label>ชื่อคนเช่า</label>
-                                            <input class="form-control" name="" type="text" value=""
+                                            <input class="form-control" name="Cusmoter" type="text" value=""
                                                 placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>
@@ -119,8 +106,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="">สถานะห้อง</label>
-                                            <select name="s1" id="s1" class="form-control">
-                                                <option value="All">--- All Status ---</option>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="all">ทั้งหมด</option>
                                                 @foreach($statuses as $status)
                                                     <option value="{{ $status->status_room }}">{{ $status->status_room }}</option>
                                                 @endforeach
@@ -132,8 +119,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="">ประเภทห้องเช่า</label>
-                                            <select name="rt" id="rt" class="form-control">
-                                                <option value="All">--- All Status ---</option>
+                                            <select name="typerent" id="typerent" class="form-control">
+                                                <option value="all">ประเภท ทั้งหมด</option>
                                                 <option value="การันตี">การันตี</option>
                                                 <option value="การันตีรับล่วงหน้า">การันตีรับล่วงหน้า</option>
                                                 <option value="เบิกจ่ายล่วงหน้า">เบิกจ่ายล่วงหน้า</option>
@@ -188,5 +175,22 @@
                 $('#enddate').datepicker('setStartDate', selectedStartDate);
             });
         });
+    </script>
+     <script>
+        // JavaScript สำหรับกำหนดค่าให้กับ input ของวันที่
+        // โดยใช้คำสั่ง new Date() เพื่อสร้างวัตถุ Date ที่เก็บวันที่และเวลาปัจจุบัน
+        var today = new Date();
+
+        // getFirstDayOfMonth
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1; // Note: Month starts from 0
+        const formattedMonth = month < 10 ? '0' + month : month; 
+        // แปลงวัตถุ Date เป็นสตริงในรูปแบบที่ต้องการ (ในที่นี้เราใช้วิธีการกำหนดใน HTML)
+        // โดยเราจะให้สตริงนี้เป็นค่าของ value ของ input
+        var todayString = today.toISOString().split('T')[0]; // แบ่งส่วนของวันที่และเวลาและเลือกส่วนของวันที่เท่านั้น
+
+        // กำหนดค่าของ input วันที่ใน DOM ด้วยการเลือกจาก id และกำหนดค่า value
+        document.getElementById('startdate').value = `${year}-${formattedMonth}-01`;
+        document.getElementById('enddate').value = todayString;
     </script>
 @endpush

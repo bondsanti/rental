@@ -211,7 +211,7 @@
                                     &nbsp;&nbsp;
                                     <i class="nav-icon"> - </i>
                                     <p>
-                                        Assetห้องเช่า
+                                        Asset ห้องเช่า
                                     </p>
                                 </a>
                             </li>
