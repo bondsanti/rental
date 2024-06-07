@@ -219,8 +219,9 @@
                         <div class="card-header card-outline card-info">
                             <h3 class="card-title mt-2 mr-2">จำนวน <b class="text-red">{{ $rentsCount }}</b> ห้อง</h3>
                             @if ($rentsCount)
-                                <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
-                                aria-hidden="true"></i> Export Excel</button>
+                                <button id="export-btn" class="btn btn-success">
+                                    <input type="hidden" id="btn_export" value="{{ $rentsCount }}">
+                                    <i class="fa fa-file-excel" aria-hidden="true"></i> Export Excel</button>
                             @endif
                         </div>
                         <div class="card-body">
@@ -1207,27 +1208,31 @@
 
     </script>
     <script>
-        document.getElementById('export-btn').addEventListener('click', function() {
-            var table = document.getElementById('table-excel');
-            var wb = XLSX.utils.table_to_book(table, {
-                sheet: "Sheet JS"
-            });
-            var wbout = XLSX.write(wb, {
-                bookType: 'xlsx',
-                bookSST: true,
-                type: 'binary'
-            });
+        let btn_export = $('#btn_export').val();
+        if (btn_export) {
+            document.getElementById('export-btn').addEventListener('click', function() {
+                var table = document.getElementById('table-excel');
+                var wb = XLSX.utils.table_to_book(table, {
+                    sheet: "Sheet JS"
+                });
+                var wbout = XLSX.write(wb, {
+                    bookType: 'xlsx',
+                    bookSST: true,
+                    type: 'binary'
+                });
 
-            function s2ab(s) {
-                var buf = new ArrayBuffer(s.length);
-                var view = new Uint8Array(buf);
-                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-                return buf;
-            }
-            saveAs(new Blob([s2ab(wbout)], {
-                type: "application/octet-stream"
-            }), 'rental.xlsx');
-        });
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+                saveAs(new Blob([s2ab(wbout)], {
+                    type: "application/octet-stream"
+                }), 'rental.xlsx');
+            });
+        }
+        
     </script>
     <!-- Return Form-->
     @if (isset($formInputs))

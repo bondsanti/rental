@@ -39,7 +39,6 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-
                                             </div>
                                             <div class="col-sm-6">
                                                 <label for="validationDefault04">ปี</label>
@@ -56,7 +55,6 @@
                                                         </option>
                                                     @endfor
                                                 </select>
-
                                             </div>
                                         </div>
                                     </div>
@@ -78,9 +76,11 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">จำนวน <b class="text-red">{{ count($results) }}</b> ทะเบียนสัญญา
-                                        <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
-                                                aria-hidden="true"></i> Export Excel</button>
-
+                                        @if (count($results))
+                                            <button id="export-btn" class="btn btn-success">
+                                                <input type="hidden" id="btn_export" value="{{ count($results) }}">
+                                                <i class="fa fa-file-excel" aria-hidden="true"></i> Export Excel</button>
+                                        @endif
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -97,7 +97,7 @@
                                             </tr>
                                             <tr>
                                                 <th class="text-center" width="2%">#</th>
-                                                <th class="text-center">โครงการ</th>
+                                                <th class="text-center" width="8%">โครงการ</th>
                                                 <th class="text-center">ห้องชุด</th>
                                                 <th class="text-center">สถานะ</th>
                                                 <th class="text-center">วันที่ทำสัญญา</th>
@@ -105,26 +105,28 @@
                                                 <th class="text-center">เลขที่สัญญาประกันทรัพย์สิน</th>
                                                 <th class="text-center">วันเริ่มสัญญา</th>
                                                 <th class="text-center">วันครบสัญญา</th>
-                                                <th class="text-center">ผู้เช่าช่วง</th>
+                                                <th class="text-center" width="10%">ผู้เช่าช่วง</th>
                                                 <th class="text-center">ค่าเช่าต่อเดือน</th>
 
                                                 <th class="text-center table-info">วันที่ทำสัญญา</th>
                                                 <th class="text-center table-info">เลขที่สัญญาเช่า</th>
                                                 <th class="text-center table-info">วันเริ่มสัญญา</th>
                                                 <th class="text-center table-info">วันครบสัญญา</th>
-                                                <th class="text-center table-info">เจ้าของห้อง</th>
+                                                <th class="text-center table-info" width="11%">เจ้าของห้อง</th>
                                                 <th class="text-center table-info">ค่าเช่าต่อเดือน</th>
 
                                             </tr>
                                         </thead>
                                         @if ($results->isEmpty())
-                                            <tr>
-                                                <td colspan="17" class="text-danger">
-                                                    <h3>
-                                                        <center>ไม่พบข้อมูล</center>
-                                                    </h3>
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="17" class="text-danger">
+                                                        <h3>
+                                                            <center>ไม่พบข้อมูล</center>
+                                                        </h3>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         @else
                                             <tbody>
                                                 @foreach ($results as $key => $data)
@@ -162,7 +164,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -170,7 +171,6 @@
     </section>
 @endsection
 @push('script')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -190,32 +190,35 @@
                 "responsive": true,
                 "columnDefs": [{
                     "orderable": false,
-                    "targets": [0, 1, 2, 3]
+                    "targets": [4, 5, 6, 10, 12, 16]
                 }]
             });
         });
     </script>
     <script>
-        document.getElementById('export-btn').addEventListener('click', function() {
-            var table = document.getElementById('my-table');
-            var wb = XLSX.utils.table_to_book(table, {
-                sheet: "Sheet JS"
-            });
-            var wbout = XLSX.write(wb, {
-                bookType: 'xlsx',
-                bookSST: true,
-                type: 'binary'
-            });
+        let btn_export = $('#btn_export').val();
+        if (btn_export) {
+            document.getElementById('export-btn').addEventListener('click', function() {
+                var table = document.getElementById('my-table');
+                var wb = XLSX.utils.table_to_book(table, {
+                    sheet: "Sheet JS"
+                });
+                var wbout = XLSX.write(wb, {
+                    bookType: 'xlsx',
+                    bookSST: true,
+                    type: 'binary'
+                });
 
-            function s2ab(s) {
-                var buf = new ArrayBuffer(s.length);
-                var view = new Uint8Array(buf);
-                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-                return buf;
-            }
-            saveAs(new Blob([s2ab(wbout)], {
-                type: "application/octet-stream"
-            }), 'contract_data.xlsx');
-        });
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+                saveAs(new Blob([s2ab(wbout)], {
+                    type: "application/octet-stream"
+                }), 'contract_data.xlsx');
+            });
+        }
     </script>
 @endpush
