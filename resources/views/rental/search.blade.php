@@ -38,10 +38,8 @@
         background: white;
         border: 2px solid #D8D9DC;
         border-radius: 5px;
-        /* padding: 1rem; */
         padding-bottom: 0.8rem;
         text-align: center;
-        /* margin: 2rem; */
         margin: 0 auto;
 
         position: relative;
@@ -52,14 +50,8 @@
 
     }
 
-    /* input[type="radio"]#control_05:checked+label {
-        background: #70b018;
-        color: white;
-
-    } */
     .button {
         background-color: #078f09;
-        /* Green */
         border: none;
         color: white;
         padding: 15px 32px;
@@ -215,14 +207,9 @@
                                         class="btn bg-gradient-danger"><i class="fa fa-refresh"></i> เคลียร์</a>
                                 </div>
 
-
-
                             </div>
                         </form>
-
                     </div>
-
-
                 </div>
             </div>
 
@@ -230,8 +217,11 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header card-outline card-info">
-                            <h3 class="card-title">จำนวน <b class="text-red">{{ $rentsCount }}</b> ห้อง</h3>
-
+                            <h3 class="card-title mt-2 mr-2">จำนวน <b class="text-red">{{ $rentsCount }}</b> ห้อง</h3>
+                            @if ($rentsCount)
+                                <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
+                                aria-hidden="true"></i> Export Excel</button>
+                            @endif
                         </div>
                         <div class="card-body">
                             <table id="table" class="table table-hover table-striped text-center ">
@@ -380,15 +370,137 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <table class="table table-hover table-striped text-center h6">
-                                <tr>
-                                    <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
-                                </tr>
-                            </table>
+                            @if ($rentsCount)
+                                <table class="table table-hover table-striped text-center h6">
+                                    <tr>
+                                        <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
+                                    </tr>
+                                </table>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
+
+            {{-- table for export excel --}}
+            <table id="table-excel" class="d-none table table-hover table-striped text-center ">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th width="10%">โครงการ</th>
+                        <th width="5%" >ห้องเลขที่</th>
+                        <th>บ้านเลขที่</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>ขนาด<sup>(ตรม.)</sup></th>
+                        <th>บัญชีแสดงสัญญา</th>
+                        <th>เลขที่สัญญาเจ้าของ</th>
+                        <th width="15%">ลูกค้า</th>
+                        <th>โทร</th>
+                        <th>ราคาห้องเช่า</th>
+                        <th>วันเริ่มสัญญา</th>
+                        <th>วันสิ้นสุดสัญญา</th>
+                        <th>ประเภทห้องเช่า</th>
+                        <th>สถานะห้องเช่า</th>
+                        <th>เลขที่สัญญาผู้เช่า</th>
+                        <th>ผู้เช่า</th>
+                        <th>โทร</th>
+                        <th>ค่าเช่า</th>
+                        <th>วันเริ่มเช่า</th>
+                        <th>วันสิ้นสุดสัญญา</th>
+                        <th>วันออก</th>
+                        <th>สถานะการเช่า</th>
+                    </tr>
+                </thead>
+                @php
+                    $totalgarantee = 0;
+                    $totalgaranteebefore = 0;
+                    $totalpaidbefore = 0;
+                    $totalcontinvat = 0;
+                    $totalcontexvat = 0;
+                    $totalforrental = 0;
+                    $totalcantcontact = 0;
+                    $totalall = 0;
+                    $txtprice = 0;
+                @endphp
+                <tbody>
+                    @foreach ($rents as $item)
+                    @php
+                        if ($item->price_cus > 0) {
+                            $txtprice = $item->price_cus;
+                        } else {
+                            $txtprice = $item->room_price;
+                        }
+                        if ($item->rental_status === 'การันตี') {
+                            $totalgarantee++;
+                        }elseif ($item->rental_status === 'การันตีรับล่วงหน้า') {
+                            $totalgaranteebefore++;
+                        }elseif ($item->rental_status === 'เบิกจ่ายล่วงหน้า') {
+                            $totalpaidbefore++;
+                        }elseif ($item->rental_status === 'ฝากต่อหักภาษี') {
+                            $totalcontinvat++;
+                        }elseif ($item->rental_status === 'ฝากต่อไม่หักภาษี') {
+                            $totalcontexvat++;
+                        }elseif ($item->rental_status === 'ฝากเช่า') {
+                            $totalforrental++;
+                        }elseif ($item->rental_status === 'ติดต่อเจ้าของห้องไม่ได้') {
+                            $totalcantcontact++;
+                        }
+                        $totalall++;
+                    @endphp
+                        <tr>
+                            <td>{{ $loop->index + 1 }}</td>
+                            <td>{{ $item->Project_Name }}</td>
+                            <td>{{ $item->RoomNo }}</td>
+                            <td>{{ $item->HomeNo }}</td>
+                            <td>{{ $item->RoomType }}</td>
+                            <td>{{ $item->Location }}</td>
+                            <td>{{ $item->Size }}</td>
+                            <td>{{ $item->Electric_Contract }}</td>
+                            <td>{{ $item->contract_owner }}</td>
+                            <td>{{ $item->Owner }}</td>
+                            <td>{{ $item->phone_owner }}</td>
+                            <td>{{ number_format($item->room_price) }}</td>
+                            @if ($item->date_endrend != '')
+                                <td>{{ $item->date_firstrend ?? ''}}</td>
+                                <td>{{ $item->date_endrend ?? ''}}</td>
+                            @else
+                                <td>{{ $item->Guarantee_Startdate ?? '' }}</td>
+                                <td>{{ $item->Guarantee_Enddate ?? '' }}</td>
+                            @endif
+                            
+                            <td>{{ $item->rental_status }}</td>
+                            <td>{{ $item->Status_Room }}</td>
+                            @if ($item->Status_Room == 'ไม่พร้อมอยู่')
+                                <td>{{ $item->Other }}</td>
+                            @else
+                                <td>{{ $item->contract_cus }}</td>
+                                <td>{{ $item->Cus_Name }}</td>
+                                <td>{{ $item->phone_cus }}</td>
+                                <td>{{ $txtprice ?? 0 }}</td>
+                            @endif
+                            <td>{{ $item->Contract_Startdate ?? '' }}</td>
+                            <td>
+                                @if ($item->Contract_Enddate  == "0000-00-00" || $item->Contract_Enddate < "1990-01-01")
+                                    -
+                                @else
+                                    @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($item->Contract_Enddate))))
+                                        <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($item->Contract_Enddate)) }}</div>
+                                    @else
+                                        {{ date('d/m/Y', strtotime($item->Contract_Enddate)) }}
+                                    @endif
+                                    
+                                @endif
+                            </td>
+                            <td>{{ $item->Cancle_Date ?? '' }}</td>
+                            <td>{{ $item->Contract_Status }}</td>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
+                    </tr>
+                </tbody>
+            </table>
 
             {{-- view modal --}}
             <div class="modal fade" id="modal-view">
@@ -400,25 +512,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        {{-- <form id="createForm" name="createForm" class="form-horizontal" method="post"> --}}
-                            {{-- <form id="createForm" name="createForm"  method="post" action="{{route('project.insert')}}" class="form-horizontal"> --}}
-                            {{-- @csrf --}}
-
-                            {{-- <input type="hidden" class="form-control" id="user_id" name="user_id"
-                                value="{{ $dataLoginUser->id }}"> --}}
                             <div class="modal-body">
-
-                                {{-- <div class="col-md-12">
-                                    <div class="card">
-                                        <div class="card-header card-outline card-info">
-                                            <h3 class="card-title">ข้อมูลห้อง</h3>
-
-                                        </div>
-                                        <div class="card-body">
-
-                                        </div>
-                                    </div>
-                                </div> --}}
                                 <div class="box-body">
                                     <div class="col-md-12">
                                         <div class="card">
@@ -428,7 +522,6 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-sm-3">
-
                                                         <div class="form-group">
                                                             <label>โครงการ</label>
                                                             <input type="text" readonly class="form-control" value="" name="projectName" id="projectName">
@@ -453,7 +546,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
@@ -480,7 +572,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label>แขวง/ตำบล</label>
@@ -503,10 +594,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
-
                                                         <div class="form-group">
                                                             <label>วันรับห้อง</label>
                                                             <input type="text" readonly class="form-control" value="" name="transferDate" id="transferDate">
@@ -531,7 +620,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
 
@@ -559,7 +647,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
 
@@ -587,7 +674,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="row">
                                                     <div class="col-sm-3">
 
@@ -844,8 +930,6 @@
                             <div class="modal-footer justify-contentend">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnCloseView"><i
                                         class="fa fa-times"></i> ปิดหน้าต่าง</button>
-                                {{-- <button type="button" class="btn bg-gradient-success" id="savedata"
-                                    value="create"><i class="fa fa-save"></i> บันทึก</button> --}}
                             </div>
                         {{-- </form> --}}
                     </div>
@@ -874,7 +958,6 @@
                             <input type="hidden" class="form-control" id="project_id" name="project_id">
                             <input type="hidden" class="form-control" id="customer_id" name="customer_id">
                             <div class="modal-body">
-
                                 <div class="box-body">
                                     <div class="row text-center">
                                         <div class="col-sm-6">
@@ -889,7 +972,6 @@
                                                 <img src="../uploads/images/furniture.svg" width="35" height="35">&nbsp;<br><span>สัญญาตั้งตัวเเทน</span>
                                             </label>
                                         </div>
-
                                     </div>
                                     <br><br>
                                     <div class="row text-center">
@@ -921,7 +1003,6 @@
                                             <input type="text" name="phayarn2" style="height: 35px; width:65%;border: 2px solid #dbdbdb ;border-radius: 4px;margin-top:10px;text-align: center;">
                                         </div>
                                     </div>
-
                                     <br><br>
                                     <div class="row text-center">
                                         <div class="col-sm-12">
@@ -931,8 +1012,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
                             <div class="modal-footer justify-contentend">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnPrint"><i
@@ -950,6 +1029,7 @@
 @endsection
 @push('script')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
 
@@ -1006,10 +1086,10 @@
         $('body').on('click', '.view-item', function() {
 
             const id = $(this).data('id');
-            console.log(id);
+            // console.log(id);
             $('#modal-view').modal('show');
             $.get('../api/rental/detail/' + id, function(data) {
-                console.log(data);
+                // console.log(data);
                 $('#projectName').val(data.Project_Name);
                 $('#numberhome').val(data.numberhome);
                 $('#HomeNo').val(data.HomeNo);
@@ -1044,8 +1124,6 @@
                 $('#contractEnd').val(data.Contract_Enddate ?? '-');
                 $('#cancelDate').val(data.Cancle_Date ?? '-');
                 $('#contractStatus').val(data.Contract_Status ?? '-');
-
-
             });
         });
 
@@ -1055,13 +1133,13 @@
             const room_id = $(this).data('id');
             const project_id = $(this).data('pid');
             const customer_id = $(this).data('cid');
-            console.log(room_id,project_id,customer_id);
+            // console.log(room_id,project_id,customer_id);
             $('#modal-print').modal('show');
             $('#room_id').val(room_id);
             $('#project_id').val(project_id);
             $('#customer_id').val(customer_id);
             $.get('../api/rental/getLeaseCode/' + project_id, function(data) {
-                console.log(data);
+                // console.log(data);
                 const lease_code_id = data.lease_code_id;
                 const lease_agr_code = data.lease_agr_code;
                 const sub_lease_code = data.sub_lease_code;
@@ -1073,7 +1151,6 @@
                     $('.btnApprove').css({
                         'background-color': 'gray',
                         'cursor': 'not-allowed',
-
                     });
                 }else{
                     $('.btnApprove').prop('disabled', false);
@@ -1081,12 +1158,9 @@
                     $('.btnApprove').css({
                         'background-color': 'green',
                         'cursor': 'pointer',
-
                     });
                 }
-
-                console.log(lease_code_id);
-
+                // console.log(lease_code_id);
             });
         });
 
@@ -1095,7 +1169,6 @@
 
             const id = $(this).data("id");
             //console.log(id);
-
             Swal.fire({
                 title: 'คุณแน่ใจไหม? ',
                 text: "หากต้องการลบข้อมูลนี้ โปรดยืนยัน การลบข้อมูล",
@@ -1127,14 +1200,34 @@
                                 1500);
 
                         },
-
                     });
-
                 }
             });
-
         });
 
+    </script>
+    <script>
+        document.getElementById('export-btn').addEventListener('click', function() {
+            var table = document.getElementById('table-excel');
+            var wb = XLSX.utils.table_to_book(table, {
+                sheet: "Sheet JS"
+            });
+            var wbout = XLSX.write(wb, {
+                bookType: 'xlsx',
+                bookSST: true,
+                type: 'binary'
+            });
+
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+            saveAs(new Blob([s2ab(wbout)], {
+                type: "application/octet-stream"
+            }), 'rental.xlsx');
+        });
     </script>
     <!-- Return Form-->
     @if (isset($formInputs))

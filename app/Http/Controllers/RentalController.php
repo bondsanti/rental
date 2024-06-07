@@ -110,12 +110,16 @@ class RentalController extends Controller
             'rooms.HomeNo',
             'rooms.RoomNo',
             'rooms.RoomType',
+            'rooms.Location',
             'rooms.rental_status',
+            'rooms.Electric_Contract',
             'rooms.Size',
             'rooms.Owner',
             'rooms.Status_Room',
             'rooms.Phone',
+            'rooms.Phone as phone_owner',
             'rooms.price',
+            'rooms.price as room_price',
             'rooms.Trans_Status',
             'rooms.contract_owner',
             'rooms.Owner',
@@ -123,11 +127,15 @@ class RentalController extends Controller
             'rooms.Guarantee_Enddate',
             'rooms.date_firstrend',
             'rooms.date_endrend',
+            'rooms.Other',
             'customers.id as cid',
             'customers.Contract_Status',
             'customers.Contract_Startdate',
             'customers.Contract_Enddate',
-            'customers.Cus_Name'
+            'customers.Cus_Name',
+            'customers.contract_cus',
+            'customers.Phone as phone_cus',
+            'customers.Price as price_cus'
 
         )
             ->from('rooms as rooms')
