@@ -10,14 +10,14 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>
-                        AvailableRoom
+                        Available Room
 
                     </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('main') }}">Home</a></li>
-                        <li class="breadcrumb-item active">AvailableRoom</li>
+                        <li class="breadcrumb-item active">Available Room</li>
                     </ol>
                 </div>
             </div>
@@ -29,16 +29,18 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">AvailableRoom
-                                <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
-                                    aria-hidden="true"></i> Export Excel</button>
+                            <h3 class="card-title">Available Room
+                                @if (COUNT($results))
+                                    <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
+                                        aria-hidden="true"></i> Export Excel</button>
+                                @endif
                             </h3>
                         </div>
                         <div class="card-body">
                             <table id="my-table" class="display table table-bordered table-font table-sm"
                                 style="width:100%">
                                 <thead class="table-success">
-                                    <tr>
+                                    <tr class="text-center">
                                         <th>No.</th>
                                         <th>โครงการ</th>
                                         <th>ฝากเช่า</th>
@@ -56,14 +58,14 @@
                                     <tr>
                                         <td align=center>{{ $key + 1 }}</td>
                                         <td align=center>{{ $data->project_name }}</td>
-                                        <td align=right>{{ $data->rental_status1 }}</td>
-                                        <td align=right>{{ $data->rental_status2 }}</td>
-                                        <td align=right>{{ $data->rental_status3 }}</td>
-                                        <td align=right>{{ $data->rental_status4 }}</td>
-                                        <td align=right>{{ $data->rental_status5 }}</td>
-                                        <td align=right>{{ $data->rental_status6 }}</td>
-                                        <td align=right>{{ $data->rental_status7 }}</td>
-                                        <td align=right>{{ $data->totalall }}</td>
+                                        <td align=center>{{ $data->rental_status1 }}</td>
+                                        <td align=center>{{ $data->rental_status2 }}</td>
+                                        <td align=center>{{ $data->rental_status3 }}</td>
+                                        <td align=center>{{ $data->rental_status4 }}</td>
+                                        <td align=center>{{ $data->rental_status5 }}</td>
+                                        <td align=center>{{ $data->rental_status6 }}</td>
+                                        <td align=center>{{ $data->rental_status7 }}</td>
+                                        <td align=center>{{ $data->totalall }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -91,14 +93,14 @@
                                 <tfoot class="table-success">
                                     <tr>
                                         <td colspan="2" align="center">Total</td>
-                                        <td align=right>{{ $rental_status1 }}</td>
-                                        <td align=right>{{ $rental_status2 }}</td>
-                                        <td align=right>{{ $rental_status3 }}</td>
-                                        <td align=right>{{ $rental_status4 }}</td>
-                                        <td align=right>{{ $rental_status5 }}</td>
-                                        <td align=right>{{ $rental_status6 }}</td>
-                                        <td align=right>{{ $rental_status7 }}</td>
-                                        <td align=right>{{ $totalall }}</td>
+                                        <td align=center>{{ $rental_status1 }}</td>
+                                        <td align=center>{{ $rental_status2 }}</td>
+                                        <td align=center>{{ $rental_status3 }}</td>
+                                        <td align=center>{{ $rental_status4 }}</td>
+                                        <td align=center>{{ $rental_status5 }}</td>
+                                        <td align=center>{{ $rental_status6 }}</td>
+                                        <td align=center>{{ $rental_status7 }}</td>
+                                        <td align=center>{{ $totalall }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -129,7 +131,7 @@
                 "responsive": true,
                 "columnDefs": [{
                     "orderable": false,
-                    "targets": [0, 1, 2, 3]
+                    "targets": [0, 2, 3, 4, 5, 6, 7, 8, 9]
                 }]
             });
         });
