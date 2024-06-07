@@ -113,14 +113,8 @@
                                         <th>โครงการ</th>
                                         <th>ห้องเลขที่</th>
                                         <th>บ้านเลขที่</th>
-                                        {{-- <th>Type</th>
-                                        <th>Location</th>
-                                        <th>ขนาด</th> --}}
-                                        {{-- <th>บัญชีแสดงสัญญา</th> --}}
-                                        {{-- <th>รหัสเครื่องวัดฯ</th> --}}
                                         <th>ลูกค้า</th>
                                         <th>โทร</th>
-                                        {{-- <th>วันรับห้อง</th> --}}
                                         <th>วันสิ้นสุดการันตี</th>
                                         <th>ประเภทห้องเช่า</th>
                                         <th>Status</th>
@@ -129,9 +123,7 @@
                                         <th>ค่าเช่า</th>
                                         <th>วันเริ่มเช่า</th>
                                         <th>วันสิ้นสุดสัญญา</th>
-                                        {{-- <th>วันออก</th> --}}
                                         <th>สถานะการเช่า</th>
-                                        {{-- <th>สัญญา</th> --}}
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -175,21 +167,14 @@
                                         <td>{{ $item->Project_Name }}</td>
                                         <td class="{{ $item->public == 1 && $item->Status_Room === 'พร้อมอยู่' ? 'text-green' : ''}}">{{ $item->RoomNo }}</td>
                                         <td>{{ $item->HomeNo }}</td>
-                                        {{-- <td>{{ $item->RoomType }}</td>
-                                        <td>{{ $item->Location }}</td>
-                                        <td>{{ $item->Size }}</td> --}}
-                                        {{-- <td>{{ $item->Electric_Contract }}</td> --}}
-                                        {{-- <td>{{ $item->Meter_Code }}</td> --}}
                                         <td width="10%">{{ $item->Owner }}</td>
                                         <td>{{ $item->Phone }}</td>
-                                        {{-- <td>{{ $item->Transfer_Date }}</td> --}}
                                         <td>{{ $item->Guarantee_Enddate }}</td>
                                         <td width="7%" class="{{ $item->rental_status === 'ฝากเช่า' ? 'text-green' : ''}} {{ $item->rental_status === 'ติดต่อเจ้าของห้องไม่ได้' ? 'text-red text-bold' : ''}}">{{ $item->rental_status }}</td>
                                         <td class="{{ $item->Status_Room === 'อยู่แล้ว' ? 'text-green text-bold' : ''}}">{{ $item->Status_Room }}</td>
                                         <td width="10%">{{ $item->Cus_Name }}</td>
                                         <td>{{ $item->Cus_phone }}</td>
                                         <td>{{ $txtprice }}</td>
-                                        {{-- <td>{{ $item->Contract_Startdate }}</td> --}}
                                         <td>{{ $item->Contract_Startdate === '0000-00-00' ? '-' : $item->Contract_Startdate }}</td>
                                         @if (date("Y-m-d")>date('Y-m-d',strtotime("-1 months", strtotime($item->Contract_Enddate))))
                                             <td class="text-red text-bold">{{ $item->Contract_Enddate }}</td>
@@ -197,7 +182,6 @@
                                             <td>{{ $item->Contract_Enddate }}</td>
                                         @endif
                                         
-                                        {{-- <td>{{ $item->Cancle_Date }}</td> --}}
                                         <td width="6%" class="{{ $item->Contract_Status === 'เช่าอยู่' ? 'text-green text-bold' : ''}} {{ $item->Contract_Status === 'ต่อสัญญา' ? 'text-blue' : ''}} {{ $item->Contract_Status === 'ยกเลิกสัญญา' ? 'text-red' : ''}}">{{ $item->Contract_Status }}</td>
                                         <td>
                                             <button type="button" class="btn bg-gradient-info btn-sm view-item" data-id="{{ $item->id }}" title="ดูรายละเอียด">
@@ -206,17 +190,11 @@
                                             @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Admin")
                                                 <a href="{{ url('/rental/edit/' . $item->id) }}"
                                                     class="btn bg-gradient-danger btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="แก้ไข">
-                                                    <i class="fa fa-pencil-square">
-                                                    </i>
-
+                                                    <i class="fa fa-pencil-square"></i>
                                                 </a>
-                                                {{-- <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
-                                                    <i class="fa fa-print"></i>
-                                                </button> --}}
                                                 <a href="{{ url('/rental/rent/' . $item->id) }}"
                                                     class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
-                                                    <i class="fa fa-credit-card-alt">
-                                                    </i>
+                                                    <i class="fa fa-credit-card-alt"> </i>
                                                 </a>
                                                 <a href="{{ url('/rental/history/' . $item->id) }}"
                                                     class="btn bg-gradient-info btn-sm edit-item" data-toggle="tooltip" data-placement="top" title="ประวัติการเช่า">
@@ -228,11 +206,13 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <table class="table table-hover table-striped text-center h6">
-                                <tr>
-                                    <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
-                                </tr>
-                            </table>
+                            @if ($rentsCount)
+                                <table class="table table-hover table-striped text-center h6">
+                                    <tr>
+                                        <td colspan="16"><center>ผลการค้นหาทั้งหมด : {{ $totalall }} | การันตี {{$totalgarantee}} | การันตีรับล่วงหน้า {{$totalgaranteebefore}} | เบิกจ่ายล่วงหน้า {{$totalpaidbefore}} | ฝากต่อหักภาษี {{$totalcontinvat}} | ฝากต่อไม่หักภาษี {{$totalcontexvat}} | ฝากเช่า {{$totalforrental}} | ติดต่อเจ้าของห้องไม่ได้ {{$totalcantcontact}} </center></td>
+                                    </tr>
+                                </table>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -526,8 +506,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
                             <div class="modal-footer justify-contentend">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnCloseView"><i
@@ -561,7 +539,7 @@
                 'autoWidth': false,
                 "responsive": true,
                 "columnDefs": [
-                        { "orderable": false, "targets": [0, 1, 2, 3, 5, 6, 10, 11, 12, 13, 15] }
+                        { "orderable": false, "targets": [0, 2, 3, 5, 6, 10, 11, 12, 13, 15] }
                     ]
             });
             $('.datepicker').datepicker({
@@ -583,7 +561,7 @@
             const id = $(this).data('id');
             $('#modal-view').modal('show');
             $.get('../../api/rental/detail/' + id, function(data) {
-                console.log(data);
+                // console.log(data);
                 $('#projectName').val(data.Project_Name);
                 $('#numberhome').val(data.numberhome);
                 $('#HomeNo').val(data.HomeNo);
@@ -620,6 +598,20 @@
                 $('#contractStatus').val(data.Contract_Status ?? '-');
             });
         });
-        
     </script>
+    <!-- Return Form-->
+    @if (isset($formInputs))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var formInputs = @json($formInputs);
+
+                Object.keys(formInputs).forEach(function(key) {
+                    var input = document.querySelector('[name="' + key + '"]');
+                    if (input) {
+                        input.value = formInputs[key];
+                    }
+                });
+            });
+        </script>
+    @endif
 @endpush

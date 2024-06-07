@@ -90,11 +90,9 @@ class ContractController extends Controller
 
         //ตรวจสอบว่าการอัพเดทเสร็จสมบูรณ์หรือไม่
         if ($upout) {
-            // ถ้าเสร็จสมบูรณ์ ใช้ JavaScript เพื่อแสดง Alert ว่าอัพเดทสำเร็จ
-            echo '<script>alert("อัพเดทข้อมูลสำเร็จ!");</script>';
+            Alert::success('Success', 'อัพเดทข้อมูลสำเร็จ!');
         } else {
-            // ถ้าไม่เสร็จสมบูรณ์ ใช้ JavaScript เพื่อแสดง Alert ว่ามีปัญหาเกิดขึ้น
-            echo '<script>alert("มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้");</script>';
+            Alert::error('Error', 'มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้');
         }
         return redirect()->back();
     }
@@ -203,6 +201,8 @@ class ContractController extends Controller
             ->orderBy('RoomNo', 'asc') 
             ->get();
 
+        $formInputs = $request->all();
+
         return view(
             'contract.room_con.room_search',
             compact(
@@ -212,7 +212,8 @@ class ContractController extends Controller
                 'rents',
                 'rentsCount',
                 'startdate',
-                'enddate'
+                'enddate',
+                'formInputs'
             )
         );
     }
