@@ -43,20 +43,6 @@ class RentalController extends Controller
             ->orderBy('Project_Name', 'asc')
             ->get();
 
-        // $status = DB::connection('mysql_report')->table('rental_room')
-        //     ->select(DB::raw('
-        //     CASE
-        //         WHEN COALESCE(Status_room, "") = "" THEN "ห้องใหม่"
-        //         WHEN Status_room = "จอง" THEN "จอง"
-        //         WHEN Status_room = "พร้อมอยู่" THEN "พร้อมอยู่"
-        //         WHEN Status_room IN ("รอคลีน", "รอตรวจ", "รอเฟอร์", "ไม่พร้อมอยู่") THEN "ไม่พร้อมอยู่"
-        //         WHEN Status_room IN ("สวัสดิการ", "ห้องออฟฟิต", "เช่าอยู่", "อยู่แล้ว") THEN "อยู่แล้ว"
-        //     END AS name
-        // '))
-        //     ->whereRaw('IFNULL(status_room, "") NOT IN (?, ?)', ['', 'คืนห้อง'])
-        //     ->groupBy('name')
-        //     ->orderBy('name', 'ASC')
-        //     ->get();
         $status = DB::table('rooms')
             ->select('status_room')
             ->distinct()
@@ -82,19 +68,6 @@ class RentalController extends Controller
             ->orderBy('Project_Name', 'asc')
             ->get();
 
-        // $status = Room::select(DB::raw('
-        //     CASE 
-        //         WHEN COALESCE(Status_room, "") = "" THEN "ห้องใหม่"
-        //         WHEN Status_room = "จอง" THEN "จอง"
-        //         WHEN Status_room = "พร้อมอยู่" THEN "พร้อมอยู่"
-        //         WHEN Status_room IN ("รอคลีน", "รอตรวจ", "รอเฟอร์", "ไม่พร้อมอยู่") THEN "ไม่พร้อมอยู่"
-        //         WHEN Status_room IN ("สวัสดิการ", "ห้องออฟฟิต", "เช่าอยู่", "อยู่แล้ว") THEN "อยู่แล้ว"
-        //     END AS name
-        // '))
-        //     ->whereRaw('IFNULL(status_room, "") NOT IN (?,?)', ['', 'คืนห้อง'])
-        //     ->groupBy('name')
-        //     ->orderBy('name', 'ASC')
-        //     ->get();
         $status = DB::table('rooms')
             ->select('status_room')
             ->distinct()
@@ -192,10 +165,6 @@ class RentalController extends Controller
         }else{
             $rents->whereRaw("IFNULL(status_room, '') <> 'คืนห้อง'");
         }
-
-        // if (!$request->dateselect && $request->startdate  && $request->enddate) {
-        //     $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
-        // }
 
         if ($request->dateselect && $request->startdate) {
             if ($request->dateselect == "transfer_date") {
@@ -318,7 +287,6 @@ class RentalController extends Controller
                     ->on('rooms.RoomNo', '=', 'customers.RoomNo')
                     ->on('rooms.id', '=', 'customers.rid');
             })
-
             ->where('rooms.id', $id)
             ->first();
 
