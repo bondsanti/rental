@@ -83,6 +83,10 @@ class ContractController extends Controller
 
     public function out_update(Request $request)
     {
+        if ($request->Project_NameTH == '' || $request->address_full == '') {
+            Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
+            return redirect()->back(); 
+        }
         $update_out = Project::where('pid', $request->pid)->first();
         $update_out->Project_NameTH = $request->Project_NameTH;
         $update_out->address_full   = $request->address_full;

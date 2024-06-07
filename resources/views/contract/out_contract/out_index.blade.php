@@ -13,7 +13,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('main') }}">Home</a></li>
-                        <li class="breadcrumb-item active">รายละเอียดโครงการ(ออกสัญญา)</li>
+                        <li class="breadcrumb-item active">รายละเอียดโครงการ (ออกสัญญา)</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                                             <td>{{ $data->Project_NameTH }}</td>
                                             <td>{{ $data->address_full }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
+                                                <button type="button" class="btn btn-sm btn-warning edit-btn" data-toggle="modal"
                                                     data-target="#editmodal2{{ $data->pid }}">แก้ไข</button>
                                             </td>
                                         </tr>
@@ -58,7 +58,7 @@
                                                             <font class="text-danger"> {{ $data->Project_Name }} </font>
                                                         </h5>
                                                         <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
+                                                            aria-label="Close" id="close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
@@ -85,7 +85,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">ออก</button>
+                                                            data-dismiss="modal" id="btnClose">ออก</button>
                                                         <button type="submit" name="update"
                                                             class="btn btn-primary">บันทึก</button>
                                                     </div>
@@ -103,6 +103,56 @@
         </div>
     </section>
     <script>
+        $(document).ready(function(){
+            $('.edit-btn').click(function() {
+                var modalId = $(this).data('target'); // Get the target modal ID
+                var inputs = $(modalId).find('input');
+                var textarea = $(modalId).find('textarea');
+                var Project_NameTH = $(modalId).find('#Project_NameTH').val().trim();
+                var address_full = $(modalId).find('#address_full').val().trim();
+
+                // Remove previous invalid feedback
+                $(modalId).find('.is-invalid').removeClass('is-invalid');
+
+                inputs.removeClass('is-invalid').on('input', function() {
+                    // Remove is-invalid class when user starts typing
+                    $(this).removeClass('is-invalid');
+                    $("button[name='update']").prop("disabled", false);
+                });
+                textarea.removeClass('is-invalid').on('input', function() {
+                    // Remove is-invalid class when user starts typing
+                    $(this).removeClass('is-invalid');
+                    $("button[name='update']").prop("disabled", false);
+                });
+                // Validation
+                if (!Project_NameTH) {
+                    $(modalId).find('#Project_NameTH').addClass('is-invalid');
+                }
+                if (!address_full) {
+                    $(modalId).find('#address_full').addClass('is-invalid');
+                }
+                   
+                if (!Project_NameTH || !address_full) {
+                    $("button[name='update']").prop("disabled", true);
+                }else{
+                    $("button[name='update']").prop("disabled", false);
+                }
+                
+            });
+
+            $('#close').click(function() {
+                var modalId = $(this).data('target');
+                $(modalId).trigger("reset");
+                $(modalId).modal('hide');
+            });
+
+            $('#btnClose').click(function() {
+                var modalId = $(this).data('target');
+                $(modalId).trigger("reset");
+                $(modalId).modal('hide');
+            });   
+        });
+
         $(function() {
             $('#example1').DataTable({
                 "paging": true,
