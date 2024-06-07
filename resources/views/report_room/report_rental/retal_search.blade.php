@@ -18,14 +18,13 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>
-                        SummaryRental
-
+                        Summary Rental
                     </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('main') }}">Home</a></li>
-                        <li class="breadcrumb-item active">SummaryRental</li>
+                        <li class="breadcrumb-item active">Summary Rental</li>
                     </ol>
                 </div>
             </div>
@@ -37,24 +36,23 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">ค้นหา SummaryRental</h3>
+                            <h3 class="card-title">ค้นหา Summary Rental</h3>
                         </div>
                         <form action="{{ route('report.search') }}" method="POST" id="reportSearch">
                             @csrf
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5"></div>
+                                    <div class="col-md-2">
                                         <div class="form-row">
                                             <div class="col-sm-12 input-wrapper">
                                                 <label for="date1">วันที่</label>
                                                 <input type="date" name="date1" id="date1"
                                                     value="{{ $date1 }}">
                                             </div>
-
                                         </div>
                                     </div>
-                                    <div class="col-md-4"></div>
+                                    <div class="col-md-5"></div>
                                 </div>
                                 <br>
                                 <div class="box-footer text-center">
@@ -72,9 +70,12 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">จำนวน <b class="text-red">{{ COUNT($requests) }}</b>
-                                        SummaryRental
-                                        <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
-                                            aria-hidden="true"></i> Export Excel</button>
+                                        Summary Rental
+                                        @if (COUNT($requests))
+                                            <input type="hidden" id="btn_export" value="{{ COUNT($requests) }}">
+                                            <button id="export-btn" class="btn btn-success"><i class="fa fa-file-excel"
+                                                aria-hidden="true"></i> Export Excel</button>
+                                        @endif
                                     </h3>
                                 </div>
                                 <div class="card-body">
@@ -84,8 +85,6 @@
                                                 <th colspan="4" id="th">1.จำนวนห้องเช่าทั้งหมด
                                                     และจำนวนเงินค่าเช่าที่ต้องเก็บได้</th>
                                             </tr>
-
-
                                             @php
                                                 $totalRoom = 0;
                                                 $totalAmount = 0;
@@ -159,26 +158,29 @@
         });
     </script>
     <script>
-        document.getElementById('export-btn').addEventListener('click', function() {
-            var table = document.getElementById('my-table');
-            var wb = XLSX.utils.table_to_book(table, {
-                sheet: "Sheet JS"
-            });
-            var wbout = XLSX.write(wb, {
-                bookType: 'xlsx',
-                bookSST: true,
-                type: 'binary'
-            });
+        let btn_export = $('#btn_export').val();
+        if (btn_export) {
+            document.getElementById('export-btn').addEventListener('click', function() {
+                var table = document.getElementById('my-table');
+                var wb = XLSX.utils.table_to_book(table, {
+                    sheet: "Sheet JS"
+                });
+                var wbout = XLSX.write(wb, {
+                    bookType: 'xlsx',
+                    bookSST: true,
+                    type: 'binary'
+                });
 
-            function s2ab(s) {
-                var buf = new ArrayBuffer(s.length);
-                var view = new Uint8Array(buf);
-                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-                return buf;
-            }
-            saveAs(new Blob([s2ab(wbout)], {
-                type: "application/octet-stream"
-            }), 'SummaryRental_data.xlsx');
-        });
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+                saveAs(new Blob([s2ab(wbout)], {
+                    type: "application/octet-stream"
+                }), 'SummaryRental_data.xlsx');
+            });
+        }
     </script>
 @endpush

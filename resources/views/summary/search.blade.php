@@ -39,10 +39,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                   
                                     <div class="col-sm-4"> 
                                     </div>
-
                                 </div>
                                
                                 <div class="box-footer text-center">
@@ -59,7 +57,6 @@
                             <button type="button" class="btn btn-info btn-block">
                                 <h4 class="mt-2"><i class="fa fa-exclamation"></i> กรุณา ค้นหา ค่าจอง/ค่าประกัน</h4>
                             </button>
-
                         </div>
                     </div>
 
@@ -68,7 +65,6 @@
                             <div class="card">
                                 <div class="card-header card-outline card-info">
                                     <h3 class="card-title">ข้อมูลรายงานสรุป ค่าจอง/ค่าประกัน</b></h3>
-        
                                 </div>
                                 <div class="card-body">
                                     <table id="table" class="table table-hover table-striped text-center ">
@@ -92,21 +88,21 @@
                                                     $rent += $item->bail1;
                                                 @endphp
                                                 <tr>
-                                                        <td>
-                                                            <div class="h6 text-bold">{{ $loop->index + 1 }}</div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="h6 text-bold">{{ $item->Project_Name }}</div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="h6 text-bold">{{ number_format($item->amtroom) }}</div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="h6 text-bold">{{ number_format($item->deposit1) }}</div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="h6 text-bold">{{ number_format($item->bail1) }}</div>
-                                                        </td>
+                                                    <td>
+                                                        <div class="h6 text-bold">{{ $loop->index + 1 }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="h6 text-bold">{{ $item->Project_Name }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="h6 text-bold">{{ number_format($item->amtroom) }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="h6 text-bold">{{ number_format($item->deposit1) }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="h6 text-bold">{{ number_format($item->bail1) }}</div>
+                                                    </td>
                                                 </tr>                                                
                                             @endforeach
                                             <tr class="bg-green">
@@ -119,7 +115,6 @@
                                                 <td><div class="h6 text-bold">{{ number_format($rent) }}</div></td>
                                             </tr>
                                         </tbody>
-        
                                     </table>
                                 </div>
                             </div>
@@ -127,9 +122,7 @@
                     </div>
                 </div>
             </div>
-            
         </div>
-
     </section>
 @endsection
 @push('script')

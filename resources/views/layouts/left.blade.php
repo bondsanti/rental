@@ -162,7 +162,7 @@
                                         &nbsp;&nbsp;
                                         <i class="nav-icon"> - </i>
                                         <p>
-                                            สรุปค่าจอง/ค่าประกัน(ห้องเช่า)
+                                            สรุปค่าจอง/ค่าประกัน (ห้องเช่า)
                                         </p>
                                     </a>
                                 </li>
@@ -193,7 +193,7 @@
                                     &nbsp;&nbsp;
                                     <i class="nav-icon"> - </i>
                                     <p>
-                                        SummaryRental
+                                        Summary Rental
                                     </p>
                                 </a>
                             </li>
@@ -202,7 +202,7 @@
                                     &nbsp;&nbsp;
                                     <i class="nav-icon"> - </i>
                                     <p>
-                                        AvailableRoom
+                                        Available Room
                                     </p>
                                 </a>
                             </li>
