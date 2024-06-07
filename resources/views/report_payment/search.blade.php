@@ -140,7 +140,7 @@
                                         <th width="5%" >ห้องเลขที่</th>
                                         <th>เลขที่บ้าน</th>
                                         <th>ขื่อลูกค้า</th>
-                                        <th width="15%">เบอร์โทร</th>
+                                        <th width="10%">เบอร์โทร</th>
                                         <th>สถานะห้องเช่า</th>
                                         <th>เริ่มต้นสัญญา</th>
                                         <th>สิ้นสุดสัญญา</th>
@@ -250,7 +250,7 @@
                 'autoWidth': false,
                 "responsive": true,
                 "columnDefs": [
-                        { "orderable": false, "targets": [0, 1, 2, 3, 5, 10, 12, 13, 14] }
+                        { "orderable": false, "targets": [0, 2, 3, 5, 10, 12, 13, 14] }
                     ]
             });
 

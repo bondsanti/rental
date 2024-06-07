@@ -16,7 +16,6 @@
     <!-- /.content-header -->
     <section class="content">
         <div class="container-fluid">
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -51,10 +50,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                   
                                     <div class="col-sm-4"> 
                                     </div>
-
                                 </div>
                                
                                 <div class="box-footer text-center">
@@ -80,10 +77,9 @@
                             <div class="card">
                                 <div class="card-header card-outline card-info">
                                     <h3 class="card-title">ข้อมูลสรุปค่าเช่าของห้องเช่า ประจำเดือน <span class="text-bold text-green">{{ $monthY ?? ''}}</span></h3>
-        
                                 </div>
                                 <div class="card-body">
-                                    <table id="table" class="table table-hover table-striped text-center ">
+                                    <table id="table" class="table table-hover table-striped text-center">
                                         <thead>
                                             <tr>
                                                 <th class="h6 text-bold">No</th>
@@ -92,7 +88,7 @@
                                                 <th class="h6 text-bold">ห้องเลขที่</th>
                                                 <th class="h6 text-bold">บ้านเลขที่</th>
                                                 <th class="h6 text-bold">AR Code</th>
-                                                <th class="h6 text-bold">ผู้เช่า</th>
+                                                <th class="h6 text-bold" width="12%">ผู้เช่า</th>
                                                 <th class="h6 text-bold">วันเริ่มเช่า</th>
                                                 <th class="h6 text-bold">วันหมดสัญญา</th>
                                                 <th class="h6 text-bold">ค่าเช่ารายเดือน</th>
@@ -120,7 +116,7 @@
                                                         <div class="h6 text-green text-bold">{{ $item->arcode }}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="h6 text-bold">{{ $item->name }}</div>
+                                                        <div class="h6 text-bold text-left">{{ $item->name }}</div>
                                                     </td>
                                                     <td>
                                                        <div class="h6 text-green text-bold">{{ $item->startdate }}</div>
@@ -133,9 +129,7 @@
                                                     </td>
                                                 </tr>                                                
                                             @endforeach
-                                        
                                         </tbody>
-        
                                     </table>
                                 </div>
                             </div>
@@ -143,9 +137,7 @@
                     </div>
                 </div>
             </div>
-            
         </div>
-
     </section>
 @endsection
 @push('script')
@@ -155,6 +147,20 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
+
+            $('#table').DataTable({
+                'paging': false,
+                'lengthChange': false,
+                'searching': false,
+                'ordering': true,
+                'info': false,
+                'autoWidth': false,
+                "responsive": true,
+                "columnDefs": [{
+                    "orderable": false,
+                    "targets": [0, 1, 5, 9]
+                }]
             });
         });
     </script>
