@@ -419,19 +419,19 @@
 
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <div class="form-group">
+                                        {{-- <div class="form-group">
                                             <label>รูปภาพปก</label>
                                             <input class="form-control" id="filUploadMain" name="filUploadMain" type="file"
                                                 placeholder="รูปภาพปก">
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     <div class="col-sm-3">
-                                        <div class="form-group">
+                                        {{-- <div class="form-group">
                                             <label>รูปภาพห้อง</label>
                                             <input class="form-control" id="filUpload" name="filUpload[]" type="file"
                                                 placeholder="รูปภาพห้อง" multiple="multiple">
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     <div class="col-sm-3">
@@ -442,15 +442,107 @@
                                     
                                 </div>
                             </div>
-
-                            
-                        
-
                     </div>
+
+                    <div class="card">
+                        <div class="card-header card-outline card-info">
+                            <h3 class="card-title">อัพโหลดรูป</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                alt="" id="img-cover" style="border-radius: 10px;">
+                                    <div class="form-group">
+                                        <br>
+                                        <label for="exampleInputFile">รูปภาพปก</label>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input"
+                                                    onchange="previewImage(event)" accept="image/jpeg, image/jpg, image/png"
+                                                    id="filUploadMain" name="filUploadMain">
+                                                <label class="custom-file-label"
+                                                    for="exampleInputFile"></label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview1">
+                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                alt="" id="room1" style="border-radius: 10px;">
+                                    </div>
+                                    <div class="form-group">
+                                        <br>
+                                        <label for="exampleInputFile">รูปภาพห้อง</label>
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" accept="image/jpeg, image/jpg, image/png"
+                                                    id="filUpload" name="filUpload[]" multiple="multiple" onchange="previewMultiImage(event)">
+                                                <label class="custom-file-label"
+                                                    for="exampleInputFile"></label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview2">
+                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                alt="" id="room2" style="border-radius: 10px;">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview3">
+                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                alt="" id="room3" style="border-radius: 10px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div id="imagePreview4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview5">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview6">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview7">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div id="imagePreview4">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview5">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview6">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview7">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-header card-outline card-info">
                             <h3 class="card-title">เฟอร์นิเจอร์/เครื่องใช้ไฟฟ้า</h3>
-
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -631,6 +723,7 @@
             format: 'yyyy-mm-dd', // รูปแบบวันที่
             autoclose: true,
         });
+       
     });
     function goBack() {
         window.history.back();
@@ -684,5 +777,49 @@
     // document.querySelector('#owner_district').addEventListener('change', (event) => {
     //     showZipcode();
     // });
+</script>
+<script>
+    function previewImage(event) {
+        var imageElement = document.getElementById('img-cover');
+        var fileInput = event.target;
+
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                imageElement.src = e.target.result;
+            }
+
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    }
+
+    function previewMultiImage(event) {
+   
+        var files = event.target.files;
+        let index = 1;
+        let j = 1;
+        for (var i = 0; i < files.length; i++) {
+            let imagePreviewContainer = document.getElementById('imagePreview'+index);
+            // console.log(imagePreviewContainer);
+            imagePreviewContainer.innerHTML = ''; // Clear previous previews
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                let elem = 'room'+j;
+                console.log(elem);
+                // let preimg = document.getElementById(elem);
+                // preimg.remove();
+                // console.log(img);
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('size-image');
+                imagePreviewContainer.appendChild(img);
+                
+                j++;
+            }
+            reader.readAsDataURL(files[i]);
+            index++;
+        }
+    }
 </script>
 @endpush

@@ -513,18 +513,18 @@ class RentalController extends Controller
         }
 
         // หาจำนวนวัน
-        if ($request->Contract_Startdate && $request->Contract_Enddate) {
-            $startDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Startdate);
-            $endDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Enddate);
+        // if ($request->Contract_Startdate && $request->Contract_Enddate) {
+        //     $startDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Startdate);
+        //     $endDate = Carbon::createFromFormat('Y-m-d', $request->Contract_Enddate);
 
-            $totalMonths = $startDate->diffInMonths($endDate) + 1;
-            $days = $startDate->diffInDays($endDate);
-            if($days > 365){
-                $totalDays = $days - 365;
-            }else{
-                $totalDays = 0;
-            }
-        }
+        //     $totalMonths = $startDate->diffInMonths($endDate) + 1;
+        //     $days = $startDate->diffInDays($endDate);
+        //     if($days > 365){
+        //         $totalDays = $days - 365;
+        //     }else{
+        //         $totalDays = 0;
+        //     }
+        // }
 
         $rental_room->pid = $request->project_id ?? NULL;
         // $rental_room->numebrhome = $request->room_address ?? NULL;
