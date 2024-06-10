@@ -312,6 +312,7 @@ class RentalController extends Controller
         $rents = Room::select(
             'projects.*',
             'rooms.*',
+            'rooms.RoomNo as room_no',
             'rooms.id as room_id',
             'rooms.pid as project_id',
             'rooms.Phone as owner_phone',
@@ -335,36 +336,50 @@ class RentalController extends Controller
             $roomNo = $item->RoomNo;
         }
        
-        $productId = DB::select("
-            SELECT products.pid 
-            FROM rooms 
-            INNER JOIN products ON ? = products.Homeno 
-                                AND ? = products.RoomNo 
-                                AND ? = products.project_id  
-            ORDER BY products.pid DESC 
-            LIMIT 1", [$homeNo, $roomNo, $pid]
-        );
+        // dd($rents);
+        // $productId = DB::select("
+        //     SELECT products.pid 
+        //     FROM rooms 
+        //     INNER JOIN products ON ? = products.Homeno 
+        //                         AND ? = products.RoomNo 
+        //                         AND ? = products.project_id  
+        //     ORDER BY products.pid DESC 
+        //     LIMIT 1", [$homeNo, $roomNo, $pid]
+        // );
        
-        if ($productId) {
-            $product = DB::table('products')
-            ->select('gauranteestart', 'gauranteeend')
-            ->where('pid', $productId[0]->pid)
-            ->first();
+        // if ($productId) {
+        //     $product = DB::table('products')
+        //     ->select('gauranteestart', 'gauranteeend')
+        //     ->where('pid', $productId[0]->pid)
+        //     ->first();
             
-            $product_id = $productId[0]->pid;
-            $gauranteestart = $product->gauranteestart;
-            $gauranteeend = $product->gauranteeend;
-        } else {
-            $product_id = '';
-            $gauranteestart = '';
-            $gauranteeend = '';
-        }
+        //     $product_id = $productId[0]->pid;
+        //     $gauranteestart = $product->gauranteestart;
+        //     $gauranteeend = $product->gauranteeend;
+        // } else {
+        //     $product_id = '';
+        //     $gauranteestart = '';
+        //     $gauranteeend = '';
+        // }
         
         
         $lease_auto_code = Lease_auto_code::where('ref_cus_id', $ref_cus_id)
             ->first();
 
-        return view('rental.edit', compact('dataLoginUser', 'isRole', 'rents', 'projects', 'lease_auto_code','images','provinces','amphoes','tambons','product_id','gauranteestart','gauranteeend'));
+        return view('rental.edit', 
+            compact('dataLoginUser', 
+                    'isRole', 
+                    'rents', 
+                    'projects', 
+                    'lease_auto_code',
+                    'images',
+                    'provinces',
+                    'amphoes',
+                    'tambons',
+                    // 'product_id',
+                    // 'gauranteestart',
+                    // 'gauranteeend'
+            ));
     }
 
     public function update(UpdateRentalRequest $request)
@@ -2148,6 +2163,11 @@ class RentalController extends Controller
             ->join('payments', 'payments.cid', '=', 'customers.id')
             ->where('rooms.id', $request->id)
             ->first();
+        
+        if (!$result) {
+            Alert::error('Error', 'กรุณากรอกข้อมูลให้ครบถ้วน \nจึงจะสามารถใช้งานในส่วนของค่าเช่าได้');
+            return redirect(route('rental/edit/', $request->id)); 
+        }
 
         return view('rental.rent.index', compact('dataLoginUser', 'isRole', 'result'));
     }

@@ -10,9 +10,9 @@
         <input type="hidden" name="room_id" value="{{ $item->rid ?? $item->room_id }}">
         <input type="hidden" name="customer_id" value="{{ $item->id }}">
         <input type="hidden" name="project_id" value="{{ $item->pid }}">
-        <input type="hidden" name="product_id" value="{{ $product_id }}">
+        {{-- <input type="hidden" name="product_id" value="{{ $product_id }}">
         <input type="hidden" name="chk_satrt" value="{{ $gauranteestart }}">
-        <input type="hidden" name="chk_end" value="{{ $gauranteeend }}">
+        <input type="hidden" name="chk_end" value="{{ $gauranteeend }}"> --}}
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -299,7 +299,7 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="text-danger"><b >*</b> เลขที่ห้อง</label>
-                                                <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->RoomNo ?? old('RoomNo') ?? '' }}"
+                                                <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->room_no ?? old('RoomNo') ?? '' }}"
                                                     placeholder="เลขที่ห้อง">
                                                 @error('RoomNo')
                                                     <div class="error text-danger">{{ $message }}</div>
@@ -485,8 +485,6 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>สถานะห้อง</label>
-                                                {{-- <input class="form-control" name="Status_Room" type="text" value="{{ $item->Status_Room ?? '' }}"
-                                                    placeholder="สถานะห้อง">  --}}
                                                 <select class="form-control" name="Status_Room">
                                                     <option value="">-- เลือก --</option>
                                                     <option value="รอตรวจ" {{ $item->Status_Room == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
@@ -579,20 +577,20 @@
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
-                                            <div class="form-group">
+                                            {{-- <div class="form-group">
                                                 <label>รูปภาพปก</label>
                                                 <input class="form-control" id="filUploadMain" name="filUploadMain" type="file"
                                                     placeholder="รูปภาพปก">
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
-                                            <div class="form-group">
+                                            {{-- <div class="form-group">
                                                 <label>รูปภาพห้อง</label>
                                                 <input class="form-control" id="filUpload" name="filUpload[]" type="file"
                                                     placeholder="รูปภาพห้อง" multiple="multiple">
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="col-sm-1"></div>
                                         
@@ -1012,7 +1010,6 @@
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
                                             @endif
-                                            {{-- <p class="form-control text-danger {{ $item->Contract_Startdate ? '' : 'datepicker' }}" name="Contract_Startdate" {{ $item->Contract_Startdate ? 'readonly' : '' }}> {{ $item->Contract_Startdate ?? '' }} </p> --}}
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1036,7 +1033,6 @@
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
                                             @endif
-                                            {{-- <p class="form-control text-danger {{ $item->Contract_Enddate ? '' : 'datepicker' }}" name="Contract_Enddate" {{ $item->Contract_Enddate ? 'readonly' : '' }}>{{ $item->Contract_Enddate ?? '' }}</p> --}}
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1044,16 +1040,14 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>ระยะเวลา</label>
-                                            {{-- <p class="form-control"><font color="red">{{ $item->Contract ?? ''}}</font> เดือน <input name="Contract" type="text" value="{{ $item->Contract ?? 0}}" style="width: 15%"> วัน </p> --}}
                                             @if ($item->Contract)
-                                            <div class="date_rent_show">
-                                                <input class="form-control" name="Contract" type="hidden" value="{{ $item->Contract }}">
-                                                <p class="form-control"><font color="red">{{ $item->Contract }}</font> เดือน <input name="Day" type="text" value="{{ $item->Day ?? old('Day') ?? 0 }}" style="width:25%; margin-left:10px;"> วัน </p>
-                                            </div>
-                                            <div class="date_rent">
-                                                <p class="form-control"><input name="Contract_Renew" type="number" value="{{ old('Contract_Renew') ?? '' }}" style="width: 25%"> เดือน <input name="Day_Renew" type="number" value="{{ old('Day_Renew') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>
-                                            </div>
-                                                
+                                                <div class="date_rent_show">
+                                                    <input class="form-control" name="Contract" type="hidden" value="{{ $item->Contract }}">
+                                                    <p class="form-control"><font color="red">{{ $item->Contract }}</font> เดือน <input name="Day" type="text" value="{{ $item->Day ?? old('Day') ?? 0 }}" style="width:25%; margin-left:10px;"> วัน </p>
+                                                </div>
+                                                <div class="date_rent">
+                                                    <p class="form-control"><input name="Contract_Renew" type="number" value="{{ old('Contract_Renew') ?? '' }}" style="width: 25%"> เดือน <input name="Day_Renew" type="number" value="{{ old('Day_Renew') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>
+                                                </div>
                                             @else
                                                 <p class="form-control @error('Contract') is-invalid @enderror"><input name="Contract" type="number" value="{{ old('Contract') ?? '' }}" style="width: 25%"> เดือน <input name="Day" type="number" value="{{ old('Day') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>
                                                 @error('Contract')
@@ -1109,40 +1103,6 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label>ใบเสร็จจาก express</label>
-                                            <input class="form-control" name="fileUploadExpress" type="file" value="{{ $item->print_contract_manual ?? ''}}"
-                                                placeholder="ใบเสร็จจาก express">
-                                            @if (date("m") == '01')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '02')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '03')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '04')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '05')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '06')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '07')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '08')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '09')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '10')
-                                                <input type="hidden" name="filename" value="">
-                                            @elseif(date("m") == '11')
-                                                <input type="hidden" name="filename" value="">
-                                            @else
-                                                <input type="hidden" name="filename" value="">
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-1"></div>
-
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
                                             <label>สัญญา</label>
                                             <select class="form-control" name="Contract_Reason">
                                                 <option value="">--เลือก--</option>
@@ -1156,10 +1116,6 @@
                                     </div>
                                     <div class="col-sm-1"></div>
 
-                                    
-                                </div>
-
-                                <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>สถานะเช่า</label>
@@ -1176,6 +1132,10 @@
                                     </div>
                                     <div class="col-sm-1"></div>
 
+                                    
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>วันออก</label>
@@ -1187,9 +1147,16 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label>หมายเหตุ ลูกค้า</label>
-                                                <textarea class="form-control" name="cust_remark" id="" cols="5" rows="3">{{ $item->cust_remark ?? old('cust_remark') ?? '' }}</textarea>
+                                            <div class="form-group">
+                                                <label>หมายเหตุ ลูกค้า</label>
+                                                    <textarea class="form-control" name="cust_remark" id="" cols="5" rows="3">{{ $item->cust_remark ?? old('cust_remark') ?? '' }}</textarea>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="col-sm-1"></div>
+
+                                    <div class="col-sm-2">
+                                        
                                     </div>
                                     <div class="col-sm-1"></div>
 
@@ -1204,8 +1171,11 @@
                                     <div class="col-sm-1">
                                         <div class="form-group">
                                             <label style="margin-left: 20px;">รูปภาพปก</label>
-                                            <div class="mt-3"><img src="{{ asset($item->image) }}" height="160" style="border-radius: 10%; margin-top: 5px;"/></div>
-                                            {{-- <div class="mt-3"><img src="https://img.freepik.com/free-vector/hacker-anonymous-mask-server-room-with-multiple-computer-monitors-displaying-secret-information_33099-1629.jpg?w=1380&t=st=1712651282~exp=1712651882~hmac=d3f15efe0108fb807d63b90cfec27b9d88c04d955eafd4da8d9c906b00a0f390" height="160" style="border-radius: 10%; margin-top: 5px;"/></div> --}}
+                                            @if ($item->image)
+                                                <div class="mt-3"><img src="{{ asset($item->image) }}" height="160" style="border-radius: 10%; margin-top: 5px;"/></div>
+                                            @else
+                                                <img src="{{ url('uploads/noimage.jpg') }}" class="size-image" style="border-radius: 10px;">
+                                            @endif
                                         </div>
                                     </div>
                                     {{-- <div class="col-sm-1"></div> --}}
@@ -1215,71 +1185,124 @@
                                             <label style="margin-left: 160px; width: 100%">รูปภาพห้อง</label>
                                         </div>
                                     </div>
-                                    @foreach ($images as $image)
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ asset($image->img_path) }}" height="160" style="border-radius: 10%; margin-top: 30px;" height="50"/></span>
+                                    @forelse ($images as $image)
+                                        <div class="col-sm-1">
+                                            <div class="form-group">
+                                                <label></label>
+                                                <span><img src="{{ asset($image->img_path) }}" height="160" style="border-radius: 10%; margin-top: 30px;" height="50"/></span>
+                                                    <button class="btn bg-gradient-danger btn-sm delete-room-img"
+                                                    data-id="{{ $image->id }}" data-rid="{{ $image->rid }}" title="ลบ" style="margin-left: 100px; margin-top: 2px;">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1"></div>
-                                    {{-- <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path }}" height="160" style="border-radius: 10%; margin-top: 5px;" height="50"/></span>
+                                        <div class="col-sm-1"></div>
+                                    @empty
+                                        <div class="col-sm-1">
+                                            <div class="form-group">
+                                                <label></label>
+                                                <img src="{{ url('uploads/noimage.jpg') }}" class="size-image" style="border-radius: 10px; margin-top: 9px;">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path }}" height="160" style="border-radius: 10%; margin-top: 5px;" height="50"/></span>
-                                        </div>
-                                    </div>
+                                        <div class="col-sm-1"></div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
 
-                                    <div class="col-sm-1">
+
+                        <div class="card">
+                            <div class="card-header card-outline card-info">
+                                <h3 class="card-title">อัพโหลดรูป</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                    alt="" id="img-cover" style="border-radius: 10px;">
                                         <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path }}" height="160" style="border-radius: 10%; margin-top: 5px;" height="50"/></span>
+                                            <br>
+                                            <label for="exampleInputFile">รูปภาพปก</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input"
+                                                        onchange="previewImage(event)" accept="image/jpeg, image/jpg, image/png"
+                                                        id="filUploadMain" name="filUploadMain">
+                                                    <label class="custom-file-label"
+                                                        for="exampleInputFile"></label>
+                                                </div>
+    
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview1">
+                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                    alt="" id="room1" style="border-radius: 10px;">
+                                        </div>
                                         <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path  }}" height="50"/></span>
+                                            <br>
+                                            <label for="exampleInputFile">รูปภาพห้อง</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" accept="image/jpeg, image/jpg, image/png"
+                                                        id="filUpload" name="filUpload[]" multiple="multiple" onchange="previewMultiImage(event)">
+                                                    <label class="custom-file-label"
+                                                        for="exampleInputFile"></label>
+                                                </div>
+    
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path  }}" height="50"/></span>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview2">
+                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                    alt="" id="room2" style="border-radius: 10px;">
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path  }}" height="50"/></span>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview3">
+                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
+                                                                    alt="" id="room3" style="border-radius: 10px;">
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path   }}" height="50"/></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview4">
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path ?? '#'  }}" height="50"/></span>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview5">
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label></label>
-                                            <span><img src="{{ $image->img_path ?? '#'  }}" height="50"/></span>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview6">
                                         </div>
-                                    </div> --}}
-                                    @endforeach
-                                    
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview7">
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview4">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview5">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview6">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview7">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1291,6 +1314,7 @@
 </form>
 @endsection
 @push('script')
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     $(document).ready(function() {
         $('[data-toggle="tooltip"]').tooltip();
@@ -1298,11 +1322,6 @@
             format: 'yyyy-mm-dd', // รูปแบบวันที่
             autoclose: true,
         });
-
-        // $('#startdate').on('changeDate', function(e) {
-        //     var selectedStartDate = e.date;
-        //     $('#enddate').datepicker('setStartDate', selectedStartDate);
-        // });
 
         const ddl = $("#ddl").val();
 
@@ -1320,6 +1339,48 @@
                 $(".date_rent").hide();
                 $(".date_rent_show").show();
             }
+        });
+
+        //Delete
+        $('body').on('click', '.delete-room-img', function(event) {
+            event.preventDefault();
+            const id = $(this).data("id");
+            const rid = $(this).data("rid");
+            console.log(id,rid);
+
+            Swal.fire({
+                title: 'คุณแน่ใจไหม? ',
+                text: "หากต้องการลบรูปภาพนี้ โปรดยืนยัน การลบข้อมูล",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยัน'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "DELETE",
+                        url: '../../api/room/deleteImageRoom/' + id + '/' + rid,
+
+                        success: function(data) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: true,
+                                timer: 2500
+                            });
+
+                            setTimeout(function(){
+                                    location.reload();
+                                },1500);
+
+                        },
+                    });
+                }
+            });
+
         });
     });
     function goBack() {
@@ -1440,5 +1501,45 @@
     document.querySelector('#cus_tumbon').addEventListener('change', (event) => {
         showZipcode();
     });
+</script>
+<script>
+    function previewImage(event) {
+        var imageElement = document.getElementById('img-cover');
+        var fileInput = event.target;
+
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                imageElement.src = e.target.result;
+            }
+
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    }
+
+    function previewMultiImage(event) {
+   
+        var files = event.target.files;
+        let index = 1;
+        let j = 1;
+        for (var i = 0; i < files.length; i++) {
+            let imagePreviewContainer = document.getElementById('imagePreview'+index);
+            imagePreviewContainer.innerHTML = ''; // Clear previous previews
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                let elem = 'room'+j;
+                console.log(elem);
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('size-image');
+                imagePreviewContainer.appendChild(img);
+                
+                j++;
+            }
+            reader.readAsDataURL(files[i]);
+            index++;
+        }
+    }
 </script>
 @endpush

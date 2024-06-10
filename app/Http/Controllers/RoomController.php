@@ -167,4 +167,18 @@ class RoomController extends Controller
             return redirect(route('room'));
         }   
     }
+
+    public function deleteImageRoom($id, $rid){
+        $imgRoom = Room_Images::where('id', $id)->where('rid', $rid)->first();
+        if($imgRoom){
+            $imgRoom->delete();
+            return response()->json([
+                'message' => 'ลบรูปภาพสำเร็จ'
+            ], 201);
+        }else{
+            Alert::error('Error', 'ลบรูปภาพไม่สำเร็จ !กรุณาลองอีกครั้ง');
+            return redirect()->back();
+        }
+
+    }
 }
