@@ -8,7 +8,6 @@ use App\Models\Room;
 use App\Models\Project;
 use App\Models\User;
 use Carbon\Carbon;
-// use Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -29,6 +28,8 @@ class MainController extends Controller
 
         // ดึงปีปัจจุบัน
         $currentYear = Carbon::now()->year;
+        // $startYear = Carbon::now()->format('Y-01-01');
+        // $endYear = Carbon::now()->format('Y-m-d');
 
         $query = Room::select(
             'projects.Project_Name',
@@ -65,11 +66,12 @@ class MainController extends Controller
                     ->on('rooms.RoomNo', '=', 'customers.RoomNo')
                     ->on('rooms.id', '=', 'customers.rid');
             })
-            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
             })
+            // ->whereBetween('customers.Contract_Startdate', [$startYear , $endYear]);
+            // ->whereBetween('rooms.date_endrend', [$startYear , $endYear]);
             ->whereYear('rooms.date_endrend', '=', $currentYear);
 
         // กรองสถานะ
@@ -83,13 +85,16 @@ class MainController extends Controller
             } elseif ($status == 'already') {
                 $query->where('rooms.Status_Room', 'อยู่แล้ว');
             }
+        }else{
+            $query->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'");
         }
         $rents = $query
             ->orderBy('Project_Name', 'ASC')
             ->get();
+
         // นับจำนวนห้องในแต่ละสถานะ
         $readyCount = Room::where('Status_Room', 'พร้อมอยู่')
-            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
+            ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
@@ -98,7 +103,7 @@ class MainController extends Controller
             ->count();
 
         $notReadyCount = Room::whereIn('Status_Room', ['ไม่พร้อมอยู่', 'รอคลีน', 'รอตรวจ', 'รอเฟอร์'])
-            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
+            ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
@@ -107,7 +112,7 @@ class MainController extends Controller
             ->count();
 
         $occupiedCount = Room::whereIn('Status_Room', ['สวัสดิการ', 'ห้องออฟฟิต', 'เช่าอยู่'])
-            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
+            ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
@@ -116,7 +121,7 @@ class MainController extends Controller
             ->count();
 
         $alreadyCount = Room::where('Status_Room', 'อยู่แล้ว')
-            ->whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
+            ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
@@ -124,7 +129,7 @@ class MainController extends Controller
             ->whereYear('date_endrend', '=', $currentYear)
             ->count();
         // นับจำนวนห้องทั้งหมด
-        $totalCount = Room::whereRaw('ifnull(rooms.status_room, "") <> ?', ['คืนห้อง'])
+        $totalCount = Room::whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');

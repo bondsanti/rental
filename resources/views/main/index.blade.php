@@ -46,12 +46,12 @@
                         <div class="col-sm-2 col-6">
                             <a href="{{ route('main') }}" class="small-box-footer">
                                 <div class="small-box bg-gradient-info">
-                                    <div class="inner">
+                                    <div class="inner {{ $status != 'ready' && $status != 'not_ready' && $status != 'occupied' && $status != 'already' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}">
                                         <h3>{{ $totalCount }}</h3>
                                         <p>ห้องทั้งหมด</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fa fa-building"></i>
+                                        <i class="fa-solid fa-city"></i>
                                     </div>
                                 </div>
                             </a>
@@ -59,12 +59,12 @@
                         <div class="col-sm-2 col-6">
                             <a href="{{ route('main', ['status' => 'ready']) }}" class="small-box-footer">
                                 <div class="small-box bg-gradient-orange">
-                                    <div class="inner" style="color: white">
+                                    <div class="inner {{ $status == 'ready' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}" style="color: white">
                                         <h3>{{ $readyCount }}</h3>
                                         <p>ห้องพร้อมอยู่</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fa fa-home"></i>
+                                        <i class="fa-solid fa-building-circle-check"></i>
                                     </div>
                                 </div>
                             </a>
@@ -72,25 +72,25 @@
                         <div class="col-sm-2 col-6">
                             <a href="{{ route('main', ['status' => 'not_ready']) }}" class="small-box-footer">
                                 <div class="small-box bg-gradient-gray">
-                                    <div class="inner">
+                                    <div class="inner {{ $status == 'not_ready' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}">
                                         <h3>{{ $notReadyCount }}</h3>
                                         <p>ห้องรอคลีน/รอตรวจ/ไม่พร้อมอยู่</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fa fa-home"></i>
+                                        <i class="fa-solid fa-building-circle-xmark"></i>
                                     </div>
                                 </div>
                             </a>
                         </div>
                         <div class="col-sm-2 col-6">
                             <a href="{{ route('main', ['status' => 'occupied']) }}" class="small-box-footer">
-                                <div class="small-box bg-gradient-gray-dark">
-                                    <div class="inner">
+                                <div class="small-box bg-gradient-blue">
+                                    <div class="inner {{ $status == 'occupied' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}">
                                         <h3>{{ $occupiedCount }}</h3>
                                         <p>ห้องสวัสดิการ/ห้องออฟฟิต</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fa fa-home"></i>
+                                        <i class="fa-solid fa-building-shield"></i>
                                     </div>
                                 </div>
                             </a>
@@ -98,12 +98,12 @@
                         <div class="col-sm-2 col-6">
                             <a href="{{ route('main', ['status' => 'already']) }}" class="small-box-footer">
                                 <div class="small-box bg-gradient-success">
-                                    <div class="inner">
+                                    <div class="inner {{ $status == 'already' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}">
                                         <h3>{{ $alreadyCount }}</h3>
                                         <p>ห้องอยู่แล้ว</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fa fa-home"></i>
+                                        <i class="fa-solid fa-building-user"></i>
                                     </div>
                                 </div>
                             </a>
@@ -206,17 +206,30 @@
                                                     </td>
                                                     <td>{{ $room->Contract_Status }}</td>
                                                     <td>
-                                                        @if ($room->date_endrend)
-                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                        @if ($room->rental_status=="การันตี")
+                                                            @if ($room->Guarantee_Enddate)
+                                                            {{ date('d/m/Y', strtotime($room->Guarantee_Enddate)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @else
-                                                            -
+                                                            @if ($room->date_endrend)
+                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($room->Contract_Enddate)
-                                                            {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
-                                                        @else
+                                                        @if ($room->Contract_Enddate  == "0000-00-00" || $room->Contract_Enddate < "1990-01-01")
                                                             -
+                                                        @else
+                                                            @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($room->Contract_Enddate))))
+                                                                <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}</div>
+                                                            @else
+                                                                {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
+                                                            @endif
+                                                            
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -245,17 +258,30 @@
                                                     </td>
                                                     <td>{{ $room->Contract_Status }}</td>
                                                     <td>
-                                                        @if ($room->date_endrend)
-                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                        @if ($room->rental_status=="การันตี")
+                                                            @if ($room->Guarantee_Enddate)
+                                                            {{ date('d/m/Y', strtotime($room->Guarantee_Enddate)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @else
-                                                            -
+                                                            @if ($room->date_endrend)
+                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($room->Contract_Enddate)
-                                                            {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
-                                                        @else
+                                                        @if ($room->Contract_Enddate  == "0000-00-00" || $room->Contract_Enddate < "1990-01-01")
                                                             -
+                                                        @else
+                                                            @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($room->Contract_Enddate))))
+                                                                <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}</div>
+                                                            @else
+                                                                {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
+                                                            @endif
+                                                            
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -284,17 +310,30 @@
                                                     </td>
                                                     <td>{{ $room->Contract_Status }}</td>
                                                     <td>
-                                                        @if ($room->date_endrend)
-                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                        @if ($room->rental_status=="การันตี")
+                                                            @if ($room->Guarantee_Enddate)
+                                                            {{ date('d/m/Y', strtotime($room->Guarantee_Enddate)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @else
-                                                            -
+                                                            @if ($room->date_endrend)
+                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($room->Contract_Enddate)
-                                                            {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
-                                                        @else
+                                                        @if ($room->Contract_Enddate  == "0000-00-00" || $room->Contract_Enddate < "1990-01-01")
                                                             -
+                                                        @else
+                                                            @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($room->Contract_Enddate))))
+                                                                <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}</div>
+                                                            @else
+                                                                {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
+                                                            @endif
+                                                            
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -323,17 +362,30 @@
                                                     </td>
                                                     <td>{{ $room->Contract_Status }}</td>
                                                     <td>
-                                                        @if ($room->date_endrend)
-                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                        @if ($room->rental_status=="การันตี")
+                                                            @if ($room->Guarantee_Enddate)
+                                                            {{ date('d/m/Y', strtotime($room->Guarantee_Enddate)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @else
-                                                            -
+                                                            @if ($room->date_endrend)
+                                                            {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                            @else
+                                                                -
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($room->Contract_Enddate)
-                                                            {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
-                                                        @else
+                                                        @if ($room->Contract_Enddate  == "0000-00-00" || $room->Contract_Enddate < "1990-01-01")
                                                             -
+                                                        @else
+                                                            @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($room->Contract_Enddate))))
+                                                                <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}</div>
+                                                            @else
+                                                                {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
+                                                            @endif
+                                                            
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -361,17 +413,30 @@
                                                 </td>
                                                 <td>{{ $room->Contract_Status }}</td>
                                                 <td>
-                                                    @if ($room->date_endrend)
-                                                        {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                    @if ($room->rental_status=="การันตี")
+                                                        @if ($room->Guarantee_Enddate)
+                                                        {{ date('d/m/Y', strtotime($room->Guarantee_Enddate)) }}
+                                                        @else
+                                                            -
+                                                        @endif
                                                     @else
-                                                        -
+                                                        @if ($room->date_endrend)
+                                                        {{ date('d/m/Y', strtotime($room->date_endrend)) }}
+                                                        @else
+                                                            -
+                                                        @endif
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($room->Contract_Enddate)
-                                                        {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
-                                                    @else
+                                                    @if ($room->Contract_Enddate  == "0000-00-00" || $room->Contract_Enddate < "1990-01-01")
                                                         -
+                                                    @else
+                                                        @if (date("Y-m-d") > date('Y-m-d', strtotime("-1 months", strtotime($room->Contract_Enddate))))
+                                                            <div class="text-danger text-bold">{{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}</div>
+                                                        @else
+                                                            {{ date('d/m/Y', strtotime($room->Contract_Enddate)) }}
+                                                        @endif
+                                                        
                                                     @endif
                                                 </td>
                                             </tr>
@@ -400,13 +465,13 @@
                 'paging': false,
                 'lengthChange': false,
                 'searching': false,
-                'ordering': false,
+                'ordering': true,
                 'info': false,
                 'autoWidth': false,
                 "responsive": true,
                 "columnDefs": [{
                     "orderable": false,
-                    "targets": [0, 1, 2, 3]
+                    "targets": [0, 3]
                 }]
             });
         });

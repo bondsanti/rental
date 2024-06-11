@@ -345,6 +345,8 @@ class RentalController extends Controller
             }else{
                 $totalDays = 0;
             }
+        }else{
+            $totalDays = 0;
         }
        
         // dd($rents);

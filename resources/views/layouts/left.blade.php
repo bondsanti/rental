@@ -130,7 +130,7 @@
                                         </p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a style="" href="{{ route('report.guarantee') }}" class="nav-link {{ request()->routeIs('report.guarantee') ? 'active' : '' }} {{ request()->routeIs('report.guarantee.search') ? 'active' : '' }}">
                                         &nbsp;&nbsp;
                                         <i class="nav-icon"> - </i>
@@ -147,7 +147,7 @@
                                             สรุปค่าเช่า-การันตี
                                         </p>
                                     </a>
-                                </li>
+                                </li> --}}
                                 <li class="nav-item">
                                     <a style="" href="{{ route('report.rent') }}" class="nav-link {{ request()->routeIs('report.rent') ? 'active' : '' }} {{ request()->routeIs('report.rent.search') ? 'active' : '' }}">
                                         &nbsp;&nbsp;
