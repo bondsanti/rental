@@ -1043,7 +1043,7 @@
                                             @if ($item->Contract)
                                                 <div class="date_rent_show">
                                                     <input class="form-control" name="Contract" type="hidden" value="{{ $item->Contract }}">
-                                                    <p class="form-control"><font color="red">{{ $item->Contract }}</font> เดือน <input name="Day" type="text" value="{{ $item->Day ?? old('Day') ?? 0 }}" style="width:25%; margin-left:10px;"> วัน </p>
+                                                    <p class="form-control"><font color="red">{{ $item->Contract }}</font> เดือน <input name="Day" type="text" value="{{ $totalDays ?? $item->Day ?? old('Day') ?? 0 }}" style="width:25%; margin-left:10px;"> วัน </p>
                                                 </div>
                                                 <div class="date_rent">
                                                     <p class="form-control"><input name="Contract_Renew" type="number" value="{{ old('Contract_Renew') ?? '' }}" style="width: 25%"> เดือน <input name="Day_Renew" type="number" value="{{ old('Day_Renew') ?? '' }}" style="width:25%; margin-left:15px;"> วัน </p>

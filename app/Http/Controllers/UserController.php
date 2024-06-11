@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Log;
 use App\Models\Role_user;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class UserController extends Controller
         
             $roleUser->refresh();
 
-            // Log::addLog($request->user_id, '', 'Create RoleUser : '. $roleUser);
+            Log::addLog($request->session()->get('loginId'), 'Add Role', 'RoleUser : '. $roleUser);
 
             return response()->json([
                 'message' => 'เพิ่มข้อมูลสำเร็จ'
@@ -77,11 +78,11 @@ class UserController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit(Request $request,$id)
     {
 
         $users = Role_user::with('role:id,code,name_th,active','position:id,name')->where('id', $id)->first();
-  
+        
         return response()->json($users, 200);
     }
 
@@ -95,7 +96,7 @@ class UserController extends Controller
 
         $roleUser->save();
 
-    //    Log::addLog($request->user_id,json_encode($roleUser_old), 'Update RoleUser : '.$roleUser);
+       Log::addLog($request->user_id,json_encode($roleUser_old), 'Update RoleUser : '.$roleUser);
 
         return response()->json([
             'message' => 'อัพเดทข้อมูลสำเร็จ'
@@ -110,7 +111,7 @@ class UserController extends Controller
 
         $roleUser_old = $roleUser->toArray();
 
-        // Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
+        Log::addLog($user_id,json_encode($roleUser_old), 'Delete RoleUser : '.$roleUser);
         $roleUser->delete($id);
 
         return response()->json([

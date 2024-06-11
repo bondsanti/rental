@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRoomRequest;
+use App\Models\Log;
 use App\Models\Project;
 use App\Models\Role_user;
 use App\Models\Room;
@@ -11,6 +12,7 @@ use App\Models\Tambon;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class RoomController extends Controller
@@ -160,6 +162,11 @@ class RoomController extends Controller
         
         // $room->save();
         if ($room->save()) {
+            $projects = DB::table('projects')
+                ->select('Project_Name')
+                ->where('pid', $request->project_id)
+                ->first();
+            Log::addLog($request->session()->get('loginId'), 'เพิ่มห้องเช่า', 'ชื่อโครงการ ' .$projects->Project_Name. ' เจ้าของห้อง ' .$request->onwername. ' ห้องเลขที่ ' .$request->RoomNo);
             Alert::success('Success', 'เพิ่มข้อมูลสำเร็จ');
             return redirect(route('rental'));
         }else {
@@ -171,6 +178,7 @@ class RoomController extends Controller
     public function deleteImageRoom($id, $rid){
         $imgRoom = Room_Images::where('id', $id)->where('rid', $rid)->first();
         if($imgRoom){
+            unlink($imgRoom->img_path);
             $imgRoom->delete();
             return response()->json([
                 'message' => 'ลบรูปภาพสำเร็จ'

@@ -33,7 +33,7 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>โครงการ</label>
-                                    <input type="text" readonly class="form-control" value="{{ $result->Project_Name }}">
+                                    <input type="text" name="projectName" readonly class="form-control" value="{{ $result->Project_Name }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">
@@ -82,7 +82,7 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label>ลูกค้าเช่าซื้อ</label>
-                                    <input type="text" readonly class="form-control" value="{{ $result->Cus_Name }}">
+                                    <input type="text" name="cusName" readonly class="form-control" value="{{ $result->Cus_Name }}">
                                 </div>
                             </div>
                             <div class="col-sm-4">

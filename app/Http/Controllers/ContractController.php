@@ -7,6 +7,7 @@ use App\Models\Role_user;
 use App\Models\User;
 use App\Models\Lease_auto_code;
 use App\Models\Lease_code;
+use App\Models\Log;
 use App\Models\Project;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -40,6 +41,7 @@ class ContractController extends Controller
     }
     public function update(Request $request)
     {
+        dd($request->all());
         if ($request->lease_agr_code == '' || $request->sub_lease_code == '' || $request->insurance_code == '' || $request->agent_contract_code == '') {
             Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
             return redirect()->back(); 
@@ -51,8 +53,13 @@ class ContractController extends Controller
         $update_lcode->agent_contract_code  = $request->agent_contract_code;
         $updated = $update_lcode->save(); // บันทึกข้อมูลและเก็บผลลัพธ์การบันทึกไว้
 
+        $projects = DB::table('projects')
+                ->select('Project_Name')
+                ->where('pid', $request->pid)
+                ->first();
         // ตรวจสอบว่าการอัพเดทเสร็จสมบูรณ์หรือไม่
         if ($updated) {
+            Log::addLog($request->session()->get('loginId'), 'แก้ไขรูปแบบเลขที่สัญญาเช่า', 'โครงการ ' .$projects->Project_Name);
             Alert::success('Success', 'บันทึกข้อมูลสำเร็จ!');
             return redirect()->back(); 
         } else {
@@ -94,6 +101,7 @@ class ContractController extends Controller
 
         //ตรวจสอบว่าการอัพเดทเสร็จสมบูรณ์หรือไม่
         if ($upout) {
+            Log::addLog($request->session()->get('loginId'), 'แก้ไขรายละเอียดโครงการ', $request->Project_NameTH);
             Alert::success('Success', 'อัพเดทข้อมูลสำเร็จ!');
         } else {
             Alert::error('Error', 'มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้');
