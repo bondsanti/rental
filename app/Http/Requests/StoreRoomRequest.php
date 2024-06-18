@@ -25,7 +25,7 @@ class StoreRoomRequest extends FormRequest
     {
         return [
             'project_id' => 'required|string',
-            'numberhome' => 'required|string',
+            // 'numberhome' => 'required|string',
             'HomeNo' => 'required',
             'onwername' => 'required|string',
             'cardowner' => 'required|string',
@@ -41,7 +41,7 @@ class StoreRoomRequest extends FormRequest
     {
         return [
             'project_id.required' => 'กรุณาเลือกโครงการ',
-            'numberhome.required' => 'กรุณากรอกเลขที่บ้านเจ้าของห้อง',
+            // 'numberhome.required' => 'กรุณากรอกเลขที่บ้านเจ้าของห้อง',
             'HomeNo.required' => 'กรุณากรอกบ้านเลขที่',
             'onwername.required' => 'กรุณากรอกชื่อเจ้าของห้อง',
             'cardowner.required' => 'กรุณากรอกเลขบัตรประชาชน',

@@ -13,7 +13,6 @@
                     <h1 class="m-0">
                         เพิ่มห้องเช่า
                     </h1>
-                    
                 </div><!-- /.col -->
                 <div class="col-md-6 text-right">
                     <div class="form-group">
@@ -41,6 +40,54 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
+                                            <label><b class="text-danger">*</b> เจ้าของห้อง</label>
+                                            <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text"
+                                                placeholder="เจ้าของห้อง" value="{{ old('onwername') }}">
+                                            @error('onwername')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror         
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label><b class="text-danger">*</b> บัตรประชาชน</label>
+                                            <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text"
+                                                placeholder="บัตรประชาชน" value="{{ old('cardowner') }}">
+                                            @error('cardowner')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror
+                                            {{-- <label><b class="text-danger">*</b> เลขที่บ้านเจ้าของห้อง</label>
+                                            <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text"
+                                                placeholder="เลขที่บ้านเจ้าของ" value="{{ old('numberhome') }}">
+                                            @error('numberhome')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror --}}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label>อัปโหลดไฟล์บัตรประชาชน</label>
+                                                <input class="form-control" name="filUploadPersonID" type="file" 
+                                                    placeholder="เลขที่สัญญา">
+                                            </div>      
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label><b class="text-danger">*</b> เบอร์ติดต่อ</label>
+                                            <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text"
+                                                placeholder="เบอร์ติดต่อ" value="{{ old('ownerphone') }}">
+                                            @error('ownerphone')
+                                                <div class="error text-danger">{{ $message }}</div>
+                                            @enderror    
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
                                             <label><b class="text-danger">*</b> โครงการ</label>
                                             <select name="project_id" id="project_id" class="form-control @error('project_id') is-invalid @enderror">
                                                 <option value="">-- เลือก --</option>
@@ -56,16 +103,6 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> เลขที่บ้านเจ้าของห้อง</label>
-                                            <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text"
-                                                placeholder="เลขที่บ้านเจ้าของ" value="{{ old('numberhome') }}">
-                                            @error('numberhome')
-                                                <div class="error text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
                                             <label><b class="text-danger">*</b> ห้องเลขที่</label>
                                             <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text"
                                                 placeholder="ห้องเลขที่" value="{{ old('RoomNo') }}">
@@ -74,6 +111,7 @@
                                             @enderror
                                         </div>
                                     </div>
+
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label><b class="text-danger">*</b> บ้านเลขที่</label>
@@ -82,37 +120,6 @@
                                             @error('HomeNo')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label><b class="text-danger">*</b> เจ้าของห้อง</label>
-                                            <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text"
-                                                placeholder="เจ้าของห้อง" value="{{ old('onwername') }}">
-                                            @error('onwername')
-                                                <div class="error text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label><b class="text-danger">*</b> บัตรประชาชน</label>
-                                            <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text"
-                                                placeholder="บัตรประชาชน" value="{{ old('cardowner') }}">
-                                            @error('cardowner')
-                                                <div class="error text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>อัปโหลดไฟล์บัตรประชาชน</label>
-                                            <input class="form-control" name="filUploadPersonID" type="file" 
-                                                placeholder="เลขที่สัญญา">
                                         </div>
                                     </div>
 
@@ -165,8 +172,7 @@
                                                             {{ $amphure->amphoe }}
                                                         </option>
                                                     @endforeach
-                                                @endif
-                                                
+                                                @endif    
                                             </select>
                                             @error('owner_khet')
                                                 <div class="error text-danger">{{ $message }}</div>
@@ -197,17 +203,6 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> เบอร์ติดต่อ</label>
-                                            <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text"
-                                                placeholder="เบอร์ติดต่อ" value="{{ old('ownerphone') }}">
-                                            @error('ownerphone')
-                                                <div class="error text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
                                             <label>วันรับห้อง</label>
                                             <input class="form-control datepicker" name="transfer_date" id="transfer_date"
                                                 placeholder="วันรับห้อง" value="{{ old('transfer_date') }}">
@@ -229,9 +224,7 @@
                                                 placeholder="ขนาดห้อง" value="{{ old('room_size') }}">
                                         </div>
                                     </div>
-                                    
-                                </div>
-                                <div class="row">
+
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ทิศ/ฝั่ง</label>
@@ -239,7 +232,9 @@
                                                 placeholder="ทิศ/ฝั่ง" value="{{ old('Location') }}">
                                         </div>
                                     </div>
-
+                                    
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>อาคาร</label>
@@ -258,190 +253,186 @@
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>กุญแจ หน้า</label>
-                                            <input class="form-control" name="room_key_front" type="text"
-                                                placeholder="กุญแจ หน้า" value="{{ old('room_key_front') }}">
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>กุญแจ นอน</label>
-                                            <input class="form-control" name="room_key_bed" type="text"
-                                                placeholder="กุญแจ นอน" value="{{ old('room_key_bed') }}">
+                                            
                                         </div>
                                     </div>
 
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label>กุญแจ ระเบียง</label>
-                                            <input class="form-control" name="room_key_balcony" type="text"
-                                                placeholder="กุญแจ ระเบียง" value="{{ old('room_key_balcony') }}">
+                                            
                                         </div>
                                     </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>กุญแจ Mail Box</label>
-                                            <input class="form-control" name="room_key_mailbox" type="text"
-                                                placeholder="กุญแจ Mail Box" value="{{ old('room_key_mailbox') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>คีย์การ์ด</label>
-                                            <input class="form-control" name="room_card" type="text"
-                                                placeholder="คีย์การ์ด" value="{{ old('room_card') }}">
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>คีย์การ์ด P</label>
-                                            <input class="form-control" name="room_card_p" type="text"
-                                                placeholder="คีย์การ์ด P" value="{{ old('room_card_p') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>คีย์การ์ด B</label>
-                                            <input class="form-control" name="room_card_b" type="text"
-                                                placeholder="คีย์การ์ด B" value="{{ old('room_card_b') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>คีย์การ์ด C</label>
-                                            <input class="form-control" name="room_card_c" type="text"
-                                                placeholder="คีย์การ์ด C" value="{{ old('room_card_c') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>ระยะเริ่มการันตี</label>
-                                            <input class="form-control datepicker" name="gauranteestart" id="gauranteestart"
-                                                placeholder="ระยะเริ่มการันตี" value="{{ old('gauranteestart') }}">
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>ระยะสิ้นสุดการันตี</label>
-                                            <input class="form-control datepicker" name="gauranteeend" id="gauranteeend"
-                                                placeholder="ระยะสิ้นสุดการันตี" value="{{ old('gauranteeend') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>จำนวนเงินการันตี</label>
-                                            <input class="form-control" name="gauranteeamount" type="text"
-                                                placeholder="จำนวนเงินการันตี" value="{{ old('gauranteeamount') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>สถานะห้อง</label>
-                                                <select class="form-control" name="Status_Room">
-                                                    <option value="">-- เลือก --</option>
-                                                    <option value="รอตรวจ" {{ old('Status_Room') == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
-                                                    <option value="รอเฟอร์" {{ old('Status_Room') == 'รอเฟอร์' ? 'selected' : '' }}>รอเฟอร์</option>
-                                                    <option value="รอคลีน" {{ old('Status_Room') == 'รอคลีน' ? 'selected' : '' }}>รอคลีน</option>
-                                                    <option value="พร้อมอยู่" {{ old('Status_Room') == 'พร้อมอยู่' ? 'selected' : '' }}>พร้อมอยู่</option>
-                                                    <option value="อยู่แล้ว" {{ old('Status_Room') == 'อยู่แล้ว' ? 'selected' : '' }}>อยู่แล้ว</option>
-                                                    <option value="ห้องออฟฟิต" {{ old('Status_Room') == 'ห้องออฟฟิต' ? 'selected' : '' }}>ห้องออฟฟิต</option>
-                                                    <option value="ห้องตัวอย่าง" {{ old('Status_Room') == 'ห้องตัวอย่าง' ? 'selected' : '' }}>ห้องตัวอย่าง</option>
-                                                    <option value="จอง" {{ old('Status_Room') == 'จอง' ? 'selected' : '' }}>จอง</option>
-                                                    <option value="สวัสดิการ" {{ old('Status_Room') == 'สวัสดิการ' ? 'selected' : '' }}>สวัสดิการ</option>
-                                                </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>บัญชีแสดงสัญญา</label>
-                                            <input class="form-control" name="Electric_Contract" type="text"
-                                                placeholder="บัญชีแสดงสัญญา" value="{{ old('Electric_Contract') }}">
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>รหัสเครื่องวัดฯ</label>
-                                            <input class="form-control" name="Meter_Code" type="text"
-                                                placeholder="รหัสเครื่องวัดฯ" value="{{ old('Meter_Code') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>ประเภทห้องเช่า</label>
-                                            <select class="form-control"  name="rental_status">
-                                                <option value="">-- เลือก --</option>
-                                                <option value="การันตี" {{ old('rental_status') == 'การันตี' ? 'selected' : '' }}>การันตี</option>
-                                                <option value="เบิกจ่ายล่วงหน้า" {{ old('rental_status') == 'เบิกจ่ายล่วงหน้า' ? 'selected' : '' }}>เบิกจ่ายล่วงหน้า</option>
-                                                <option value="ฝากต่อหักภาษี" {{ old('rental_status') == 'ฝากต่อหักภาษี' ? 'selected' : '' }}>ฝากต่อหักภาษี</option>
-                                                <option value="ฝากต่อไม่หักภาษี" {{ old('rental_status') == 'ฝากต่อไม่หักภาษี' ? 'selected' : '' }}>ฝากต่อไม่หักภาษี</option>
-                                                <option value="ฝากเช่า" {{ old('rental_status') == 'ฝากเช่า' ? 'selected' : '' }}>ฝากเช่า</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label>ราคาค่าเช่าห้อง</label>
-                                            <input class="form-control" name="room_price" type="text"
-                                                placeholder="ราคาค่าเช่า" value="{{ old('room_price') }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                    </div>
-                                    
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        {{-- <div class="form-group">
-                                            <label>รูปภาพปก</label>
-                                            <input class="form-control" id="filUploadMain" name="filUploadMain" type="file"
-                                                placeholder="รูปภาพปก">
-                                        </div> --}}
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        {{-- <div class="form-group">
-                                            <label>รูปภาพห้อง</label>
-                                            <input class="form-control" id="filUpload" name="filUpload[]" type="file"
-                                                placeholder="รูปภาพห้อง" multiple="multiple">
-                                        </div> --}}
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                    </div>
-                                    
                                 </div>
                             </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header card-outline card-info">
+                            <h3 class="card-title">กุญแจ/คีย์การ์ด</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>กุญแจ หน้า</label>
+                                        <input class="form-control" name="room_key_front" type="text"
+                                            placeholder="กุญแจ หน้า" value="{{ old('room_key_front') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>กุญแจ นอน</label>
+                                        <input class="form-control" name="room_key_bed" type="text"
+                                            placeholder="กุญแจ นอน" value="{{ old('room_key_bed') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>กุญแจ ระเบียง</label>
+                                        <input class="form-control" name="room_key_balcony" type="text"
+                                            placeholder="กุญแจ ระเบียง" value="{{ old('room_key_balcony') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>กุญแจ Mail Box</label>
+                                        <input class="form-control" name="room_key_mailbox" type="text"
+                                            placeholder="กุญแจ Mail Box" value="{{ old('room_key_mailbox') }}">
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>คีย์การ์ด</label>
+                                        <input class="form-control" name="room_card" type="text"
+                                            placeholder="คีย์การ์ด" value="{{ old('room_card') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>คีย์การ์ด P</label>
+                                        <input class="form-control" name="room_card_p" type="text"
+                                            placeholder="คีย์การ์ด P" value="{{ old('room_card_p') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>คีย์การ์ด B</label>
+                                        <input class="form-control" name="room_card_b" type="text"
+                                            placeholder="คีย์การ์ด B" value="{{ old('room_card_b') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>คีย์การ์ด C</label>
+                                        <input class="form-control" name="room_card_c" type="text"
+                                            placeholder="คีย์การ์ด C" value="{{ old('room_card_c') }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header card-outline card-info">
+                            <h3 class="card-title">รายละเอียดเช่า</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>ประเภทการเช่า</label>
+                                        <select class="form-control"  name="rental_status">
+                                            <option value="">-- เลือก --</option>
+                                            <option value="การันตี" {{ old('rental_status') == 'การันตี' ? 'selected' : '' }}>การันตี</option>
+                                            <option value="เบิกจ่ายล่วงหน้า" {{ old('rental_status') == 'เบิกจ่ายล่วงหน้า' ? 'selected' : '' }}>เบิกจ่ายล่วงหน้า</option>
+                                            <option value="ฝากต่อหักภาษี" {{ old('rental_status') == 'ฝากต่อหักภาษี' ? 'selected' : '' }}>ฝากต่อหักภาษี</option>
+                                            <option value="ฝากต่อไม่หักภาษี" {{ old('rental_status') == 'ฝากต่อไม่หักภาษี' ? 'selected' : '' }}>ฝากต่อไม่หักภาษี</option>
+                                            <option value="ฝากเช่า" {{ old('rental_status') == 'ฝากเช่า' ? 'selected' : '' }}>ฝากเช่า</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>ระยะเริ่มการันตี/ฝากเช่า</label>
+                                        <input class="form-control datepicker" name="gauranteestart" id="gauranteestart"
+                                            placeholder="ระยะเริ่มการันตี" value="{{ old('gauranteestart') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>ระยะสิ้นสุดการันตี/ฝากเช่า</label>
+                                        <input class="form-control datepicker" name="gauranteeend" id="gauranteeend"
+                                            placeholder="ระยะสิ้นสุดการันตี" value="{{ old('gauranteeend') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>จำนวนเงินการันตี</label>
+                                        <input class="form-control" name="gauranteeamount" type="text"
+                                            placeholder="จำนวนเงินการันตี" value="{{ old('gauranteeamount') }}">
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>บัญชีแสดงสัญญา</label>
+                                        <input class="form-control" name="Electric_Contract" type="text"
+                                            placeholder="บัญชีแสดงสัญญา" value="{{ old('Electric_Contract') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>รหัสเครื่องวัดฯ</label>
+                                        <input class="form-control" name="Meter_Code" type="text"
+                                            placeholder="รหัสเครื่องวัดฯ" value="{{ old('Meter_Code') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>ราคาค่าเช่าห้อง</label>
+                                        <input class="form-control" name="room_price" type="text"
+                                            placeholder="ราคาค่าเช่า" value="{{ old('room_price') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>สถานะห้อง</label>
+                                        <select class="form-control" name="Status_Room">
+                                            <option value="">-- เลือก --</option>
+                                            <option value="รอตรวจ" {{ old('Status_Room') == 'รอตรวจ' ? 'selected' : '' }}>รอตรวจ</option>
+                                            <option value="รอเฟอร์" {{ old('Status_Room') == 'รอเฟอร์' ? 'selected' : '' }}>รอเฟอร์</option>
+                                            <option value="รอคลีน" {{ old('Status_Room') == 'รอคลีน' ? 'selected' : '' }}>รอคลีน</option>
+                                            <option value="พร้อมอยู่" {{ old('Status_Room') == 'พร้อมอยู่' ? 'selected' : '' }}>พร้อมอยู่</option>
+                                            <option value="อยู่แล้ว" {{ old('Status_Room') == 'อยู่แล้ว' ? 'selected' : '' }}>อยู่แล้ว</option>
+                                            <option value="ห้องออฟฟิต" {{ old('Status_Room') == 'ห้องออฟฟิต' ? 'selected' : '' }}>ห้องออฟฟิต</option>
+                                            <option value="ห้องตัวอย่าง" {{ old('Status_Room') == 'ห้องตัวอย่าง' ? 'selected' : '' }}>ห้องตัวอย่าง</option>
+                                            <option value="จอง" {{ old('Status_Room') == 'จอง' ? 'selected' : '' }}>จอง</option>
+                                            <option value="สวัสดิการ" {{ old('Status_Room') == 'สวัสดิการ' ? 'selected' : '' }}>สวัสดิการ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -450,61 +441,39 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-sm-3">
-                                    <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                alt="" id="img-cover" style="border-radius: 10px;">
-                                    <div class="form-group">
-                                        <br>
-                                        <label for="exampleInputFile">รูปภาพปก</label>
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input"
-                                                    onchange="previewImage(event)" accept="image/jpeg, image/jpg, image/png"
-                                                    id="filUploadMain" name="filUploadMain">
-                                                <label class="custom-file-label"
-                                                    for="exampleInputFile"></label>
-                                            </div>
-
+                                <div class="form-group">
+                                    <label for="exampleInputFile">รูปภาพห้อง</label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" accept="image/jpeg, image/jpg, image/png"
+                                                id="filUpload" name="filUpload[]" multiple="multiple" onchange="previewMultiImage(event)">
+                                            <label class="custom-file-label"
+                                                for="exampleInputFile"></label>
                                         </div>
+
                                     </div>
                                 </div>
+                                <br>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-3">
                                     <div id="imagePreview1">
-                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                alt="" id="room1" style="border-radius: 10px;">
-                                    </div>
-                                    <div class="form-group">
-                                        <br>
-                                        <label for="exampleInputFile">รูปภาพห้อง</label>
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" accept="image/jpeg, image/jpg, image/png"
-                                                    id="filUpload" name="filUpload[]" multiple="multiple" onchange="previewMultiImage(event)">
-                                                <label class="custom-file-label"
-                                                    for="exampleInputFile"></label>
-                                            </div>
-
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
                                     <div id="imagePreview2">
-                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                alt="" id="room2" style="border-radius: 10px;">
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
                                     <div id="imagePreview3">
-                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                alt="" id="room3" style="border-radius: 10px;">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-sm-3">
                                     <div id="imagePreview4">
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-3">
                                     <div id="imagePreview5">
                                     </div>
@@ -515,25 +484,29 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div id="imagePreview7">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview8">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <div id="imagePreview4">
+                                    <div id="imagePreview9">
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
-                                    <div id="imagePreview5">
+                                    <div id="imagePreview10">
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
-                                    <div id="imagePreview6">
+                                    <div id="imagePreview11">
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
-                                    <div id="imagePreview7">
+                                    <div id="imagePreview12">
                                     </div>
                                 </div>
                             </div>
@@ -678,42 +651,40 @@
                                     <textarea name="Other" id="" cols="33" rows="3"></textarea>
                                 </div>
                                 <div class="col-sm-2">
-                                    {{-- <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="cardowner" type="number" value="{{ $item->Sofa }}"> เครื่องซักผ้า
-                                    </p> --}}
                                 </div>
 
                                 <div class="col-sm-2">
-                                    {{-- <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="cardowner" type="number"> เครื่องทำน้ำอุ่น
-                                    </p> --}}
                                 </div>
 
                                 <div class="col-sm-2">
-                                    {{-- <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ทีวี
-                                    </p> --}}
                                 </div>
 
                                 <div class="col-sm-2">
-                                    {{-- <p class="form-group">
-                                        <input style="width: 15%" style="display: inline" name="cardowner" type="number"> ตู้เย็น
-                                    </p> --}}
                                 </div>
                                 
                             </div>
                         </div>
                     </div>
-                
-                 {{-- @endforeach --}}
+
+                    <div class="form-group row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <td>
+                                <div class="col-sm-4 offset-4">
+
+                                    <button type="submit" class="btn btn-success"><i
+                                        class="fa-solid fa-arrow-up-from-bracket"></i> เพิ่มข้อมูลห้อง</button>
+                                </div>
+
+                            </td>
+                        </div>
+                        <div class="col-md-4"></div>
+                    </div>
                 </div>
-            {{-- </form>     --}}
             </div>
             
         </div><!-- /.container-fluid -->
     </section>
-
-    {{-- @endforeach --}}
 </form>
 @endsection
 @push('script')

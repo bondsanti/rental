@@ -64,7 +64,7 @@ class RoomController extends Controller
         $room = new Room();
         $room->Create_Date = now();
         $room->pid = $request->project_id;
-        $room->numberhome = $request->numberhome ?? NULL;
+        // $room->numberhome = $request->numberhome ?? NULL;
         $room->RoomNo = $request->RoomNo;
         $room->HomeNo = $request->HomeNo;
         $room->Owner = $request->onwername ?? NULL;
@@ -114,20 +114,20 @@ class RoomController extends Controller
         }
 
         // รูปภาพปก
-        if ($request->hasFile('filUploadMain')) {
-            $allowedfileExtension = ['jpg', 'jpeg','png'];
-            $file = $request->file('filUploadMain');
-            $extension = $file->getClientOriginalExtension();
-            $check = in_array($extension, $allowedfileExtension);
-            if ($check) {
-                $filename = 'main_' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
-                $file->move('uploads/images_room/', $filename);
-                $room->image = 'uploads/images_room/' . $filename;
-            }else{
-                Alert::error('Error', 'Allowed types: jpg, jpeg, png');
-                return redirect()->back(); 
-            }
-        }
+        // if ($request->hasFile('filUploadMain')) {
+        //     $allowedfileExtension = ['jpg', 'jpeg','png'];
+        //     $file = $request->file('filUploadMain');
+        //     $extension = $file->getClientOriginalExtension();
+        //     $check = in_array($extension, $allowedfileExtension);
+        //     if ($check) {
+        //         $filename = 'main_' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '.' . $extension;
+        //         $file->move('uploads/images_room/', $filename);
+        //         $room->image = 'uploads/images_room/' . $filename;
+        //     }else{
+        //         Alert::error('Error', 'Allowed types: jpg, jpeg, png');
+        //         return redirect()->back(); 
+        //     }
+        // }
 
         // รูปภาพห้อง
         if ($request->hasFile('filUpload')) {
