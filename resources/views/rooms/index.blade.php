@@ -510,6 +510,44 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div id="imagePreview13">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview14">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview15">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview16">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div id="imagePreview17">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview18">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview19">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div id="imagePreview20">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -671,11 +709,9 @@
                         <div class="col-md-4">
                             <td>
                                 <div class="col-sm-4 offset-4">
-
                                     <button type="submit" class="btn btn-success"><i
                                         class="fa-solid fa-arrow-up-from-bracket"></i> เพิ่มข้อมูลห้อง</button>
                                 </div>
-
                             </td>
                         </div>
                         <div class="col-md-4"></div>

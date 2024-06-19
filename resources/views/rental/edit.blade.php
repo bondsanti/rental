@@ -53,7 +53,6 @@
                         <div class="card">
                             <div class="card-header card-outline card-info">
                                 <h3 class="card-title">รายละเอียดห้อง</h3>
-
                             </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -126,15 +125,26 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>อัปโหลดไฟล์บัตรประชาชน</label>
-                                                <input class="form-control" name="filUploadPersonID" type="file" 
+                                                @if ($item->file_id_path)
+                                                    <div class="form-control">
+                                                        <input  name="filUploadPersonID" type="file" 
+                                                    placeholder="อัปโหลดไฟล์บัตรประชาชน" style="width:190px;">
+                                                        <button type="button" class="btn btn-sm bg-gradient-info view-personID" data-src="{{ $item->file_id_path }}" title="ดูข้อมูล" style="margin-top: -10px;">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <input class="form-control" name="filUploadPersonID" type="file" 
                                                     placeholder="อัปโหลดไฟล์บัตรประชาชน">
+                                                @endif
+                                                
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="text-danger">เลขที่สัญญา <u>*เจ้าของห้อง</u></label>
+                                                <label>เลขที่สัญญา <u class="text-danger">*เจ้าของห้อง</u></label>
                                                 <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_owner ?? '' }}</p>
                                                     
                                             </div>
@@ -143,7 +153,7 @@
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="text-danger">เลขที่สัญญา <u>*แต่งตั้งตัวแทน</u></font></label>
+                                                <label>เลขที่สัญญา <u class="text-danger">*แต่งตั้งตัวแทน</u></label>
                                                 <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_agent ?? '' }}</p>
                                             </div>
                                         </div>
@@ -155,8 +165,19 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>file สัญญา</label>
-                                                <input class="form-control" name="filUploadContract" type="file"
+                                                @if ($item->file_rent)
+                                                    <div class="form-control">
+                                                        <input name="filUploadContract" type="file"
+                                                        placeholder="file สัญญา" style="width: 190px">
+                                                        <button type="button" class="btn btn-sm bg-gradient-info view-fileRent" data-src="{{ $item->file_rent }}" title="ดูข้อมูล" style="margin-top:-10px;">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <input class="form-control" name="filUploadContract" type="file"
                                                     placeholder="file สัญญา">
+                                                @endif
+                                                
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -298,7 +319,7 @@
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="text-danger"><b >*</b> เลขที่ห้อง</label>
+                                                <label><b class="text-danger">*</b> เลขที่ห้อง</label>
                                                 <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->room_no ?? old('RoomNo') ?? '' }}"
                                                     placeholder="เลขที่ห้อง">
                                                 @error('RoomNo')
@@ -506,16 +527,19 @@
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>วันที่รับค่าเช่างวดแรก</label>
-                                                <input class="form-control datepicker" name="date_firstget" id="date_firstget" value="{{ $item->date_firstget ?? old('date_firstget') ?? '' }}"
+                                                <label><span class="text-danger">*</span> วันที่รับค่าเช่างวดแรก</label>
+                                                <input class="form-control datepicker @error('date_firstget') is-invalid @enderror" name="date_firstget" id="date_firstget" value="{{ $item->date_firstget ?? old('date_firstget') ?? '' }}"
                                                     placeholder="วันที่รับค่าเช่างวดแรก">
+                                                @error('date_firstget')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="text-danger">วันที่ *<u>ทำสัญญา</u></label>
+                                                <label><span class="text-danger">*</span> วันที่ <u>ทำสัญญา</u></label>
                                                 <input class="form-control datepicker @error('date_print_contract_manual') is-invalid @enderror" name="date_print_contract_manual" id="date_print_contract_manual" value="{{ $item->date_print_contract_manual ?? old('date_print_contract_manual') ?? '' }}"
                                                     placeholder="วันที่ ทำสัญญา">
                                                 @error('date_print_contract_manual')
@@ -780,7 +804,16 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-1">
-                                        @if (!$item->file_id_path_cus)
+                                        
+                                        @if ($item->file_id_path_cus)
+                                            <div class="form-group">
+                                                <label>อัปโหลดไฟล์ </label>
+                                                <input name="file_id_path_cus" type="file" placeholder="อัปโหลดไฟล์" style="width: 82px;">
+                                                <button type="button" class="bg-gradient-info view-IDCard" data-src="{{ $item->file_id_path_cus }}" title="ดูข้อมูล" style="border:none; padding-top:3px; padding-bottom:3px; border-radius:3px;">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        @else
                                             <div class="form-group">
                                                 <label>อัปโหลดไฟล์</label>
                                                 <input class="form-control" name="file_id_path_cus" type="file" 
@@ -791,7 +824,7 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label class="text-danger">เลขที่สัญญา *<u>ผู้เช่า</u></label>
+                                            <label>เลขที่สัญญา <u class="text-danger">*ผู้เช่า</u></label>
                                             <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_cus ?? '' }}</p>
                                         </div>
                                     </div>
@@ -799,7 +832,7 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label class="text-danger">เลขที่สัญญา *<u>ประกันทรัพย์สิน</u></label>
+                                            <label>เลขที่สัญญา <u class="text-danger">*ประกันทรัพย์สิน</u></label>
                                             <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_insurance ?? '' }}</p>
                                         </div>
                                     </div>
@@ -808,7 +841,7 @@
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label class="text-danger">เลขที่สัญญาเก่า *<u>กรณีต่อสัญญา</u></label>
+                                            <label>เลขที่สัญญาเก่า <u class="text-danger">*กรณีต่อสัญญา</u></label>
                                             <input class="form-control text-danger" name="code_contract_old" type="text" value="{{ $item->code_contract_old ?? '' }}"
                                                 placeholder="กรุณากรอกเลขสัญญาเก่า">
                                         </div>
@@ -1087,7 +1120,17 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>หนังสือสัญญา</label>
-                                            <input class="form-control" name="file_contract_path" type="file" >
+                                            
+                                            @if ($item->file_contract_path)
+                                                <div class="form-control">
+                                                    <input name="file_contract_path" type="file" style="width: 190px;">
+                                                    <button type="button" class="btn btn-sm bg-gradient-info view-fileContract" data-src="{{ $item->file_contract_path }}" title="ดูข้อมูล" style="margin-top: -10px;">
+                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <input class="form-control" name="file_contract_path" type="file" >
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-sm-1"></div>
@@ -1119,13 +1162,16 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label>สถานะเช่า</label>
-                                                <select class="form-control" name="Contract_Status" id="ddl">
+                                                <select class="form-control @error('Contract_Status') is-invalid @enderror" name="Contract_Status" id="ddl">
                                                     <option value="">-- เลือก --</option>
                                                     <option value="เช่าอยู่" {{ $item->Contract_Status === 'เช่าอยู่' ? 'selected' : ''}}>เช่าอยู่</option>
                                                     <option value="ต่อสัญญา" {{ $item->Contract_Status === 'ต่อสัญญา' ? 'selected' : ''}}>ต่อสัญญา</option>
                                                     <option value="ออก" {{ $item->Contract_Status === 'ออก' ? 'selected' : ''}}>ออก</option>
                                                     <option value="ยกเลิกสัญญา" {{ $item->Contract_Status === 'ยกเลิกสัญญา' ? 'selected' : ''}}>ยกเลิกสัญญา</option>
                                                 </select>
+                                                @error('Contract_Status')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
                                                 <small class="form-text text-danger" data-toggle="tooltip" data-placement="bottom" title="ออก = ลูกค้าออกตามสัญญา
                                                 ยกเลิกสัญญา = ลูกค้าออกก่อนสัญญาที่ระบุไว้">*สถานะ</small>
                                         </div>
@@ -1166,25 +1212,16 @@
                                     <div class="col-sm-1"></div>
 
                                 </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label style="margin-left: 20px;">รูปภาพปก</label>
-                                            @if ($item->image)
-                                                <div class="mt-3"><img src="{{ asset($item->image) }}" height="160" style="border-radius: 10%; margin-top: 5px;"/></div>
-                                            @else
-                                                <img src="{{ url('uploads/noimage.jpg') }}" class="size-image" style="border-radius: 10px;">
-                                            @endif
-                                        </div>
-                                    </div>
-                                    {{-- <div class="col-sm-1"></div> --}}
+                                
+                            </div>
+                        </div>
 
-                                    <div class="col-sm-1">
-                                        <div class="form-group">
-                                            <label style="margin-left: 160px; width: 100%">รูปภาพห้อง</label>
-                                        </div>
-                                    </div>
+                        <div class="card">
+                            <div class="card-header card-outline card-info">
+                                <h3 class="card-title">รูปภาพห้อง</h3>
+                            </div>
+                            <div class="card-body" style="margin-top: -40px;">
+                                <div class="row">
                                     @forelse ($images as $image)
                                         <div class="col-sm-1">
                                             <div class="form-group">
@@ -1217,31 +1254,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-sm-3">
-                                        <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                    alt="" id="img-cover" style="border-radius: 10px;">
                                         <div class="form-group">
-                                            <br>
-                                            <label for="exampleInputFile">รูปภาพปก</label>
-                                            <div class="input-group">
-                                                <div class="custom-file">
-                                                    <input type="file" class="custom-file-input"
-                                                        onchange="previewImage(event)" accept="image/jpeg, image/jpg, image/png"
-                                                        id="filUploadMain" name="filUploadMain">
-                                                    <label class="custom-file-label"
-                                                        for="exampleInputFile"></label>
-                                                </div>
-    
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <div id="imagePreview1">
-                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                    alt="" id="room1" style="border-radius: 10px;">
-                                        </div>
-                                        <div class="form-group">
-                                            <br>
                                             <label for="exampleInputFile">รูปภาพห้อง</label>
                                             <div class="input-group">
                                                 <div class="custom-file">
@@ -1250,62 +1263,206 @@
                                                     <label class="custom-file-label"
                                                         for="exampleInputFile"></label>
                                                 </div>
-    
                                             </div>
-                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div  class="row">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview1"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview2">
-                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                    alt="" id="room2" style="border-radius: 10px;">
-                                        </div>
+                                        <div id="imagePreview2"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview3">
-                                            <img src="{{ url('uploads/noimage.jpg') }}" class="size-image"
-                                                                    alt="" id="room3" style="border-radius: 10px;">
-                                        </div>
+                                        <div id="imagePreview3"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview4"></div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <div id="imagePreview4">
-                                        </div>
+                                        <div id="imagePreview5"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview5">
-                                        </div>
+                                        <div id="imagePreview6"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview6">
-                                        </div>
+                                        <div id="imagePreview7"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview7">
-                                        </div>
+                                        <div id="imagePreview8"></div>
                                     </div>
                                 </div>
     
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <div id="imagePreview4">
-                                        </div>
+                                        <div id="imagePreview9"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview5">
-                                        </div>
+                                        <div id="imagePreview10"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview6">
-                                        </div>
+                                        <div id="imagePreview11"></div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <div id="imagePreview7">
-                                        </div>
+                                        <div id="imagePreview12"></div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview13"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview14"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview15"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview16"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview17"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview18"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview19"></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div id="imagePreview20"></div>
+                                    </div>
+                                </div>
+
+                                
+
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4">
+                                <td>
+                                    <div class="col-sm-4 offset-4">
+                                        <button class="btn bg-gradient-success " type="submit"><i
+                                            class="fa-solid fa-arrow-up-from-bracket"></i> อัพเดทข้อมูล</button>
+                                    </div>
+                                </td>
+                            </div>
+                            <div class="col-md-4"></div>
+                        </div>
+
+                        <div class="modal fade" id="modal-view-personID">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">รูปบัตรประชาชน</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSlip">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="box-body text-center">
+                                            {{-- <img id="personID" src="" alt="personID" class="img-fluid rounded">  --}}
+                                            <iframe id="personID" src="" width="100%" height="600px">  
+                                            </iframe>
+                                        </div>
+                
+                                    </div>
+                                    <div class="modal-footer justify-contentend">
+                                        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeSlip">
+                                            <i class="fa fa-times"></i> ปิดหน้าต่าง</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+
+                        <div class="modal fade" id="modal-view-fileRent">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">รูปไฟล์สัญญา</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSlip">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="box-body text-center">
+                                            {{-- <img id="fileRent" src="" alt="fileRent" class="img-fluid rounded">  --}}
+                                            <iframe id="fileRent" src="" width="100%" height="600px">  
+                                            </iframe>
+                                        </div>
+                
+                                    </div>
+                                    <div class="modal-footer justify-contentend">
+                                        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeSlip">
+                                            <i class="fa fa-times"></i> ปิดหน้าต่าง</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+
+                        <div class="modal fade" id="modal-view-IDCard">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">รูปบัตรประชาชนลูกค้า</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSlip">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="box-body text-center">
+                                            <iframe id="IDCard" src="" width="100%" height="600px">  
+                                            </iframe>
+                                        </div>
+                
+                                    </div>
+                                    <div class="modal-footer justify-contentend">
+                                        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeSlip">
+                                            <i class="fa fa-times"></i> ปิดหน้าต่าง</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+
+                        <div class="modal fade" id="modal-view-fileContract">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">ไฟล์หนังสือสัญญา</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSlip">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="box-body text-center">
+                                            <iframe id="fileContract" src="" width="100%" height="600px">
+                                            </iframe>
+                                        </div>
+                
+                                    </div>
+                                    <div class="modal-footer justify-contentend">
+                                        <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="closeSlip">
+                                            <i class="fa fa-times"></i> ปิดหน้าต่าง</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
@@ -1380,6 +1537,42 @@
                     });
                 }
             });
+
+        });
+
+        //View modal personID
+        $('body').on('click', '.view-personID', function() {
+            const src = $(this).data('src');
+            console.log(src);
+            $('#personID').attr('src', '{{ asset("uploads/image_id/") }}' + '/' + src);
+            $('#modal-view-personID').modal('show');
+
+        });
+
+        //View modal fileRent
+        $('body').on('click', '.view-fileRent', function() {
+            const src = $(this).data('src');
+            console.log(src);
+            $('#fileRent').attr('src', '{{ asset("uploads/image_rent/") }}' + '/' + src);
+            $('#modal-view-fileRent').modal('show');
+
+        });
+
+        //View modal IDCard customer
+        $('body').on('click', '.view-IDCard', function() {
+            const src = $(this).data('src');
+            console.log(src);
+            $('#IDCard').attr('src', '{{ asset("/") }}' + src);
+            $('#modal-view-IDCard').modal('show');
+
+        });
+
+        //View modal fileContract
+        $('body').on('click', '.view-fileContract', function() {
+            const src = $(this).data('src');
+            console.log(src);
+            $('#fileContract').attr('src', '{{ asset("/") }}' + src);
+            $('#modal-view-fileContract').modal('show');
 
         });
     });

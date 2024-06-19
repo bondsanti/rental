@@ -332,7 +332,7 @@ class RentalController extends Controller
             // $roomNo = $item->RoomNo;
         }
 
-        // dd($Contract_Startdate, $Contract_Enddate);
+        // dd($rents);
         // หาจำนวนวัน
         if ($Contract_Startdate && $Contract_Enddate) {
             $startDate = Carbon::createFromFormat('Y-m-d', $Contract_Startdate);
@@ -463,8 +463,8 @@ class RentalController extends Controller
         if ($request->hasFile('filUpload')) {
             $allowedfileExtension = ['jpg', 'jpeg','png'];
             $files = $request->file('filUpload');
-            $isImage = NULL;
-            $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
+            // $isImage = NULL;
+            // $isImage = Room_Images::where('rid', $request->room_id)->where('img_category', 'เช่าอยู่')->first();
             foreach ($files as $key => $file) {
                 $extension = $file->getClientOriginalExtension();
                 $check = in_array($extension, $allowedfileExtension);
@@ -474,17 +474,23 @@ class RentalController extends Controller
                     $file->move('uploads/images_room', $name);
                     $img_room[$key] = 'uploads/images_room/' . $request->room_id . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
             
-                    if($isImage){
-                        $isImage->img_path = $img_room[$key];
-                        $isImage->img_category = 'เช่าอยู่';
-                        $isImage->save();
-                    }else{
-                        $image = new Room_Images();
-                        $image->rid = $request->room_id;
-                        $image->img_path = $img_room[$key];
-                        $image->img_category = 'เช่าอยู่';
-                        $image->save();
-                    }
+                    // if($isImage){
+                    //     $isImage->rid = $request->room_id;
+                    //     $isImage->img_path = $img_room[$key];
+                    //     $isImage->img_category = 'เช่าอยู่';
+                    //     $isImage->save();
+                    // }else{
+                    //     $image = new Room_Images();
+                    //     $image->rid = $request->room_id;
+                    //     $image->img_path = $img_room[$key];
+                    //     $image->img_category = 'เช่าอยู่';
+                    //     $image->save();
+                    // }
+                    $image = new Room_Images();
+                    $image->rid = $request->room_id;
+                    $image->img_path = $img_room[$key];
+                    $image->img_category = 'เช่าอยู่';
+                    $image->save();
                 }
                 else {
                     Alert::error('Error', 'Allowed types: jpg, jpeg, png');
@@ -642,8 +648,13 @@ class RentalController extends Controller
                 $newContract->Contract_Reason = $request->Contract_Reason ?? NULL;
                 $newContract->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
                 $newContract->cust_remark = $request->cust_remark;
-                $newContract->file_id_path_cus = $file_id_path_cus ?? NULL;
-                $newContract->file_contract_path = $file_contract_path ?? NULL;
+                if ($request->hasFile('file_id_path_cus')) {
+                    $newContract->file_id_path_cus = $file_id_path_cus ?? NULL;
+                }
+                if ($request->hasFile('file_contract_path')) {
+                    $newContract->file_contract_path = $file_contract_path ?? NULL;
+                }
+                
                 $newContract->save();
 
                 // 3. insert new payment
@@ -1242,8 +1253,12 @@ class RentalController extends Controller
                 $rental_customer->Contract_Reason = $request->Contract_Reason ?? NULL;
                 $rental_customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
                 $rental_customer->cust_remark = $request->cust_remark;
-                $rental_customer->file_id_path_cus = $file_id_path_cus ?? NULL;
-                $rental_customer->file_contract_path = $file_contract_path ?? NULL;
+                if ($request->hasFile('file_id_path_cus')) {
+                    $rental_customer->file_id_path_cus = $file_id_path_cus ?? NULL;
+                }
+                if ($request->hasFile('file_contract_path')) {
+                    $rental_customer->file_contract_path = $file_contract_path ?? NULL;
+                }
                 $rental_customer->save();
             }
             
@@ -1287,8 +1302,12 @@ class RentalController extends Controller
             $customer->Contract_Reason = $request->Contract_Reason ?? NULL;
             $customer->date_print_contract_cus_manual = $request->date_print_contract_manual ?? NULL;
             $customer->cust_remark = $request->cust_remark ?? NULL;
-            $customer->file_id_path_cus = $file_id_path_cus ?? NULL;
-            $customer->file_contract_path = $file_contract_path ?? NULL;
+            if ($request->hasFile('file_id_path_cus')) {
+                $customer->file_id_path_cus = $file_id_path_cus ?? NULL;
+            }
+            if ($request->hasFile('file_contract_path')) {
+                $customer->file_contract_path = $file_contract_path ?? NULL;
+            }
             $customer->save();
         }
 

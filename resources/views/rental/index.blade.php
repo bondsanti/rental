@@ -9,7 +9,12 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">ห้องเช่า</h1>
-                </div><!-- /.col -->
+                </div>
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-1">
+                    <a href="{{ route('room') }}" type="button" class="btn bg-gradient-primary"><i class="fa fa-plus"></i> เพิ่มห้องเช่า</a>
+                </div>
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>

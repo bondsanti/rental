@@ -34,6 +34,7 @@ class UpdateRentalRequest extends FormRequest
             'ownerphone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'RoomNo' => 'required',
             'date_print_contract_manual' => 'required',
+            'date_firstget' => 'required',
             'Cus_Name' => 'required',
             'IDCard' => 'required',
             'cus_homeAddress' => 'required',
@@ -46,6 +47,7 @@ class UpdateRentalRequest extends FormRequest
             'Contract_Enddate' => 'required',
             'Contract' => 'required|numeric|gt:0',
             'start_paid_date' => 'required|date',
+            'Contract_Status' => 'required',
         ];
     }
 
@@ -62,6 +64,7 @@ class UpdateRentalRequest extends FormRequest
             'RoomNo.required' => 'กรุณากรอกเลขที่ห้อง',
             'ownerphone.required' => 'กรุณากรอกหมายเลขโทรศัพท์',
             'date_print_contract_manual.required' => 'กรุณากรอกวันที่ทำสัญญา',
+            'date_firstget.required' => 'กรุณากรอกวันที่รับค่าเช่างวดแรก',
             'Cus_Name.required' => 'กรุณากรอกชื่อลูกค้าเช่าซื้อ',
             'IDCard.required' => 'กรุณากรอกเลขบัตรประชาชนของลูกค้าเช่าซื้อ',
             'cus_homeAddress.required' => 'กรุณากรอกเลขบัตรประชาชนของลูกค้าเช่าซื้อ',
@@ -74,6 +77,7 @@ class UpdateRentalRequest extends FormRequest
             'Contract_Enddate.required' => 'กรุณากรอกวันสิ้นสุดสัญญา',
             'Contract.required' => 'กรุณาระบุจำนวนเดือน',
             'start_paid_date.required' => 'กรุณากรอกวันที่จ่ายงวดแรก',
+            'Contract_Status.required' => 'กรุณาระบุสถานะเช่า',
         ];
     }
 

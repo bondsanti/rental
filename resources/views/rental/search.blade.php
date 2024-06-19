@@ -71,7 +71,12 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">ห้องเช่า</h1>
-                </div><!-- /.col -->
+                </div>
+                <div class="col-sm-5">
+                </div>
+                <div class="col-sm-1">
+                    <a href="{{ route('room') }}" type="button" class="btn bg-gradient-primary"><i class="fa fa-plus"></i> เพิ่มห้องเช่า</a>
+                </div>
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>
@@ -343,7 +348,7 @@
                                                         <i class="fa fa-print"></i>
                                                     </button>
                                                     <a href="{{ url('/rental/rent/' . $item->id) }}"
-                                                        class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
+                                                        class="btn bg-gradient-success btn-sm edit-item  {{ $item->cid ? '' : 'd-none'}} {{ $item->Contract_Status != 'เช่าอยู่' ? 'd-none' : ''}}" data-toggle="tooltip" data-placement="top" title="ค่าเช่า">
                                                         <i class="fa fa-credit-card-alt">
                                                         </i>
                                                     </a>
