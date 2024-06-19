@@ -133,7 +133,7 @@ class RoomController extends Controller
         if ($request->hasFile('filUpload')) {
             $allowedfileExtension = ['jpg', 'jpeg', 'png'];
             $files = $request->file('filUpload');
-            $isImage = Room_Images::where('rid', $lastId)->where('img_category', 'เช่าอยู่')->first();
+            // $isImage = Room_Images::where('rid', $lastId)->where('img_category', 'เช่าอยู่')->first();
             foreach ($files as $key => $file) {
                 $extension = $file->getClientOriginalExtension();
                 $check = in_array($extension, $allowedfileExtension);
@@ -142,17 +142,22 @@ class RoomController extends Controller
                     $name =  $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
                     $file->move('uploads/images_room', $name);
                     $img_room[$key] = 'uploads/images_room/' . $lastId . '_' . $request->project_id . '_' . $request->RoomNo . '_' . $key . '.' . $extension;
-                    if($isImage){
-                        $isImage->img_path = $img_room[$key];
-                        $isImage->img_category = 'เช่าอยู่';
-                        $isImage->save();
-                    }else{
-                        $image = new Room_Images();
-                        $image->rid = $lastId;
-                        $image->img_path = $img_room[$key];
-                        $image->img_category = 'เช่าอยู่';
-                        $image->save();
-                    }
+                    // if($isImage){
+                    //     $isImage->img_path = $img_room[$key];
+                    //     $isImage->img_category = 'เช่าอยู่';
+                    //     $isImage->save();
+                    // }else{
+                    //     $image = new Room_Images();
+                    //     $image->rid = $lastId;
+                    //     $image->img_path = $img_room[$key];
+                    //     $image->img_category = 'เช่าอยู่';
+                    //     $image->save();
+                    // }
+                    $image = new Room_Images();
+                    $image->rid = $lastId;
+                    $image->img_path = $img_room[$key];
+                    $image->img_category = 'เช่าอยู่';
+                    $image->save();
                 }else{
                     Alert::error('Error', 'Allowed types: jpg, jpeg, png');
                     return redirect()->back(); 
