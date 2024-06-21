@@ -28,8 +28,8 @@ class MainController extends Controller
 
         // ดึงปีปัจจุบัน
         $currentYear = Carbon::now()->year;
-        // $startYear = Carbon::now()->format('Y-01-01');
-        // $endYear = Carbon::now()->format('Y-m-d');
+        $now = Carbon::now()->format('Y-m-d');
+        $oneMonthAgoDate = Carbon::now()->subMonth();
 
         $query = Room::select(
             'projects.Project_Name',
@@ -73,6 +73,8 @@ class MainController extends Controller
             // ->whereBetween('customers.Contract_Startdate', [$startYear , $endYear]);
             // ->whereBetween('rooms.date_endrend', [$startYear , $endYear]);
             ->whereYear('rooms.date_endrend', '=', $currentYear);
+            // ->where('customers.Contract_Enddate', '<', $now)
+            // ->where('customers.Contract_Enddate', '>=', $oneMonthAgoDate);
 
         // กรองสถานะ
         if ($status != 'all') {
@@ -87,10 +89,14 @@ class MainController extends Controller
             }
         }else{
             $query->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'");
+            $query->where('customers.Contract_Enddate', '<=', $now)
+            ->where('customers.Contract_Enddate', '>=', $oneMonthAgoDate);
         }
         $rents = $query
             ->orderBy('Project_Name', 'ASC')
             ->get();
+
+        // dd(Carbon::create(2023, 6, 1));
 
         // นับจำนวนห้องในแต่ละสถานะ
         $readyCount = Room::where('Status_Room', 'พร้อมอยู่')
@@ -129,14 +135,31 @@ class MainController extends Controller
             ->whereYear('date_endrend', '=', $currentYear)
             ->count();
         // นับจำนวนห้องทั้งหมด
-        $totalCount = Room::whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
+        // $totalCount = Room::whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
+        //     ->where(function ($query) {
+        //         $query->where('rooms.Trans_Status', '=', '')
+        //             ->orWhereNull('rooms.Trans_Status');
+        //     })
+        //     // ->whereYear('rooms.date_endrend', '=', $currentYear)
+        //     ->where('rooms.date_endrend', '<', $now)
+        //     ->where('rooms.date_endrend', '>=', $oneMonthAgoDate)
+        //     ->count();
+
+        $totalCount = Room::join('projects', 'rooms.pid', '=', 'projects.pid')
+            ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+                OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                $join->on('rooms.pid', '=', 'customers.pid')
+                    ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                    ->on('rooms.id', '=', 'customers.rid');
+            })
             ->where(function ($query) {
                 $query->where('rooms.Trans_Status', '=', '')
                     ->orWhereNull('rooms.Trans_Status');
             })
             ->whereYear('rooms.date_endrend', '=', $currentYear)
+            ->where('customers.Contract_Enddate', '<=', $now)
+            ->where('customers.Contract_Enddate', '>=', $oneMonthAgoDate)
             ->count();
-
 
         return view('main.index', compact(
             'rents',
@@ -150,5 +173,133 @@ class MainController extends Controller
             'alreadyCount',
             'totalCount'
         ));
+    }
+
+    public function compareRentRoom(){
+
+        $startDate = Carbon::create(null, 1, 1); // January 1st of the current year
+        $endDate = Carbon::now();
+        $currentYear = Carbon::now()->year;
+        $months = [];
+        $dataCurrentYear = [];
+        $dataLastYear = [];
+        $i = 1;
+        $lastYear = date('Y') - 1;
+        while ($startDate->lessThanOrEqualTo($endDate)) {
+            $months[] = $startDate->format('F');
+            $startDate->addMonth();
+            $dataCurrentYear[] = Room::whereYear('Create_Date', '=', $currentYear)->whereBetween('Create_Date', [Carbon::create(null, $i, 1),Carbon::create(null, $i, 31)])->count();
+            $dataLastYear[] = Room::whereYear('Create_Date', '=', $lastYear)->whereBetween('Create_Date', [Carbon::create($lastYear, $i, 1),Carbon::create($lastYear, $i, 31)])->count();
+            $i++;
+        }
+
+        $labels = $months;
+        $datasets = [
+            [
+                'label' => 'ปีปัจจุบัน',
+                'backgroundColor' => 'rgba(60,141,188,0.9)',
+                'borderColor' => 'rgba(60,141,188,0.8)',
+                'pointRadius' => false,
+                'pointColor' => '#3b8bba',
+                'pointStrokeColor' => 'rgba(60,141,188,1)',
+                'pointHighlightFill' => '#fff',
+                'pointHighlightStroke' => 'rgba(60,141,188,1)',
+                'data' => $dataCurrentYear,
+            ],
+            [
+                'label' => 'ปีที่แล้ว',
+                'backgroundColor' => 'rgba(210, 214, 222, 1)',
+                'borderColor' => 'rgba(210, 214, 222, 1)',
+                'pointRadius' => false,
+                'pointColor' => 'rgba(210, 214, 222, 1)',
+                'pointStrokeColor' => '#c1c7d1',
+                'pointHighlightFill' => '#fff',
+                'pointHighlightStroke' => 'rgba(220,220,220,1)',
+                'data' => $dataLastYear,
+            ],
+        ];
+
+        $responseData = [
+            'labels' => $labels,
+            'datasets' => $datasets,
+        ];
+
+        return response()->json($responseData);
+    }
+
+    public function getContractRent(){
+        $startDate = Carbon::create(null, 1, 1); // January 1st of the current year
+        $endDate = Carbon::now();
+        $currentYear = Carbon::now()->year;
+        $months = [];
+        $dataContractStartdate = [];
+        $dataContractEnddate = [];
+        $i = 1;
+        while ($startDate->lessThanOrEqualTo($endDate)) {
+            $months[] = $startDate->format('F');
+            $startDate->addMonth();
+            $dataContractStartdate[] = Room::join('projects', 'rooms.pid', '=', 'projects.pid')
+                ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+                    OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                    $join->on('rooms.pid', '=', 'customers.pid')
+                        ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                        ->on('rooms.id', '=', 'customers.rid');
+                })
+                ->where(function ($query) {
+                    $query->where('rooms.Trans_Status', '=', '')
+                        ->orWhereNull('rooms.Trans_Status');
+                })
+                ->whereYear('customers.Contract_Startdate', '=', $currentYear)
+                ->whereBetween('customers.Contract_Startdate', [Carbon::create(null, $i, 1) , Carbon::create(null, $i, 31)])->count();
+
+            $dataContractEnddate[] = Room::join('projects', 'rooms.pid', '=', 'projects.pid')
+                ->leftJoin(DB::raw('(SELECT * FROM customers WHERE Contract_Status = "เช่าอยู่"
+                    OR Contract_Status IS NULL OR Contract_Status = "") AS customers'), function ($join) {
+                    $join->on('rooms.pid', '=', 'customers.pid')
+                        ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                        ->on('rooms.id', '=', 'customers.rid');
+                })
+                ->where(function ($query) {
+                    $query->where('rooms.Trans_Status', '=', '')
+                        ->orWhereNull('rooms.Trans_Status');
+                })
+                ->whereYear('customers.Contract_Enddate', '=', $currentYear)
+                ->whereBetween('customers.Contract_Enddate', [Carbon::create(null, $i, 1) , Carbon::create(null, $i, 31)])->count();
+
+            $i++;
+        }
+
+        $labels = $months;
+        $datasets = [
+            [
+                'label' => 'หมดสัญญา',
+                'backgroundColor' => 'rgba(243, 50, 15)',
+                'borderColor' => 'rgba(243, 50, 15)',
+                'pointRadius' => false,
+                'pointColor' => '#3b8bba',
+                'pointStrokeColor' => 'rgba(60,141,188,1)',
+                'pointHighlightFill' => '#fff',
+                'pointHighlightStroke' => 'rgba(60,141,188,1)',
+                'data' => $dataContractEnddate,
+            ],
+            [
+                'label' => 'เริ่มต้นสัญญา',
+                'backgroundColor' => 'rgba(11, 205, 4)',
+                'borderColor' => 'rgba(11, 205, 4)',
+                'pointRadius' => false,
+                'pointColor' => 'rgba(11, 205, 4)',
+                'pointStrokeColor' => '#c1c7d1',
+                'pointHighlightFill' => '#fff',
+                'pointHighlightStroke' => 'rgba(220,220,220,1)',
+                'data' => $dataContractStartdate,
+            ],
+        ];
+
+        $responseData = [
+            'labels' => $labels,
+            'datasets' => $datasets,
+        ];
+
+        return response()->json($responseData);
     }
 }

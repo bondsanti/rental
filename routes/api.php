@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\ReportGuaranteeController;
 use App\Http\Controllers\RoomController;
@@ -44,3 +45,7 @@ Route::post('/user/update/{id}',[UserController::class,'update'])->name('user.up
 Route::delete('/user/destroy/{id}/{user_id}',[UserController::class,'destroy'])->name('user.destroy');
 
 Route::delete('/room/deleteImageRoom/{id}/{rid}',[RoomController::class,'deleteImageRoom'])->name('room.deleteImageRoom');
+
+Route::get('/dashboard/compareRentRoom',[MainController::class,'compareRentRoom'])->name('dashboard.compareRentRoom');
+Route::get('/dashboard/getContractRent',[MainController::class,'getContractRent'])->name('dashboard.getContractRent');
+

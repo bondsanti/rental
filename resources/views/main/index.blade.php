@@ -48,7 +48,7 @@
                                 <div class="small-box bg-gradient-info">
                                     <div class="inner {{ $status != 'ready' && $status != 'not_ready' && $status != 'occupied' && $status != 'already' ? 'shadow p-2 m-2 rounded text-dark text-bold' : ''}}">
                                         <h3>{{ $totalCount }}</h3>
-                                        <p>ห้องทั้งหมด</p>
+                                        <p>ห้องที่หมดสัญญา</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fa-solid fa-city"></i>
@@ -108,7 +108,6 @@
                                 </div>
                             </a>
                         </div>
-
                         <div class="col-sm-1"></div>
                     </div>
                 </div>
@@ -118,19 +117,15 @@
                     <div class="card">
                         <div class="card-header ui-sortable-handle" style="cursor: move;">
                             <h3 class="card-title">
-                                <i class="fas fa-chart-pie mr-1"></i>
-                                ตารางกราฟ
+                                <i class="fa-solid fa-chart-simple"></i>
+                                กราฟแสดงห้องเช่าปีปัจจุบันกับปีที่แล้ว
                             </h3>
                         </div>
                         <div class="card-body">
                             <div class="tab-content p-0">
-                                <!-- Morris chart - Sales -->
                                 <div class="chart tab-pane active" id="revenue-chart"
                                     style="position: relative; height: 300px;">
                                     <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
-                                </div>
-                                <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                                    <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -141,15 +136,14 @@
                         <div class="card-header ui-sortable-handle" style="cursor: move;">
                             <h3 class="card-title">
                                 <i class="fa-solid fa-chart-simple"></i>
-                                ตารางกราฟ
+                                กราฟแสดงห้องเช่าที่หมดสัญญากับห้องเช่าที่เริ่มต้นสัญญา
                             </h3>
                         </div>
                         <div class="card-body">
                             <div class="tab-content p-0">
-                                <!-- Morris chart - Sales -->
                                 <div class="chart tab-pane active" style="position: relative; height: 300px;">
                                     <canvas id="barChart"
-                                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 688px;"
+                                        style="height: 300px;; max-width: 100%; display: block; width: 688px;"
                                         width="1376" height="500" class="chartjs-render-monitor"></canvas>
                                 </div>
                             </div>
@@ -157,7 +151,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -480,117 +473,115 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             // Revenue Chart
             var ctxRevenue = document.getElementById('revenue-chart-canvas').getContext('2d');
-            var revenueChart = new Chart(ctxRevenue, {
-                type: 'line', // กำหนดประเภทของกราฟ
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'Revenue',
-                        backgroundColor: 'rgba(60,141,188,0.9)',
-                        borderColor: 'rgba(60,141,188,0.8)',
-                        pointRadius: false,
-                        pointColor: '#3b8bba',
-                        pointStrokeColor: 'rgba(60,141,188,1)',
-                        pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(60,141,188,1)',
-                        data: [28, 48, 40, 19, 86, 27, 90]
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [{
-                            gridLines: {
-                                display: false,
+            
+            fetch('../api/dashboard/compareRentRoom')
+                .then(response => response.json())
+                .then(data => {
+                    let newData = data.datasets;
+                    // Creating a bar chart
+                    // console.log(newData);
+                    var barChart = new Chart(ctxRevenue, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label               : newData[0].label,
+                                    backgroundColor     : 'rgba(60,141,188,0.9)',
+                                    borderColor         : 'rgba(60,141,188,0.8)',
+                                    pointRadius          : false,
+                                    pointColor          : '#3b8bba',
+                                    pointStrokeColor    : 'rgba(60,141,188,1)',
+                                    pointHighlightFill  : '#fff',
+                                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                                    data                : newData[0].data
+                                },
+                                {
+                                    label               : newData[1].label,
+                                    backgroundColor     : 'rgba(210, 214, 222, 1)',
+                                    borderColor         : 'rgba(210, 214, 222, 1)',
+                                    pointRadius         : false,
+                                    pointColor          : 'rgba(210, 214, 222, 1)',
+                                    pointStrokeColor    : '#c1c7d1',
+                                    pointHighlightFill  : '#fff',
+                                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                                    data                : newData[1].data
+                                },  
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            responsive: true,
+                            scales: {
+                                xAxes: [{
+                                    gridLines: {
+                                        display: false,
+                                    }
+                                }],
+                                yAxes: [{
+                                    gridLines: {
+                                        display: false,
+                                    }
+                                }]
                             }
-                        }],
-                        yAxes: [{
-                            gridLines: {
-                                display: false,
-                            }
-                        }]
-                    }
-                }
-            });
-
-            // Sales Chart
-            var ctxSales = document.getElementById('sales-chart-canvas').getContext('2d');
-            var salesChart = new Chart(ctxSales, {
-                type: 'bar', // กำหนดประเภทของกราฟ
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'Sales',
-                        backgroundColor: 'rgba(210, 214, 222, 1)',
-                        borderColor: 'rgba(210, 214, 222, 1)',
-                        pointRadius: false,
-                        pointColor: 'rgba(210, 214, 222, 1)',
-                        pointStrokeColor: '#c1c7d1',
-                        pointHighlightFill: '#fff',
-                        pointHighlightStroke: 'rgba(220,220,220,1)',
-                        data: [65, 59, 80, 81, 56, 55, 40]
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [{
-                            gridLines: {
-                                display: false,
-                            }
-                        }],
-                        yAxes: [{
-                            gridLines: {
-                                display: false,
-                            }
-                        }]
-                    }
-                }
-            });
+                        }
+                    });
+                })
         });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             // Getting the context of the canvas
             var ctx = document.getElementById('barChart').getContext('2d');
-
-            // Creating a bar chart
-            var barChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'Sales',
-                        backgroundColor: 'rgba(60,141,188,0.9)',
-                        borderColor: 'rgba(60,141,188,0.8)',
-                        data: [65, 59, 80, 81, 56, 55, 40]
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    scales: {
-                        xAxes: [{
-                            gridLines: {
-                                display: false,
+            fetch('../api/dashboard/getContractRent')
+                .then(response => response.json())
+                .then(data => {
+                    let newData = data.datasets;
+                    // console.log(newData);
+                    // Creating a bar chart
+                    var barChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label               : newData[0].label,
+                                    backgroundColor     : 'rgba(243, 50, 15)',
+                                    borderColor         : 'rgba(243, 50, 15)',
+                                    pointRadius          : false,
+                                    pointColor          : '#3b8bba',
+                                    pointStrokeColor    : 'rgba(60,141,188,1)',
+                                    pointHighlightFill  : '#fff',
+                                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                                    data                : newData[0].data
+                                },
+                                {
+                                    label               : newData[1].label,
+                                    backgroundColor     : 'rgba(11, 205, 4)',
+                                    borderColor         : 'rgba(11, 205, 4)',
+                                    pointRadius         : false,
+                                    pointColor          : 'rgba(210, 214, 222, 1)',
+                                    pointStrokeColor    : '#c1c7d1',
+                                    pointHighlightFill  : '#fff',
+                                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                                    data                : newData[1].data
+                                },  
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            responsive: true,
+                            scales: {
+                                xAxes: [{
+                                    stacked: true,
+                                }],
+                                yAxes: [{
+                                    stacked: true
+                                }]
                             }
-                        }],
-                        yAxes: [{
-                            gridLines: {
-                                display: false,
-                            }
-                        }]
-                    }
-                }
-            });
+                        }
+                    });
+                })
         });
     </script>
 @endpush
