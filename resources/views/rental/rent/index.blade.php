@@ -172,21 +172,24 @@
                                                     <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
                                                 @else
                                                     {{-- check role if admin show modal approve --}}
-                                                    {{-- @if ($result->{"status_approve{$i}"}) --}}
-                                                        
-                                                        {{-- modal approve for admin --}}
+                                                    {{-- modal approve for admin --}}
+                                                    @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
                                                         <button type="button" class="btn bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip{$i}"} }}" data-index="{{ $i }}"  title="รออนุมัติ">
                                                             รออนุมัติ 
                                                             @if ($result->Contract < 12)
                                                                 <i class="fa fa-list-alt" aria-hidden="true"></i>
                                                             @endif
                                                         </button>
+                                                    @else
                                                         {{-- check role if not admin show text --}}
-                                                        {{-- <button type="button" class="btn bg-gradient-danger" title="รออนุมัติ">
-                                                            รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                        </button> --}}
-                                                        {{-- <p class="btn btn-danger">รออนุมัติ</p> --}}
-                                                    {{-- @endif --}}
+                                                        <button type="button" class="btn bg-gradient-danger" title="รออนุมัติ">
+                                                            รออนุมัติ 
+                                                            @if ($result->Contract < 12)
+                                                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                            @endif
+                                                        </button>
+                                                    @endif
+                                                        
                                                 @endif
                                             @else
                                                 <input type="file" class="form-control" style="width:120px;" name="slips{{ $i }}">
@@ -207,12 +210,21 @@
                                                 @elseif($result->{"status_approve".(16 + $i)} == 2)
                                                     <input type="file" class="form-control" style="width:120px;" name="slips{{ 16 + $i }}">
                                                 @else
-                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip".(16 + $i)} }}" data-index="{{ 16 + $i }}"  title="รออนุมัติ">
-                                                        รออนุมัติ 
-                                                        @if ($result->Contract < 12)
-                                                            <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                        @endif
-                                                    </button>
+                                                    @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
+                                                        <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $result->{"Due{$i}_Date"} }}" data-src="{{ $result->{"slip".(16 + $i)} }}" data-index="{{ 16 + $i }}"  title="รออนุมัติ">
+                                                            รออนุมัติ 
+                                                            @if ($result->Contract < 12)
+                                                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                            @endif
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="btn btn-sm bg-gradient-danger" title="รออนุมัติ">
+                                                            รออนุมัติ 
+                                                            @if ($result->Contract < 12)
+                                                                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                            @endif
+                                                        </button>
+                                                    @endif  
                                                 @endif
                                             @else
                                                 <input type="file" class="form-control" style="width:120px;" name="slips{{ 16 + $i }}">
@@ -424,8 +436,6 @@
                                         <input type="text" class="form-control" id="monthly" name="monthly"
                                             placeholder="" autocomplete="off" disabled>
 
-                                        {{-- <label for="code" class="col-form-label">รูปสลิป</label> --}}
-                                        {{-- <img src="" class="form-control" id="slip_img" name="slip_img"> --}}
                                         <div class="mt-3">
                                             <p class="text-bold">รูปสลิป <span id="slipName" name="slipName"></span></p>
                                             <img id="slip_img" src="" alt="sliper" class="img-fluid rounded">
@@ -494,8 +504,8 @@
         const id = $(this).data('id');
         const src = $(this).data('src');
         // console.log(id,src);
-        $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
-        // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
+        // $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
+        $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
         $('#modal-view-slip').modal('show');
   
     });
@@ -521,16 +531,15 @@
             name = index > 12 ? 'Express' : 'ค่าเช่า';
         }
         
-        console.log(name);
+        // console.log(name);
         let month_full = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const year = d.getFullYear()+543;;
         const month = month_full[d.getMonth()];
         const monthYear = month + ' ' + year;
-        console.log(monthYear);
-        console.log(index);
+        // console.log(monthYear);
+        // console.log(index);
         $('#modal-status-approve').modal('show');
         $.get('../../api/rental/rent/preapprove/' + id, function(data) {
-            // console.log('payment id = ',data.payment_id);
             // console.log(data.room_id);
              
             $('#payment_id').val(data.payment_id);
@@ -611,26 +620,14 @@
 
                 });
             
-            console.log(formData);
+            // console.log(formData);
         }
         
-
-        
-        // const id = $(this).data('id');
-        // const src = $(this).data('src');
-        // console.log(id,src);
-        // $('#slip').attr('src', '{{ asset('uploads/images_room/autumn-4581105_640.jpg') }}');
-        // $('#slip').attr('src', '{{ asset("uploads/image_slip/") }}' + '/' + src);
-        // $('#modal-view-slip').modal('show');
-        // $.get('../api/rental/detail/' + id, function(data) {
-        //     console.log(data);
-        // });
     });
     function goBack() {
         window.history.back();
     }
 
-    //update
    
 </script>
 @endpush

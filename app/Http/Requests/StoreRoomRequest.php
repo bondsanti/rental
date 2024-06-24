@@ -25,7 +25,6 @@ class StoreRoomRequest extends FormRequest
     {
         return [
             'project_id' => 'required|string',
-            // 'numberhome' => 'required|string',
             'HomeNo' => 'required',
             'onwername' => 'required|string',
             'cardowner' => 'required|string',
@@ -45,8 +44,8 @@ class StoreRoomRequest extends FormRequest
             'HomeNo.required' => 'กรุณากรอกบ้านเลขที่',
             'onwername.required' => 'กรุณากรอกชื่อเจ้าของห้อง',
             'cardowner.required' => 'กรุณากรอกเลขบัตรประชาชน',
-            'owner_district.required' => 'กรุณากรอกแขวง/ตำบล',
-            'owner_khet.required' => 'กรุณากรอกเขต/อำเภอ',
+            'owner_district.required' => 'กรุณาเลือกแขวง/ตำบล',
+            'owner_khet.required' => 'กรุณาเลือกเขต/อำเภอ',
             'owner_province.required' => 'กรุณาเลือกจังหวัด',
             'RoomNo.required' => 'กรุณากรอกห้องเลขที่',
             'ownerphone.required' => 'กรุณากรอกหมายเลขโทรศัพท์',

@@ -175,7 +175,7 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ห้องเลขที่</label>
-                                                <input class="form-control" name="RoomNo" type="text" value=""
+                                                <input class="form-control" name="RoomNo" id="RoomNo" type="text" value=""
                                                     placeholder="ห้องเลขที่" autocomplete="off">
                                         </div>
                                     </div>
@@ -183,14 +183,14 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>บ้านเลขที่</label>
-                                                <input class="form-control" name="HomeNo" type="text" value=""
+                                                <input class="form-control" name="HomeNo" id="HomeNo" type="text" value=""
                                                     placeholder="บ้านเลขที่" autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ชื่อลูกค้า</label>
-                                                <input class="form-control" name="Owner" type="text" value=""
+                                                <input class="form-control" name="Owner" id="Owner" type="text" value=""
                                                     placeholder="ชื่อลูกค้า" autocomplete="off">
                                         </div>
                                     </div>
@@ -198,14 +198,14 @@
                                     <div class="col-sm-3">
                                         <div class="form-group">
                                             <label>ชื่อคนเช่า</label>
-                                                <input class="form-control" name="Cusmoter" type="text" value=""
+                                                <input class="form-control" name="Cusmoter" id="Cusmoter" type="text" value=""
                                                     placeholder="ชื่อคนเช่า" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="box-footer text-center">
-                                    <button type="submit" class="btn bg-gradient-success"><i
+                                    <button type="submit" class="btn bg-gradient-success btn-search"><i
                                             class="fa fa-search"></i>
                                         ค้นหา</button>
                                     <a href="{{ route('rental') }}" type="button"
@@ -1086,7 +1086,32 @@
                 $('#createForm').trigger("reset");
                 $('#modal-print').modal('hide');
             });
+
+            // $('body').on('click', '.btn-search', function(event) {
+            //     // event.preventDefault();
+
+            //     let formInputs = @json($formInputs);
+                
+            //     // Including CSRF token in form inputs for security
+            //     formInputs._token = $('meta[name="csrf-token"]').attr('content');
+                
+            //     $.ajax({
+            //         url: '../api/search-rental',
+            //         type: 'POST',
+            //         data: formInputs,
+            //         dataType: 'json',
+            //         success: function(data) {
+            //             console.log(data);
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error("Request failed: " + status + ", " + error);
+            //         }
+            //     });
+            // })
+
+          
         });
+
 
         //View modal
         $('body').on('click', '.view-item', function() {
@@ -1238,6 +1263,37 @@
             });
         }
         
+    </script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.btn-search').addEventListener('click', async function(event) {
+                // event.preventDefault();
+
+                let formInputs = @json($formInputs);
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                try {
+                    const response = await fetch('{{ route('searchRental') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(formInputs)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+                } catch (error) {
+                    console.error("Request failed:", error);
+                }
+            });
+        });
     </script>
     <!-- Return Form-->
     @if (isset($formInputs))

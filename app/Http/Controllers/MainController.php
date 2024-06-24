@@ -96,8 +96,8 @@ class MainController extends Controller
             ->orderBy('Project_Name', 'ASC')
             ->get();
 
-        // dd(Carbon::create(2023, 6, 1));
-
+        // dd(Carbon::create(null, 6, 1));
+            
         // นับจำนวนห้องในแต่ละสถานะ
         $readyCount = Room::where('Status_Room', 'พร้อมอยู่')
             ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")
@@ -188,8 +188,32 @@ class MainController extends Controller
         while ($startDate->lessThanOrEqualTo($endDate)) {
             $months[] = $startDate->format('F');
             $startDate->addMonth();
-            $dataCurrentYear[] = Room::whereYear('Create_Date', '=', $currentYear)->whereBetween('Create_Date', [Carbon::create(null, $i, 1),Carbon::create(null, $i, 31)])->count();
-            $dataLastYear[] = Room::whereYear('Create_Date', '=', $lastYear)->whereBetween('Create_Date', [Carbon::create($lastYear, $i, 1),Carbon::create($lastYear, $i, 31)])->count();
+            $dataCurrentYear[] = Room::join('projects', 'rooms.pid', '=', 'projects.pid')
+                ->leftJoin(DB::raw('(SELECT * FROM customers) AS customers'), function ($join) {
+                    $join->on('rooms.pid', '=', 'customers.pid')
+                        ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                        ->on('rooms.id', '=', 'customers.rid');
+                })
+                // ->where(function ($query) {
+                //     $query->where('rooms.Trans_Status', '=', '')
+                //         ->orWhereNull('rooms.Trans_Status');
+                // })
+                ->whereYear('customers.Contract_Startdate', '=', $currentYear)
+                ->whereBetween('customers.Contract_Startdate', [Carbon::create(null, $i, 1) , Carbon::create(null, $i, 31)])->count();
+
+            $dataLastYear[] = Room::join('projects', 'rooms.pid', '=', 'projects.pid')
+                ->leftJoin(DB::raw('(SELECT * FROM customers) AS customers'), function ($join) {
+                    $join->on('rooms.pid', '=', 'customers.pid')
+                        ->on('rooms.RoomNo', '=', 'customers.RoomNo')
+                        ->on('rooms.id', '=', 'customers.rid');
+                })
+                // ->where(function ($query) {
+                //     $query->where('rooms.Trans_Status', '=', '')
+                //         ->orWhereNull('rooms.Trans_Status');
+                // })
+                ->whereYear('customers.Contract_Startdate', '=', $lastYear)
+                ->whereBetween('customers.Contract_Startdate', [Carbon::create($lastYear, $i, 1) , Carbon::create($lastYear, $i, 31)])->count();
+
             $i++;
         }
 

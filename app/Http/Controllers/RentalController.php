@@ -30,6 +30,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class RentalController extends Controller
@@ -63,6 +64,15 @@ class RentalController extends Controller
         $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
+        // $formInputs = $request->all();
+        // $response = Http::post('http://127.0.0.1:8000/api/search-rental', $formInputs);
+        // if ($response->successful()) {
+        //     dd(response()->json($response->json()));
+        //     return response()->json($response->json());
+        // } else {
+        //     return response()->json(['error' => 'Failed to fetch data'], $response->status());
+        // }
+        // dd($response);
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();

@@ -1,19 +1,9 @@
 
 @extends('layouts.app')
 
-@section('title', 'ค่าเช่า')
+@section('title', 'ประวัติการเช่า')
 
 @section('content')
-<form method="post" action="{{ route('rental.recordRent') }}" enctype="multipart/form-data">
-    @csrf
-    {{-- <input type="hidden" name="payment_id" value="{{ $result->payment_id }}">
-    <input type="hidden" name="project_id" value="{{ $result->project_id }}">
-    <input type="hidden" name="customer_id" value="{{ $result->customer_id }}">
-    <input type="hidden" name="room_id" value="{{ $result->room_id }}">
-    <input type="hidden" name="projectName" value="{{ $result->Project_Name }}">
-    <input type="hidden" name="roomNo" value="{{ $result->RoomNo }}">
-    <input type="hidden" name="owner" value="{{ $result->Owner }}"> --}}
-    
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
@@ -86,7 +76,6 @@
                             $sum = 0; 
                             $index = 0;
                         @endphp 
-                        {{-- @while ($count > 0) --}}
                             @foreach ($history as $key => $item)
                                 <table class="table table-bordered table-hover">
                                     <thead class="thead-dark">
@@ -382,8 +371,6 @@
             <!-- /.modal-dialog -->
         </div>
     </div>
-</form>
-
 @endsection
 
 @push('script')

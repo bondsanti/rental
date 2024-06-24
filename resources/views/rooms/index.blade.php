@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'โครงการ')
+@section('title', 'เพิ่มห้องเช่า')
 
 @section('content')
 <form id="editForm" name="editForm" method="post" action="{{ route('room.store') }}" enctype="multipart/form-data">
@@ -50,9 +50,9 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label><b class="text-danger">*</b> บัตรประชาชน</label>
+                                            <label><b class="text-danger">*</b> เลขบัตรประชาชน</label>
                                             <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text"
-                                                placeholder="บัตรประชาชน" value="{{ old('cardowner') }}">
+                                                placeholder="เลขบัตรประชาชน" value="{{ old('cardowner') }}">
                                             @error('cardowner')
                                                 <div class="error text-danger">{{ $message }}</div>
                                             @enderror

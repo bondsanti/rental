@@ -57,7 +57,75 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>เจ้าของห้อง</label>
+                                                <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text" value="{{ $item->Owner ?? old('onwername') ?? '' }}"
+                                                    placeholder="เจ้าของห้อง">
+                                                @error('onwername')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
 
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                {{-- <label>เลขที่บ้านเจ้าของห้อง</label>
+                                                <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text" value="{{ $item->numberhome ?? old('numberhome') ?? '' }}"
+                                                    placeholder="ห้องเลขที่">
+                                                @error('numberhome')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror --}}
+                                                <label>เลขบัตรประชาชน</label>
+                                                <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text" value="{{ $item->cardowner ?? old('cardowner') ?? '' }}"
+                                                    placeholder="เลขบัตรประชาชน">
+                                                @error('cardowner')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                {{-- <label>บ้านเลขที่</label>
+                                                <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text" value="{{ $item->HomeNo ?? old('HomeNo') ?? '' }}"
+                                                    placeholder="บ้านเลขที่">
+                                                @error('HomeNo')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror --}}
+                                                <label>อัปโหลดไฟล์บัตรประชาชน</label>
+                                                @if ($item->file_id_path)
+                                                    <div class="form-control">
+                                                        <input  name="filUploadPersonID" type="file" 
+                                                    placeholder="อัปโหลดไฟล์บัตรประชาชน" style="width:180px;">
+                                                        <button type="button" class="btn btn-sm bg-gradient-info view-personID" data-src="{{ $item->file_id_path }}" title="ดูข้อมูล" style="margin-top: -10px;">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <input class="form-control" name="filUploadPersonID" type="file" 
+                                                    placeholder="อัปโหลดไฟล์บัตรประชาชน">
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>เบอร์ติดต่อ</label>
+                                                <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text"
+                                                    placeholder="เบอร์ติดต่อ" value="{{ $item->owner_phone ?? old('ownerphone') ?? '' }}">
+                                                @error('ownerphone')
+                                                    <div class="error text-danger">{{ $message }}</div>
+                                                @enderror    
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>โครงการ</label>
                                                 <select name="project_id" id="project_id" class="form-control">
@@ -74,10 +142,10 @@
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>เลขที่บ้านเจ้าของห้อง</label>
-                                                <input class="form-control @error('numberhome') is-invalid @enderror" name="numberhome" type="text" value="{{ $item->numberhome ?? old('numberhome') ?? '' }}"
+                                                <label>ห้องเลขที่</label>
+                                                <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->room_no ?? old('RoomNo') ?? '' }}"
                                                     placeholder="ห้องเลขที่">
-                                                @error('numberhome')
+                                                @error('RoomNo')
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
@@ -87,97 +155,11 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>บ้านเลขที่</label>
-                                                <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text" value="{{ $item->HomeNo ?? old('HomeNo') ?? '' }}"
-                                                    placeholder="บ้านเลขที่">
+                                                <input class="form-control @error('HomeNo') is-invalid @enderror" name="HomeNo" type="text"
+                                                    placeholder="บ้านเลขที่" value="{{ $item->HomeNo ?? old('HomeNo') ?? '' }}">
                                                 @error('HomeNo')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>เจ้าของห้อง</label>
-                                                <input class="form-control @error('onwername') is-invalid @enderror" name="onwername" type="text" value="{{ $item->Owner ?? old('onwername') ?? '' }}"
-                                                    placeholder="เจ้าของห้อง">
-                                                @error('onwername')
-                                                    <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>บัตรประชาชน</label>
-                                                <input class="form-control @error('cardowner') is-invalid @enderror" name="cardowner" type="text" value="{{ $item->cardowner ?? old('cardowner') ?? '' }}"
-                                                    placeholder="บัตรประชาชน">
-                                                @error('cardowner')
-                                                    <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>อัปโหลดไฟล์บัตรประชาชน</label>
-                                                @if ($item->file_id_path)
-                                                    <div class="form-control">
-                                                        <input  name="filUploadPersonID" type="file" 
-                                                    placeholder="อัปโหลดไฟล์บัตรประชาชน" style="width:190px;">
-                                                        <button type="button" class="btn btn-sm bg-gradient-info view-personID" data-src="{{ $item->file_id_path }}" title="ดูข้อมูล" style="margin-top: -10px;">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </button>
-                                                    </div>
-                                                @else
-                                                    <input class="form-control" name="filUploadPersonID" type="file" 
-                                                    placeholder="อัปโหลดไฟล์บัตรประชาชน">
-                                                @endif
-                                                
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>เลขที่สัญญา <u class="text-danger">*เจ้าของห้อง</u></label>
-                                                <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_owner ?? '' }}</p>
-                                                    
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>เลขที่สัญญา <u class="text-danger">*แต่งตั้งตัวแทน</u></label>
-                                                <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_agent ?? '' }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-                                        
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
-                                                <label>file สัญญา</label>
-                                                @if ($item->file_rent)
-                                                    <div class="form-control">
-                                                        <input name="filUploadContract" type="file"
-                                                        placeholder="file สัญญา" style="width: 190px">
-                                                        <button type="button" class="btn btn-sm bg-gradient-info view-fileRent" data-src="{{ $item->file_rent }}" title="ดูข้อมูล" style="margin-top:-10px;">
-                                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                                        </button>
-                                                    </div>
-                                                @else
-                                                    <input class="form-control" name="filUploadContract" type="file"
-                                                    placeholder="file สัญญา">
-                                                @endif
-                                                
+                                                @enderror   
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -187,10 +169,14 @@
                                                 <label>ซอย</label>
                                                 <input class="form-control" name="owner_soi" type="text" value="{{ $item->owner_soi ??  old('owner_soi') ?? '' }}"
                                                     placeholder="ซอย">
+                                                
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ถนน</label>
@@ -200,7 +186,7 @@
                                         </div>
                                         <div class="col-sm-1"></div>
 
-                                        <div class="col-sm-2">                      
+                                        <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label for="owner_province">จังหวัด</label>
                                                 <select name="owner_province" id="owner_province" class="form-control @error('owner_province') is-invalid @enderror">
@@ -229,9 +215,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label for="owner_khet">เขต/อำเภอ</label>
@@ -259,11 +243,10 @@
                                                     <div class="error text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
-                                            
                                         </div>
                                         <div class="col-sm-1"></div>
 
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-2">                      
                                             <div class="form-group">
                                                 <label for="owner_district">แขวง/ตำบล</label>
                                                 <select name="owner_district" id="owner_district"class="form-control @error('owner_district') is-invalid @enderror">
@@ -292,15 +275,47 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>เลขที่สัญญา <u class="text-danger">*เจ้าของห้อง</u></label>
+                                                <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_owner ?? '' }}</p>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="col-sm-1"></div>
 
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label>เบอร์ติดต่อ</label>
+                                                <label>เลขที่สัญญา <u class="text-danger">*แต่งตั้งตัวแทน</u></label>
+                                                <p class="form-control text-danger">{{ optional($lease_auto_code)->code_contract_agent ?? '' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label>file สัญญา</label>
+                                                @if ($item->file_rent)
+                                                    <div class="form-control">
+                                                        <input name="filUploadContract" type="file"
+                                                        placeholder="file สัญญา" style="width: 180px">
+                                                        <button type="button" class="btn btn-sm bg-gradient-info view-fileRent" data-src="{{ $item->file_rent }}" title="ดูข้อมูล" style="margin-top:-10px;">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                @else
+                                                    <input class="form-control" name="filUploadContract" type="file"
+                                                    placeholder="file สัญญา">
+                                                @endif
+                                                {{-- <label>เบอร์ติดต่อ</label>
                                                 <input class="form-control @error('ownerphone') is-invalid @enderror" name="ownerphone" type="text" value="{{ $item->owner_phone ?? old('ownerphone') ?? '' }}"
                                                     placeholder="เบอร์ติดต่อ">
                                                 @error('ownerphone')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
+                                                @enderror --}}
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -319,18 +334,12 @@
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label><b class="text-danger">*</b> เลขที่ห้อง</label>
+                                                {{-- <label><b class="text-danger">*</b> เลขที่ห้อง</label>
                                                 <input class="form-control @error('RoomNo') is-invalid @enderror" name="RoomNo" type="text" value="{{ $item->room_no ?? old('RoomNo') ?? '' }}"
                                                     placeholder="เลขที่ห้อง">
                                                 @error('RoomNo')
                                                     <div class="error text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1"></div>
-
-                                        <div class="col-sm-2">
-                                            <div class="form-group">
+                                                @enderror --}}
                                                 <label>ประเภทห้อง</label>
                                                 <input class="form-control" name="room_type" type="text" value="{{ $item->RoomType ?? old('room_type') ?? '' }}"
                                                     placeholder="ประเภทห้อง">
@@ -355,10 +364,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>อาคาร</label>
@@ -367,7 +373,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ชั้น</label>
@@ -394,10 +403,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ ระเบียง</label>
@@ -406,7 +412,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>กุญแจ Mail Box</label>
@@ -433,10 +442,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด B</label>
@@ -445,7 +451,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>คีย์การ์ด C</label>
@@ -472,10 +481,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันที่ฝากเช่า</label>
@@ -484,7 +490,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>วันที่สิ้นสุดฝากเช่า</label>
@@ -521,10 +530,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label><span class="text-danger">*</span> วันที่รับค่าเช่างวดแรก</label>
@@ -536,7 +542,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label><span class="text-danger">*</span> วันที่ <u>ทำสัญญา</u></label>
@@ -566,10 +575,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
-                                        
-                                    </div>
 
-                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ประเภทห้องเช่า</label>
@@ -584,7 +590,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
+                                        
+                                    </div>
 
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label>ราคาค่าเช่า</label>
@@ -596,6 +605,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                
                                             </div>
                                         </div>
                                         <div class="col-sm-1"></div>
@@ -1123,7 +1139,7 @@
                                             
                                             @if ($item->file_contract_path)
                                                 <div class="form-control">
-                                                    <input name="file_contract_path" type="file" style="width: 190px;">
+                                                    <input name="file_contract_path" type="file" style="width: 180px;">
                                                     <button type="button" class="btn btn-sm bg-gradient-info view-fileContract" data-src="{{ $item->file_contract_path }}" title="ดูข้อมูล" style="margin-top: -10px;">
                                                         <i class="fa fa-eye" aria-hidden="true"></i>
                                                     </button>

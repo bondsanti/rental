@@ -140,7 +140,7 @@
                                 </div>
 
                                 <div class="box-footer text-center">
-                                    <button type="submit" class="btn bg-gradient-success"><i
+                                    <button type="submit" class="btn bg-gradient-success btn-search"><i
                                             class="fa fa-search"></i>
                                         ค้นหา</button>
                                     <a href="{{ route('rental') }}" type="button"
@@ -181,6 +181,14 @@
             $('#startdate').on('changeDate', function(e) {
                 var selectedStartDate = e.date;
                 $('#enddate').datepicker('setStartDate', selectedStartDate);
+            });
+
+
+            $('body').on('click', '.btn-search', function() {
+
+                $.post('../api/search-rental', function(data) {
+                    console.log(data);
+                });
             });
         });
     </script>

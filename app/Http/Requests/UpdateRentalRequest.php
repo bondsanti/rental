@@ -24,7 +24,6 @@ class UpdateRentalRequest extends FormRequest
     public function rules()
     {
         return [
-            'numberhome' => 'required|string',
             'HomeNo' => 'required',
             'onwername' => 'required|string',
             'cardowner' => 'required|string',
@@ -54,7 +53,6 @@ class UpdateRentalRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'numberhome.required' => 'กรุณากรอกเลขที่บ้านเจ้าของห้อง',
             'HomeNo.required' => 'กรุณากรอกบ้านเลขที่',
             'onwername.required' => 'กรุณากรอกเจ้าของบ้าน',
             'cardowner.required' => 'กรุณากรอกเลขบัตรประชาชน',
@@ -68,8 +66,8 @@ class UpdateRentalRequest extends FormRequest
             'Cus_Name.required' => 'กรุณากรอกชื่อลูกค้าเช่าซื้อ',
             'IDCard.required' => 'กรุณากรอกเลขบัตรประชาชนของลูกค้าเช่าซื้อ',
             'cus_homeAddress.required' => 'กรุณากรอกเลขบัตรประชาชนของลูกค้าเช่าซื้อ',
-            'cus_tumbon.required' => 'กรุณากรอกแขวง/ตำบล',
-            'cus_aumper.required' => 'กรุณากรอกเขต/อำเภอ',
+            'cus_tumbon.required' => 'กรุณาเลือกแขวง/ตำบล',
+            'cus_aumper.required' => 'กรุณาเลือกเขต/อำเภอ',
             'cus_province.required' => 'กรุณาเลือกจังหวัด',
             'cus_idPost.required' => 'กรุณากรอกรหัสไปรษณีย์',
             'cus_phone.required' => 'กรุณากรอกหมายเลขโทรศัพท์ลูกค้าเช่าซื้อ',

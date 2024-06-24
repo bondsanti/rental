@@ -520,7 +520,10 @@
                                 }],
                                 yAxes: [{
                                     gridLines: {
-                                        display: false,
+                                        display: true,
+                                    },
+                                    ticks: {
+                                        beginAtZero: true
                                     }
                                 }]
                             }
