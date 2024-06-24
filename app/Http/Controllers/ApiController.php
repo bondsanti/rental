@@ -160,14 +160,8 @@ class ApiController extends Controller
                 // $rents->where('rooms.Create_Date', '<=', '2024-06-21');
             }
         }
-        // else{
-        //     $rents->where('rooms.Create_Date', '<=', '2024-06-21');
-        // }
-        // elseif ($request->startdate  && $request->enddate) {
-        //     $rents->whereBetween('rooms.Create_Date', [$request->startdate, $request->enddate]);
-        // }
 
-        $rentsCount = $rents->count();
+        // $rentsCount = $rents->count();
 
         $rents = $rents
             ->orderBy('Project_Name', 'asc')
@@ -177,8 +171,9 @@ class ApiController extends Controller
     }
 
 
-    public function exampleUsingApiInController(Request $request){
+    public function exampleGetApiInController(Request $request){
         $formInputs = $request->all();
+        // $response = Http::post('https://example.com/api/search-rental', $formInputs);
         $response = Http::post('http://127.0.0.1:8000/api/search-rental', $formInputs);
         if ($response->successful()) {
             dd(response()->json($response->json()));

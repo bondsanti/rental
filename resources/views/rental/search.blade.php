@@ -523,46 +523,46 @@
                                     <div class="col-md-12">
                                         <div class="card">
                                             <div class="card-header card-outline card-info">
-                                                <h3 class="card-title">ข้อมูลห้อง</h3>
+                                                <h3 class="card-title">ข้อมูลลูกค้าและห้อง</h3>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>ลูกค้า</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerName" id="ownerName">  
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เลขบัตรประชาชน</label>
+                                                            <input type="text" readonly class="form-control" value="" name="cardOwner" id="cardOwner">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
+                                                            <label>เบอร์ติดต่อ</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerPhone" id="ownerPhone">
+                                                        </div>
+                                                    </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
                                                             <label>โครงการ</label>
                                                             <input type="text" readonly class="form-control" value="" name="projectName" id="projectName">
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            <label>เลขที่บ้านเจ้าของห้อง</label>
-                                                            <input type="text" readonly class="form-control" value="" name="numberhome" id="numberhome">
+                                                            <label>เลขที่ห้อง</label>
+                                                            <input type="text" readonly class="form-control" value="" name="roomNo" id="roomNo">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
                                                             <label>บ้านเลขที่</label>
-                                                            <input type="text" readonly class="form-control" value="" name="HomeNo" id="HomeNo">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-3">
-                                                        <div class="form-group">
-                                                            <label>ลูกค้า</label>
-                                                            <input type="text" readonly class="form-control" value="" name="ownerName" id="ownerName">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-sm-3">
-                                                        <div class="form-group">
-                                                            <label>บัตรประชาชน</label>
-                                                            <input type="text" readonly class="form-control" value="" name="cardOwner" id="cardOwner">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-3">
-                                                        <div class="form-group">
-                                                            <label>เลขที่สัญญาเจ้าของ</label>
-                                                            <input type="text" readonly class="form-control" value="" name="ownerContract" id="ownerContract">
+                                                            <input type="text" readonly class="form-control" value="" name="homeNo" id="homeNo">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
@@ -595,8 +595,8 @@
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            <label>เบอร์ติดต่อ</label>
-                                                            <input type="text" readonly class="form-control" value="" name="ownerPhone" id="ownerPhone">
+                                                           <label>เลขที่สัญญาเจ้าของ</label>
+                                                            <input type="text" readonly class="form-control" value="" name="ownerContract" id="ownerContract">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -605,12 +605,6 @@
                                                         <div class="form-group">
                                                             <label>วันรับห้อง</label>
                                                             <input type="text" readonly class="form-control" value="" name="transferDate" id="transferDate">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-3">
-                                                        <div class="form-group">
-                                                            <label>เลขที่ห้อง</label>
-                                                            <input type="text" readonly class="form-control" value="" name="roomNo" id="roomNo">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
@@ -625,15 +619,14 @@
                                                             <input type="text" readonly class="form-control" value="" name="roomSize" id="roomSize">
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
                                                     <div class="col-sm-3">
-
                                                         <div class="form-group">
                                                             <label>ทิศ/ฝั่ง</label>
                                                             <input type="text" readonly class="form-control" value="" name="location" id="location">
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
                                                             <label>อาคาร</label>
@@ -652,15 +645,14 @@
                                                             <input type="text" readonly class="form-control" value="" name="electricContract" id="electricContract">
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
                                                     <div class="col-sm-3">
-
                                                         <div class="form-group">
                                                             <label>ราคาห้องเช่า</label>
                                                             <input type="text" readonly class="form-control" value="" name="roomPrice" id="roomPrice">
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
                                                             <label>วันเริ่มสัญญา</label>
@@ -679,28 +671,29 @@
                                                             <input type="text" readonly class="form-control" value="" name="rentalStatus" id="rentalStatus">
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
                                                     <div class="col-sm-3">
-
                                                         <div class="form-group">
                                                             <label>สถานะห้อง</label>
                                                             <input type="text" readonly class="form-control" value="" name="roomStatus" id="roomStatus">
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-sm-3">
+
                                                         <div class="form-group">
-                                                            {{-- <label>วันเริ่มเช่า</label> --}}
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="form-group">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -709,7 +702,7 @@
 
                                         <div class="card">
                                             <div class="card-header card-outline card-info">
-                                                <h3 class="card-title">ข้อมูลเช่า</h3>
+                                                <h3 class="card-title">ข้อมูลผู้เช่า</h3>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
@@ -773,17 +766,14 @@
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            {{-- <label>วันเริ่มเช่า</label> --}}
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            {{-- <label>วันสิ้นสุดสัญญา</label> --}}
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <div class="form-group">
-                                                            {{-- <label>วันออก</label> --}}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -927,17 +917,13 @@
                                                 </div>
                                             </div>
                                         </div> --}}
-
                                     </div>
                                 </div>
-
-
                             </div>
                             <div class="modal-footer justify-contentend">
                                 <button type="button" class="btn bg-gradient-danger" data-dismiss="modal" id="btnCloseView"><i
                                         class="fa fa-times"></i> ปิดหน้าต่าง</button>
                             </div>
-                        {{-- </form> --}}
                     </div>
                     <!-- /.modal-content -->
                 </div>
@@ -1029,7 +1015,6 @@
                 </div>
                 <!-- /.modal-dialog -->
             </div>
-
         </div><!-- /.container-fluid -->
     </section>
 @endsection
@@ -1120,10 +1105,10 @@
             // console.log(id);
             $('#modal-view').modal('show');
             $.get('../api/rental/detail/' + id, function(data) {
-                // console.log(data);
+                console.log(data);
                 $('#projectName').val(data.Project_Name);
-                $('#numberhome').val(data.numberhome);
-                $('#HomeNo').val(data.HomeNo);
+                // $('#numberhome').val(data.numberhome);
+                $('#homeNo').val(data.HomeNo);
                 $('#ownerName').val(data.Owner);
                 $('#cardOwner').val(data.cardowner ?? '-');
                 $('#ownerContract').val(data.contract_owner ?? '-');
