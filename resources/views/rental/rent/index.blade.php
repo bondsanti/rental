@@ -292,9 +292,16 @@
                                             @elseif($result->status_approve13 == 2)
                                                 <input type="file" class="form-control" style="width:120px;" name="slips13">
                                             @else
-                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip13 }}" data-index="13"  title="รออนุมัติ">
-                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                </button>
+                                                @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip13 }}" data-index="13"  title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger" title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @endif
+                                                
                                             @endif
                                         @else
                                             <input type="file" class="form-control" style="width:120px;" name="slips13">
@@ -309,9 +316,15 @@
                                             @elseif($result->status_approve14 == 2)
                                                 <input type="file" class="form-control" style="width:120px;" name="slips14">
                                             @else
-                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip14 }}" data-index="14"  title="รออนุมัติ">
-                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                </button>
+                                                @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip14 }}" data-index="14"  title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger" title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @endif
                                             @endif
                                         @else
                                             <input type="file" class="form-control" style="width:120px;" name="slips14">
@@ -326,9 +339,15 @@
                                             @elseif($result->status_approve15 == 2)
                                                 <input type="file" class="form-control" style="width:120px;" name="slips15">
                                             @else
-                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip15 }}" data-index="15"  title="รออนุมัติ">
-                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                </button>
+                                                @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip15 }}" data-index="15"  title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger" title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @endif
                                             @endif
                                         @else
                                             <input type="file" class="form-control" style="width:120px;" name="slips15">
@@ -343,9 +362,15 @@
                                             @elseif($result->status_approve16 == 2)
                                                 <input type="file" class="form-control" style="width:120px;" name="slips16">
                                             @else
-                                                <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip16 }}" data-index="16"  title="รออนุมัติ">
-                                                    รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
-                                                </button>
+                                                @if ($isRole->role_type=="SuperAdmin" || $isRole->role_type=="Account")
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger view-approve" data-id="{{ $result->room_id }}" data-date="{{ $currentDate }}" data-src="{{ $result->slip16 }}" data-index="16"  title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm bg-gradient-danger" title="รออนุมัติ">
+                                                        รออนุมัติ <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                                    </button>
+                                                @endif
                                             @endif
                                         @else
                                             <input type="file" class="form-control" style="width:120px;" name="slips16">

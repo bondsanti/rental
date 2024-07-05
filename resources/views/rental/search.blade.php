@@ -344,7 +344,7 @@
                                                         <i class="fa fa-pencil-square">
                                                         </i>
                                                     </a>
-                                                    <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
+                                                    <button type="button" class="btn bg-gradient-warning btn-sm print-item  {{ $item->cid ? '' : 'd-none'}} {{ $item->date_print_contract_manual ? '' : 'd-none'}} {{ $item->date_firstrend ? '' : 'd-none'}}"  data-id="{{ $item->id }}" data-pid="{{ $item->pid }}" data-cid="{{ $item->cid }}" title="ปริ้นเอกสารสัญญา">
                                                         <i class="fa fa-print"></i>
                                                     </button>
                                                     <a href="{{ url('/rental/rent/' . $item->id) }}"

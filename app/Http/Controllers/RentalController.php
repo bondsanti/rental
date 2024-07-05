@@ -101,6 +101,7 @@ class RentalController extends Controller
             'rooms.date_firstrend',
             'rooms.date_endrend',
             'rooms.Other',
+            'rooms.date_print_contract_manual',
             'customers.id as cid',
             'customers.Contract_Status',
             'customers.Contract_Startdate',
@@ -1642,33 +1643,7 @@ class RentalController extends Controller
             $payment->Owner_Due11_Date = $Owner_Due11_Date ?? NULL;
             $payment->Owner_Due12_Date = $Owner_Due12_Date ?? NULL;
             $payment->save();
-            // update fileExpress in table payment
-            // if (date('m') == '01') {
-            //     $payment->file_contract_express1 = $fileExpress;
-            // }elseif (date('m') == '02') {
-            //     $payment->file_contract_express2 = $fileExpress;
-            // }elseif (date('m') == '03') {
-            //     $payment->file_contract_express3 = $fileExpress;
-            // }elseif (date('m') == '04') {
-            //     $payment->file_contract_express4 = $fileExpress;
-            // }elseif (date('m') == '05') {
-            //     $payment->file_contract_express5 = $fileExpress;
-            // }elseif (date('m') == '06') {
-            //     $payment->file_contract_express6 = $fileExpress;
-            // }elseif (date('m') == '07') {
-            //     $payment->file_contract_express7 = $fileExpress;
-            // }elseif (date('m') == '08') {
-            //     $payment->file_contract_express8 = $fileExpress;
-            // }elseif (date('m') == '09') {
-            //     $payment->file_contract_express9 = $fileExpress;
-            // }elseif (date('m') == '10') {
-            //     $payment->file_contract_express10 = $fileExpress;
-            // }elseif (date('m') == '11') {
-            //     $payment->file_contract_express11 = $fileExpress;
-            // }elseif (date('m') == '12') {
-            //     $payment->file_contract_express12 = $fileExpress;
-            // }
-            // $payment->save();
+            
         }
 
         // insert and update quarantee
@@ -1784,93 +1759,17 @@ class RentalController extends Controller
         //     }
         // }
         
-
-        // insert log rental room
         $projects = DB::table('projects')
                 ->select('Project_Name')
                 ->where('pid', $request->project_id)
                 ->first();
+
+        // insert log rental room
         Log::addLog($request->session()->get('loginId'), 'แก้ไขห้อง', 'ชื่อโครงการ '. $projects->Project_Name .' เจ้าของห้อง '. $request->onwername .' ห้องเลขที่ ' .$request->RoomNo);
-        // $logRental = new Log_Rental();
-        // $logRental->Create_Date = now()->toDateString();
-        // $logRental->pid = $request->project_id ?? NULL;
-        // $logRental->RoomNo = $request->RoomNo ?? NULL;
-        // $logRental->HomeNo = $request->HomeNo ?? NULL;
-        // $logRental->Owner = $request->onwername ?? NULL;
-        // $logRental->Phone = $request->ownerphone ?? NULL;
-        // $logRental->Transfer_date = $request->transfer_date ?? NULL;
-        // $logRental->RoomType = $request->room_type ?? NULL;
-        // $logRental->Location = $request->Location ?? NULL;
-        // $logRental->Building = $request->Building ?? NULL;
-        // $logRental->Floor = $request->Floor ?? NULL;
-        // $logRental->Size = $request->room_size ?? NULL;
-        // $logRental->Key_front = $request->room_key_front ?? NULL;
-        // $logRental->Key_bed = $request->room_key_bed ?? NULL;
-        // $logRental->Key_balcony = $request->room_key_balcony ?? NULL;
-        // $logRental->Key_mailbox = $request->room_key_mailbox ?? NULL;
-        // $logRental->KeyCard = $request->room_card ?? NULL;
-        // $logRental->KeyCard_P = $request->room_card_p ?? NULL;
-        // $logRental->KeyCard_B = $request->room_card_b ?? NULL;
-        // $logRental->KeyCard_C = $request->room_card_c ?? NULL;
-        // $logRental->Guarantee_Startdate = $request->gauranteestart ?? NULL;
-        // $logRental->Guarantee_Enddate = $request->gauranteeend ?? NULL;
-        // $logRental->Guarantee_Amount = $request->gauranteeamount ?? NULL;
-        // $logRental->DefectStatus = $request->DefectStatus ?? NULL;
-        // $logRental->Status_Room = $request->Status_Room ?? NULL;
-        // $logRental->Bed = $request->room_Bed ?? NULL;
-        // $logRental->Beding = $request->room_Beding ?? NULL;
-        // $logRental->Bedroom_Curtain = $request->room_Bedroom_Curtain ?? NULL;
-        // $logRental->Livingroom_Curtain = $request->Livingroom_Curtain ?? NULL;
-        // $logRental->Wardrobe = $request->room_Wardrobe ?? NULL;
-        // $logRental->Sofa = $request->room_Sofa ?? NULL;
-        // $logRental->TV_Table = $request->room_TV_Table ?? NULL;
-        // $logRental->Dining_Table = $request->room_Dining_Table ?? NULL;
-        // $logRental->Center_Table = $request->room_Center_Table ?? NULL;
-        // $logRental->Chair = $request->room_Chair ?? NULL;
-        // $logRental->Bedroom_Air = $request->room_Bedroom_Air ?? NULL;
-        // $logRental->Livingroom_Air =  $request->room_Livingroom_Air ?? NULL;
-        // $logRental->Water_Heater = $request->room_Water_Heater ?? NULL;
-        // $logRental->TV = $request->room_TV ?? NULL;
-        // $logRental->Refrigerator =$request->room_Refrigerator ?? NULL;
-        // $logRental->microwave = $request->room_microwave ?? NULL;
-        // $logRental->wash_machine =  $request->room_wash_machine ?? NULL;
-        // $logRental->Other = $request->Other ?? NULL;
-        // $logRental->Activeby = Session::get('code');
-        // $logRental->Process_Status = 'Status_Update';
-        // $logRental->Electric_Contract =  $request->Electric_Contract ?? NULL;
-        // $logRental->Meter_Code = $request->Meter_Code ?? NULL;
-        // $logRental->rental_status = $request->rental_status ?? NULL;
-        // $logRental->save();
 
         // insert log customer
         Log::addLog($request->session()->get('loginId'), 'เพิ่มหรือแก้ไขข้อมูลลูกค้า', 'ชื่อลูกค้า '. $request->Cus_Name .' บ้านเลขทื่ '. $request->cus_homeAddress);
-        // $logCustomer = new Log_Customer();
-        // $logCustomer->id_main = $request->customer_id;
-        // $logCustomer->Create_Date = now()->toDateString();
-        // $logCustomer->pid = $request->project_id;
-        // $logCustomer->rid = $request->room_id;
-        // $logCustomer->RoomNo = $request->RoomNo ?? NULL;
-        // $logCustomer->Building = $request->Building ?? NULL;
-        // $logCustomer->Floor = $request->Floor ?? NULL;
-        // $logCustomer->Size = $request->room_size ?? NULL;
-        // $logCustomer->Cus_Name = $request->Cus_Name ?? NULL;
-        // $logCustomer->IDCard = $request->IDCard ?? NULL;
-        // $logCustomer->Phone = $request->cus_phone ?? NULL;
-        // $logCustomer->Price = $request->Price ?? NULL;
-        // $logCustomer->Contract = $request->Contract ?? NULL;
-        // $logCustomer->Contract_Startdate = $request->Contract_Startdate ?? null;
-        // $logCustomer->Contract_Enddate = $request->Contract_Enddate ?? null;
-        // $logCustomer->Contract_Reason =  $request->Contract_Reason ?? NULL;
-        // $logCustomer->Contract_Status = $request->Contract_Status ?? NULL;
-        // $logCustomer->Cancle_Date = $request->Cancle_Date ?? NULL;
-        // $logCustomer->Activeby = Session::get('code');;
-        // $logCustomer->Process_Status = 'Status_Update';
-        // $logCustomer->cust_remark = $request->cust_remark ?? NULL;
-        // $logCustomer->file_id_path_cus = $request->file('file_id_path_cus') ?? NULL;
-        // $logCustomer->file_contract_path = $request->file('file_contract_path') ?? NULL;
-        // $logCustomer->save();
         
-
         Alert::success('Success', 'อัพเดทข้อมูลสำเร็จ!');
         return redirect(route('rental'));
     }
@@ -2069,7 +1968,7 @@ class RentalController extends Controller
             ->where('rooms.id', $request->room_id)
             ->first();
 
-
+        // dd($rents);
         if ($rents->Price) {
             $customer_price = $this->convertAmount($rents->Price);
         } else {
@@ -2089,6 +1988,12 @@ class RentalController extends Controller
         // สัญญาเช่าช่วงห้องชุด ห้องพักอาศัย
         if ($request->status_approve == 1) {
             $pdf = Pdf::loadView('rental.print.sub_apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'customer_price' => $customer_price, 'price_insurance' => $price_insurance]);
+            // $pdf->setOptions([
+            //     'margin-top' => 10,
+            //     'margin-bottom' => 10,
+            //     'margin-left' => 10,
+            //     'margin-right' => 10,
+            // ]);
             return $pdf->stream();
         }
         // สัญญาเฟอร์
@@ -2104,6 +2009,12 @@ class RentalController extends Controller
         // สัญญาเช่าห้องชุด
         if ($request->status_approve == 4) {
             $pdf = Pdf::loadView('rental.print.apartment', ['dataLoginUser' => $dataLoginUser, 'rents' => $rents, 'getCode' => $getCode, 'phayarn1' => $phayarn1, 'phayarn2' => $phayarn2, 'room_price' => $room_price, 'price_insurance' => $price_insurance]);
+            // $pdf->setOptions([
+            //     'margin-top' => 0,
+            //     'margin-bottom' => 10,
+            //     'margin-left' => 10,
+            //     'margin-right' => 10,
+            // ]);
             return $pdf->stream();
         }
     }
