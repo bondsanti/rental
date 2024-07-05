@@ -18,7 +18,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 class RoomController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
@@ -109,7 +109,7 @@ class RoomController extends Controller
                 $room->file_id_path = $filename;
             }else {
                 Alert::error('Error', 'Allowed types: jpg, jpeg, png','pdf');
-                return redirect()->back(); 
+                return redirect()->back();
             }
         }
 
@@ -125,7 +125,7 @@ class RoomController extends Controller
         //         $room->image = 'uploads/images_room/' . $filename;
         //     }else{
         //         Alert::error('Error', 'Allowed types: jpg, jpeg, png');
-        //         return redirect()->back(); 
+        //         return redirect()->back();
         //     }
         // }
 
@@ -160,11 +160,11 @@ class RoomController extends Controller
                     $image->save();
                 }else{
                     Alert::error('Error', 'Allowed types: jpg, jpeg, png');
-                    return redirect()->back(); 
+                    return redirect()->back();
                 }
             }
         }
-        
+
         // $room->save();
         if ($room->save()) {
             $projects = DB::table('projects')
@@ -177,7 +177,7 @@ class RoomController extends Controller
         }else {
             Alert::error('Error', 'เพิ่มข้อมูลไม่สำเร็จ !กรุณาลองอีกครั้ง');
             return redirect(route('room'));
-        }   
+        }
     }
 
     public function deleteImageRoom($id, $rid){

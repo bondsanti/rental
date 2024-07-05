@@ -20,7 +20,7 @@
 
               </div>
               <div class="info">
-                  <a href="#" class="d-block">คุณ {{ $dataLoginUser->name_th }}</a>
+                  <a href="#" class="d-block">คุณ {{ $dataLoginUser->email }}</a>
               </div>
           </div>
 
@@ -48,7 +48,7 @@
                             </a>
                         </li>
                   @endif
-                  
+
                   <li class="nav-item">
                       <a href="{{ route('rental') }}"
                           class="nav-link {{ request()->routeIs('rental') ? 'active' : '' }} {{ request()->routeIs('rental.search') ? 'active' : '' }} {{ request()->routeIs('rental.detail') ? 'active' : '' }}">
@@ -109,7 +109,7 @@
                             </ul>
                         </li>
                   @endif
-                  
+
                   @if ($isRole->role_type != "Account")
                     @if ($isRole->role_type != "Staff")
                         <li class="nav-item">
@@ -169,7 +169,7 @@
                             </ul>
                         </li>
                     @endif
-                    
+
                     <li class="nav-item {{ request()->routeIs('report.room') ? 'menu-open' : '' }} {{ request()->routeIs('report.rental') ? 'menu-open' : '' }} {{ request()->routeIs('report.search') ? 'menu-open' : '' }} {{ request()->routeIs('report.availble') ? 'menu-open' : '' }} {{ request()->routeIs('report.asset') ? 'menu-open' : '' }} {{ request()->routeIs('report.asset.search') ? 'menu-open' : '' }}">
                         <a style="" href="" class="nav-link {{ request()->routeIs('report.room') ? 'active' : '' }} {{ request()->routeIs('report.rental') ? 'active' : '' }} {{ request()->routeIs('report.search') ? 'active' : '' }} {{ request()->routeIs('report.availble') ? 'active' : '' }} {{ request()->routeIs('report.asset') ? 'active' : '' }} {{ request()->routeIs('report.asset.search') ? 'active' : '' }}">
                             <i class="nav-icon fa-regular fa-rectangle-list"></i>
@@ -218,9 +218,9 @@
                         </ul>
                     </li>
                   @endif
-                  
-                  
-                  @if ($isRole->role_type == 'SuperAdmin')
+
+
+                  {{-- @if ($isRole->role_type == 'SuperAdmin')
                     <li
                         class="nav-item {{ request()->routeIs('user') ? 'menu-open' : '' }}">
                         <a href="#"
@@ -241,7 +241,7 @@
                             </li>
                         </ul>
                     </li>
-                  @endif
+                  @endif --}}
 
                   <li class="nav-item">
                       {{-- <a style="background-color: rgba(255, 23, 35, 0.486)" href="{{route('logoutUser')}}" class="nav-link {{ request()->routeIs('logoutUser') ? 'active' : '' }}"> --}}

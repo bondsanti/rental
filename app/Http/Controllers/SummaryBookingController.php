@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Session;
 class SummaryBookingController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-        
+
 
         return view(
             'summary.index',

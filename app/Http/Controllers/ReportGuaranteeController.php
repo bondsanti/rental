@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Session;
 class ReportGuaranteeController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        // $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        // $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
+
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
+
         $projects = Project::selectRaw("DISTINCT CASE WHEN lh_rise IS NULL THEN 99 ELSE pid END AS pid")
                     ->selectRaw("CASE WHEN lh_rise IS NULL THEN 'อื่น ๆ' ELSE Project_Name END AS Project_Name")
                     ->orderBy('Project_Name', 'ASC')
@@ -35,7 +39,7 @@ class ReportGuaranteeController extends Controller
     }
 
     public function search(Request $request){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::selectRaw("DISTINCT CASE WHEN lh_rise IS NULL THEN 99 ELSE pid END AS pid")
                     ->selectRaw("CASE WHEN lh_rise IS NULL THEN 'อื่น ๆ' ELSE Project_Name END AS Project_Name")
@@ -47,7 +51,7 @@ class ReportGuaranteeController extends Controller
         $bid = $request->bid;
         $search_date = '%'.substr($request->monthly, 0,7).'%';
         $banks_id = $request->bid;
-       
+
         if ($request->pid == 'All') {
             $whereConditions = '';
         }else{
@@ -105,85 +109,85 @@ class ReportGuaranteeController extends Controller
         ->from(DB::raw('(
             SELECT a.*
             FROM (
-                SELECT 
-                    quarantees.due_date_amount, 
-                    quarantees.pid, 
-                    quarantees.create_date, 
-                    quarantees.id, 
-                    quarantees.due_date, 
+                SELECT
+                    quarantees.due_date_amount,
+                    quarantees.pid,
+                    quarantees.create_date,
+                    quarantees.id,
+                    quarantees.due_date,
                     quarantees.amount_fix,
-                    products.gauranteeamount, 
-                    projects.Project_Name, 
-                    products.name, 
-                    REPLACE(products.RoomNo, "-", "") AS RoomNo, 
-                    products.gauranteestart, 
-                    products.gauranteeend, 
-                    quarantees.amount, 
-                    quarantees.payment_date, 
-                    banks.Code AS bank_name, 
-                    products.bank_id_quarantee, 
-                    products.bank_acc_quarantee, 
-                    products.loan_account_number1, 
-                    products.loan_account_number2, 
-                    products.loan_account_number3 
-                FROM quarantees 
-                LEFT JOIN products ON quarantees.pid = products.pid 
-                LEFT JOIN projects ON products.project_id = projects.pid 
-                LEFT JOIN banks ON products.bank_id_quarantee = banks.id 
-                WHERE '.$whereConditions.' '.$str_banks.' quarantees.due_date LIKE "'.$search_date.'" 
-                    AND status_quarantee = "enabled" 
+                    products.gauranteeamount,
+                    projects.Project_Name,
+                    products.name,
+                    REPLACE(products.RoomNo, "-", "") AS RoomNo,
+                    products.gauranteestart,
+                    products.gauranteeend,
+                    quarantees.amount,
+                    quarantees.payment_date,
+                    banks.Code AS bank_name,
+                    products.bank_id_quarantee,
+                    products.bank_acc_quarantee,
+                    products.loan_account_number1,
+                    products.loan_account_number2,
+                    products.loan_account_number3
+                FROM quarantees
+                LEFT JOIN products ON quarantees.pid = products.pid
+                LEFT JOIN projects ON products.project_id = projects.pid
+                LEFT JOIN banks ON products.bank_id_quarantee = banks.id
+                WHERE '.$whereConditions.' '.$str_banks.' quarantees.due_date LIKE "'.$search_date.'"
+                    AND status_quarantee = "enabled"
                     AND products.status = "Mortgaged"
             ) AS a
             INNER JOIN (
-                SELECT MAX(create_date) AS create_date, pid 
+                SELECT MAX(create_date) AS create_date, pid
                 FROM quarantees
-                WHERE status_quarantee = "enabled" 
+                WHERE status_quarantee = "enabled"
                 GROUP BY pid
             ) AS b ON a.create_date = b.create_date AND a.pid = b.pid
         ) AS a'))
         ->leftJoin(DB::raw('(
             SELECT (
-                SELECT DISTINCT payment_date 
-                FROM quarantees 
-                WHERE DATE_FORMAT(due_date, "%Y%m") = DATE_FORMAT(DATE_ADD(a.due_date, INTERVAL -1 MONTH), "%Y%m") 
-                    AND status_quarantee = "enabled" 
+                SELECT DISTINCT payment_date
+                FROM quarantees
+                WHERE DATE_FORMAT(due_date, "%Y%m") = DATE_FORMAT(DATE_ADD(a.due_date, INTERVAL -1 MONTH), "%Y%m")
+                    AND status_quarantee = "enabled"
                     AND pid = a.pid
-            ) AS date_new, a.pid 
+            ) AS date_new, a.pid
             FROM (
-                SELECT 
-                    quarantees.due_date_amount, 
-                    quarantees.pid, 
-                    quarantees.create_date, 
-                    quarantees.id, 
-                    quarantees.due_date, 
-                    quarantees.amount_fix, 
-                    products.gauranteeamount, 
-                    projects.Project_Name, 
-                    products.name, 
-                    products.RoomNo, 
-                    products.gauranteestart, 
-                    products.gauranteeend, 
-                    quarantees.amount, 
-                    quarantees.payment_date, 
-                    banks.Code AS bank_name, 
-                    products.bank_id_quarantee, 
-                    products.bank_acc_quarantee, 
-                    products.loan_account_number1, 
-                    products.loan_account_number2, 
-                    products.loan_account_number3 
-                FROM quarantees 
-                LEFT JOIN products ON quarantees.pid = products.pid 
-                LEFT JOIN projects ON products.project_id = projects.pid 
-                LEFT JOIN banks ON products.bank_id_quarantee = banks.id 
-                WHERE '.$whereConditions.' '.$str_banks.' quarantees.due_date LIKE "'.$search_date.'" 
-                    AND status_quarantee = "enabled" 
+                SELECT
+                    quarantees.due_date_amount,
+                    quarantees.pid,
+                    quarantees.create_date,
+                    quarantees.id,
+                    quarantees.due_date,
+                    quarantees.amount_fix,
+                    products.gauranteeamount,
+                    projects.Project_Name,
+                    products.name,
+                    products.RoomNo,
+                    products.gauranteestart,
+                    products.gauranteeend,
+                    quarantees.amount,
+                    quarantees.payment_date,
+                    banks.Code AS bank_name,
+                    products.bank_id_quarantee,
+                    products.bank_acc_quarantee,
+                    products.loan_account_number1,
+                    products.loan_account_number2,
+                    products.loan_account_number3
+                FROM quarantees
+                LEFT JOIN products ON quarantees.pid = products.pid
+                LEFT JOIN projects ON products.project_id = projects.pid
+                LEFT JOIN banks ON products.bank_id_quarantee = banks.id
+                WHERE '.$whereConditions.' '.$str_banks.' quarantees.due_date LIKE "'.$search_date.'"
+                    AND status_quarantee = "enabled"
                     AND products.status = "Mortgaged"
             ) AS a
             INNER JOIN (
-                SELECT MAX(create_date) AS create_date, pid 
-                FROM quarantees 
-                WHERE status_quarantee = "enabled" 
-                    AND create_date IS NOT NULL 
+                SELECT MAX(create_date) AS create_date, pid
+                FROM quarantees
+                WHERE status_quarantee = "enabled"
+                    AND create_date IS NOT NULL
                 GROUP BY pid
             ) AS b ON a.create_date = b.create_date AND a.pid = b.pid
         ) AS b'), 'a.pid', '=', 'b.pid')
@@ -214,7 +218,7 @@ class ReportGuaranteeController extends Controller
             'bank_id_quarantee' => $bankId,
             'bank_acc_quarantee' => $bankName,
         ]);
-      
+
       return response()->json([
         'data' => $product,
         'message' => 'อัพเดทข้อมูลสำเร็จ'], 200);
@@ -232,7 +236,7 @@ class ReportGuaranteeController extends Controller
             ->where('status_quarantee', 'enabled')
             ->count();
           // dd($count);
-            for ($i=1; $i <= $count; $i++) { 
+            for ($i=1; $i <= $count; $i++) {
               $idRows = ($request->id - 1) + $i;
               // dump($idRows);
               // dd('=========================');
@@ -254,7 +258,7 @@ class ReportGuaranteeController extends Controller
                 ]);
               }
             }
-          
+
         //กรณีเงินมากกว่าค่างวด
         }elseif ($request->amounts > $request->amount_check) {
           $quarantee = Quarantee::where('pid', $request->pid)
@@ -266,7 +270,7 @@ class ReportGuaranteeController extends Controller
           $n = $request->amounts - $quarantee->due_date_amount;
           $count_num_row = ceil($n / $request->gauranteeamount)+1;
           $sum_Money = $request->sum_Money;
-          for ($i=1; $i <= $count_num_row ; $i++) { 
+          for ($i=1; $i <= $count_num_row ; $i++) {
             $id_rows = ($request->id-1)+$i;
             // dump($id_rows);
             // dd('=========================');

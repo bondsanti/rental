@@ -17,7 +17,8 @@ class MainController extends Controller
     public function index(Request $request)
     {
 
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        // $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $projects = Project::where('rent', 1)
@@ -97,7 +98,7 @@ class MainController extends Controller
             ->get();
 
         // dd(Carbon::create(null, 6, 1));
-            
+
         // นับจำนวนห้องในแต่ละสถานะ
         $readyCount = Room::where('Status_Room', 'พร้อมอยู่')
             ->whereRaw("IFNULL(rooms.Status_Room, '') <> 'คืนห้อง'")

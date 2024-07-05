@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Session;
 class StatHistoryController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         return view(
@@ -24,7 +24,7 @@ class StatHistoryController extends Controller
     }
 
     public function search(Request $request){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $monthly = $request->monthly;
         $results = DB::table(DB::raw("(SELECT DISTINCT pr.pid, r.pid AS project_id, p.Project_Name, r.id AS rid, r.HomeNo, r.RoomNo, rental_status
@@ -76,7 +76,7 @@ class StatHistoryController extends Controller
             ->orderBy('Project_Name')
             ->orderBy('RoomNo')
             ->get();
-            
+
         return view(
             'summary.search_history',
             compact(
@@ -86,6 +86,6 @@ class StatHistoryController extends Controller
                 'results'
             )
         );
-        
+
     }
 }

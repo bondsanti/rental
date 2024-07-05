@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-        $users = Role_user::with('role:id,code,name_th,active,department_id')->orderBy('id', 'desc')->get();
+        // $users = Role_user::with('role:id,code,name_th,active,department_id')->orderBy('id', 'desc')->get();
 
         foreach ($users as $key => $value) {
             $deparment[$key] = Department::select('name')->where('id',$value->role->department_id)->first();
@@ -63,7 +63,7 @@ class UserController extends Controller
             $roleUser->active = 1;
             $roleUser->save();
 
-        
+
             $roleUser->refresh();
 
             Log::addLog($request->session()->get('loginId'), 'Add Role', 'RoleUser : '. $roleUser);
@@ -82,7 +82,7 @@ class UserController extends Controller
     {
 
         $users = Role_user::with('role:id,code,name_th,active','position:id,name')->where('id', $id)->first();
-        
+
         return response()->json($users, 200);
     }
 

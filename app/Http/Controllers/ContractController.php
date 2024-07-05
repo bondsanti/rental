@@ -20,7 +20,7 @@ class ContractController extends Controller
 {
     public function index()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $Lease_code = DB::table('Lease_codes')
             ->join('projects', 'Lease_codes.pid', '=', 'projects.pid')
@@ -44,7 +44,7 @@ class ContractController extends Controller
         dd($request->all());
         if ($request->lease_agr_code == '' || $request->sub_lease_code == '' || $request->insurance_code == '' || $request->agent_contract_code == '') {
             Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
-            return redirect()->back(); 
+            return redirect()->back();
         }
         $update_lcode = Lease_code::where('lease_code_id', $request->lease_code_id)->first();
         $update_lcode->lease_agr_code       = $request->lease_agr_code;
@@ -61,18 +61,18 @@ class ContractController extends Controller
         if ($updated) {
             Log::addLog($request->session()->get('loginId'), 'แก้ไขรูปแบบเลขที่สัญญาเช่า', 'โครงการ ' .$projects->Project_Name);
             Alert::success('Success', 'บันทึกข้อมูลสำเร็จ!');
-            return redirect()->back(); 
+            return redirect()->back();
         } else {
             Alert::error('Error', 'มีบางอย่างผิดพลาด ไม่สามารถอัพเดทข้อมูลได้');
-            return redirect()->back(); 
+            return redirect()->back();
         }
 
     }
 
     public function out_index()
     {
-        $dataLoginUser  = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
-        $isRole         = Role_user::where('user_id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
+        $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects       = DB::table('projects')
             ->where('rent', '=', 1)
             ->orderBy('projects.Project_Name')
@@ -92,7 +92,7 @@ class ContractController extends Controller
     {
         if ($request->Project_NameTH == '' || $request->address_full == '') {
             Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
-            return redirect()->back(); 
+            return redirect()->back();
         }
         $update_out = Project::where('pid', $request->pid)->first();
         $update_out->Project_NameTH = $request->Project_NameTH;
@@ -111,7 +111,7 @@ class ContractController extends Controller
 
     public function room_con()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
@@ -128,7 +128,7 @@ class ContractController extends Controller
     }
     public function search(Request $request)
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
@@ -169,7 +169,7 @@ class ContractController extends Controller
             'customers.Cus_Name',
             'customers.Phone as Cus_phone',
             'customers.Price as Cus_price'
-    
+
         )
         ->from('rooms as rooms')
         ->join('projects', 'rooms.pid', '=', 'projects.pid')
@@ -178,19 +178,19 @@ class ContractController extends Controller
         if ($request->pid != 'all') {
             $rents->where('rooms.pid', $request->pid);
         }
-        
+
         if ($request->Owner) {
             $rents->where('rooms.Owner', 'LIKE', '%' . $request->Owner . '%');
         }
-        
+
         if ($request->RoomNo) {
             $rents->where('rooms.RoomNo', 'LIKE', '%' . $request->RoomNo . '%');
         }
-        
+
         if ($request->HomeNo) {
             $rents->where('rooms.HomeNo', 'LIKE', '%' . $request->HomeNo . '%');
         }
-        
+
         if ($request->Customer) {
             $rents->where('customers.Cus_Name', 'LIKE', '%' . $request->Customer . '%');
         }
@@ -210,7 +210,7 @@ class ContractController extends Controller
 
         $rents = $rents
             ->orderBy('Project_Name', 'asc')
-            ->orderBy('RoomNo', 'asc') 
+            ->orderBy('RoomNo', 'asc')
             ->get();
 
         $formInputs = $request->all();
@@ -232,7 +232,7 @@ class ContractController extends Controller
 
     public function list_contracct()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = DB::connection('mysql_report')
             ->table('project')
@@ -252,7 +252,7 @@ class ContractController extends Controller
 
     public function list_search(Request $request)
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')

@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
 class RentalPaymentReportController extends Controller
 {
     public function index(){
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         return view(
@@ -29,7 +29,7 @@ class RentalPaymentReportController extends Controller
 
     public function search(Request $request){
 
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $countPayment = array();
         $monthly = $request->monthly;
@@ -62,13 +62,13 @@ class RentalPaymentReportController extends Controller
             'c.cus_name',
             'c.Phone',
             'c.price',
-            DB::raw("CASE 
-                        WHEN IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ' THEN 'ไม่มีวันเซ็นต์สัญญา' 
-                        WHEN r.status_room = 'สวัสดิการ' THEN 'ห้องสวัสดิการ' 
-                        ELSE c.contract_startdate 
+            DB::raw("CASE
+                        WHEN IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ' THEN 'ไม่มีวันเซ็นต์สัญญา'
+                        WHEN r.status_room = 'สวัสดิการ' THEN 'ห้องสวัสดิการ'
+                        ELSE c.contract_startdate
                     END AS STATUS"),
-            DB::raw("CASE 
-                        WHEN IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <>'สวัสดิการ' THEN 'ยังไม่จ่าย' 
+            DB::raw("CASE
+                        WHEN IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <>'สวัสดิการ' THEN 'ยังไม่จ่าย'
                         WHEN r.status_room ='สวัสดิการ' THEN 'ห้องสวัสดิการ'
                         WHEN (
                             DATE_FORMAT(pa.due1_Date, '%Y%m') = DATE_FORMAT('".$monthly."', '%Y%m') AND IFNULL(pa.Payment_Date1, '') NOT IN ('', '0000-00-00')
@@ -83,10 +83,10 @@ class RentalPaymentReportController extends Controller
                             OR DATE_FORMAT(pa.due10_Date, '%Y%m') = DATE_FORMAT('".$monthly."', '%Y%m') AND IFNULL(pa.Payment_Date10, '') NOT IN ('', '0000-00-00')
                             OR DATE_FORMAT(pa.due11_Date, '%Y%m') = DATE_FORMAT('".$monthly."', '%Y%m') AND IFNULL(pa.Payment_Date11, '') NOT IN ('', '0000-00-00')
                             OR DATE_FORMAT(pa.due12_Date, '%Y%m') = DATE_FORMAT('".$monthly."', '%Y%m') AND IFNULL(pa.Payment_Date12, '') NOT IN ('', '0000-00-00')
-                        ) THEN 'จ่ายแล้ว' 
-                        ELSE 'ยังไม่จ่าย' 
+                        ) THEN 'จ่ายแล้ว'
+                        ELSE 'ยังไม่จ่าย'
                     END AS paid"),
-            DB::raw("CASE 
+            DB::raw("CASE
                         WHEN IFNULL( contract_startdate, '' ) = ''
                             OR contract_startdate = '0000-00-00'
                             THEN '-'
@@ -154,14 +154,14 @@ class RentalPaymentReportController extends Controller
                         WHEN (DATE_FORMAT( due11_Date, '%Y%m') = DATE_FORMAT( '".$monthly."', '%Y%m' ) and ifnull(Payment_Date11, '' ) not in ('','0000-00-00')) then approve11_date
                         WHEN (DATE_FORMAT( due12_Date, '%Y%m') = DATE_FORMAT( '".$monthly."', '%Y%m' ) and ifnull(Payment_Date12, '' ) not in ('','0000-00-00')) then approve12_date
                         else '0' end as  approve_dates"),
-            'c.price','c.Contract_Status','Cancle_Date', 'contract_startdate', 'contract_enddate','c.Phone', 'c.pid', 'c.rid', 'pa.*'         
+            'c.price','c.Contract_Status','Cancle_Date', 'contract_startdate', 'contract_enddate','c.Phone', 'c.pid', 'c.rid', 'pa.*'
             // Add similar CASE statements for other columns
         )
         ->join('projects as p', 'p.pid', '=', 'c.pid')
         ->join('payments as pa', 'pa.cid', '=', 'c.id')
         ->join('rooms as r', 'r.id', '=', 'c.rid')
         ->whereRaw("DATE_FORMAT('".$monthly."', '%Y%m%d') BETWEEN DATE_FORMAT(c.contract_startdate, '%Y%m%d') AND DATE_FORMAT(c.contract_enddate, '%Y%m%d')
-                            and CASE WHEN IFNULL( contract_startdate, '' ) = '' 
+                            and CASE WHEN IFNULL( contract_startdate, '' ) = ''
                     OR contract_startdate = '0000-00-00' and r.status_room <>'สวัสดิการ' THEN 'ยังไม่จ่าย'
                     when r.status_room ='สวัสดิการ' then 'ห้องสวัสดิการ'
                     WHEN (DATE_FORMAT( due1_Date, '%Y%m' ) = DATE_FORMAT( '".$monthly."', '%Y%m' ) and ifnull(Payment_Date1, '' ) not in ('','0000-00-00'))
@@ -191,7 +191,7 @@ class RentalPaymentReportController extends Controller
                     and DATE_FORMAT( due12_Date, '%Y%m') <> DATE_FORMAT( '".$monthly."', '%Y%m')
                     )
                     then 'จ่ายแล้ว'
-                    else 'ยังไม่จ่าย' end in ( '".$w."') 
+                    else 'ยังไม่จ่าย' end in ( '".$w."')
         ")
         ->where(function ($query) use($monthly){
             $query->whereRaw("IFNULL(c.contract_startdate, '') = '' OR c.contract_startdate = '0000-00-00' AND r.status_room <> 'สวัสดิการ'")
@@ -255,7 +255,7 @@ class RentalPaymentReportController extends Controller
             ->where('cid', $cids)
             ->where('rid', $rids)
             ->first()->countPayment;
-            
+
         $st = explode('-', $startDate);
         if ($countPayment == '0' && date('d') < $st[2]) {
             $rowNumAns = '-';
@@ -273,7 +273,7 @@ class RentalPaymentReportController extends Controller
         $monthY = thaidate('F Y', $date);
         $current_date = Carbon::now()->format('Y-m-d');
         $print_date = Carbon::now()->format('d-m-Y');
-        $DateChk = explode('-', $current_date);	  
+        $DateChk = explode('-', $current_date);
         $date_check = $DateChk[0].'-'.$DateChk[1].'-01';
         $Payment = explode('-', $date);
         $year = $Payment[0]+543;
@@ -303,7 +303,7 @@ class RentalPaymentReportController extends Controller
                 ->orderBy('id', 'DESC')
                 ->limit(1)
                 ->get();
-        
+
             $check=0;
             foreach ($invoceLimit as $item) {
                 $check++;
@@ -402,9 +402,9 @@ class RentalPaymentReportController extends Controller
                 ->where('payment_date', $date)
                 ->first();
             $REC = substr($year, -2).'/'.$Payment[1].'/'. str_pad($getBill->bill_id, 4, '0', STR_PAD_LEFT);
-    
+
         }
-        
+
         $result = Room::select(
                 'projects.*',
                 'projects.pid as project_id',
@@ -439,8 +439,8 @@ class RentalPaymentReportController extends Controller
                 $pdf = Pdf::loadView('report_payment.print_receipt', ['result' => $result, 'monthY' => $monthY, 'REC' => $REC, 'Payment_Dates' => $Payment_Dates, 'date_check' => $date_check, 'customer_price' => $customer_price]);
                 return $pdf->stream();
             }
-            
-            
+
+
     }
 
     public function convertAmount($amount_number)

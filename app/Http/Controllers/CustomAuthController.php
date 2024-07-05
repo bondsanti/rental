@@ -65,7 +65,7 @@ class CustomAuthController extends Controller
                             'username' => $user_hr->code,
                             'dates' => date('Y-m-d'),
                             'timeStm' => date('Y-m-d H:i:s'),
-                            'page' => 'Rantal'
+                            'page' => 'rantal'
                         ]);
 
                         Log::addLog($request->session()->get('loginId'), 'Login', 'Login');
@@ -108,13 +108,13 @@ class CustomAuthController extends Controller
     public function AllowLoginConnect(Request $request, $id, $token)
     {
 
-        $user = User::where('code', '=', $id)->orWhere('old_code', '=', $id)->first();
-        //dd($user);
+        $user = User::where('user_id', '=', $id)->first();
+       // dd($user);
         if ($user) {
-            $request->session()->put('loginId', $user->id);
+            $request->session()->put('loginId', $user->user_id);
             // Auth::login($user);
-            $user->last_login_at = date('Y-m-d H:i:s');
-            $user->save();
+            // $user->last_login_at = date('Y-m-d H:i:s');
+            // $user->save();
             $checkToken = User::where('token', '=', $token)->first();
 
             if ($checkToken) {
@@ -122,7 +122,7 @@ class CustomAuthController extends Controller
                     'username' => $user->code,
                     'dates' => date('Y-m-d'),
                     'timeStm' => date('Y-m-d H:i:s'),
-                    'page' => 'Rantal'
+                    'page' => 'rantal'
                 ]);
 
                 Log::addLog($request->session()->get('loginId'), 'Login', 'Login AllowLoginConnect By vBisConnect');
@@ -141,7 +141,7 @@ class CustomAuthController extends Controller
 
     public function changePassword()
     {
-        return view('auth.password'); 
+        return view('auth.password');
     }
 
     public function updatePassword(Request $request)

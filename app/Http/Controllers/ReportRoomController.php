@@ -18,7 +18,7 @@ class ReportRoomController extends Controller
 {
     public function index()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $reports = DB::table(DB::raw("
@@ -105,7 +105,7 @@ class ReportRoomController extends Controller
 
     public function report_rental()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $date1 = request()->input('date1', date('Y-m-d'));
 
@@ -503,7 +503,7 @@ class ReportRoomController extends Controller
 
     public function avaliableRoom()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $results = Room::select(
@@ -536,7 +536,7 @@ class ReportRoomController extends Controller
 
     public function listRoom()
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = DB::connection('mysql_report')
             ->table('project')
@@ -565,7 +565,7 @@ class ReportRoomController extends Controller
 
     public function asset_search(Request $request)
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $projects = DB::connection('mysql_report')
             ->table('project')
@@ -575,7 +575,7 @@ class ReportRoomController extends Controller
             )
             ->orderBy('Project_Name', 'ASC')
             ->get();
-    
+
         $startDate = $request->startdate;
         $endDate = $request->enddate;
 

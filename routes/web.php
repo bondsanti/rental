@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('_997744Isfnj)asdjknjZqwnmPOdfk_HHHGsfbp7AscaYjsn_asj20Ssdszf96GH645G1as41s_sdfnjozz/{id}&{token}',[CustomAuthController::class,'AllowLoginConnect']);
+Route::get('5cJpjHfjkVQQqhP7KJPxBphuX5L4Wktvyq9i0EcrxVDfaRdYCU7JbifCtC5WxzVyx3a/{id}&{token}',[CustomAuthController::class,'AllowLoginConnect']);
 
 
 Route::middleware(['isAuth'])->group(function () {
