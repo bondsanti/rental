@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 
-class Contract2Controller extends Controller
+class Con2Controller extends Controller
 {
     public function index()
     {

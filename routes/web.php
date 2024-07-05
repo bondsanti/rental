@@ -66,14 +66,14 @@ Route::middleware(['isLogin'])->group(function () {
     Route::get('/rental/history/{id}', [RentalController::class, 'history'])->name('rental.history');
 
     //Route Contract สัญญา
-    Route::get('/contract',[Contract2Controller::class,'index'])->name('contract');
-    Route::post('/contract/update',[Contract2Controller::class,'update'])->name('contract.update');
-    Route::get('/out_contract',[Contract2Controller::class,'out_index'])->name('out_contract');
-    Route::post('/out_contract/update',[Contract2Controller::class,'out_update'])->name('out.update');
-    Route::get('/room/contract',[Contract2Controller::class,'test'])->name('contract.room');
-    Route::post('/room/contract/search',[Contract2Controller::class,'search'])->name('contract.search');
-    Route::get('/contract/list',[Contract2Controller::class,'list_contracct'])->name('contract.list');
-    Route::post('/list/search',[Contract2Controller::class,'list_search'])->name('list.search');
+    Route::get('/contract',[Con2Controller::class,'index'])->name('contract');
+    Route::post('/contract/update',[Con2Controller::class,'update'])->name('contract.update');
+    Route::get('/out_contract',[Con2Controller::class,'out_index'])->name('out_contract');
+    Route::post('/out_contract/update',[Con2Controller::class,'out_update'])->name('out.update');
+    Route::get('/room/contract',[Con2Controller::class,'test'])->name('contract.room');
+    Route::post('/room/contract/search',[Con2Controller::class,'search'])->name('contract.search');
+    Route::get('/contract/list',[Con2Controller::class,'list_contracct'])->name('contract.list');
+    Route::post('/list/search',[Con2Controller::class,'list_search'])->name('list.search');
 
     //Route ReportRoom รายงานสรุปห้องเช่า
     Route::get('/report/room',[ReportRoomController::class,'index'])->name('report.room');
