@@ -1,10 +1,12 @@
 <?php
+
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
-use App\http\Controllers\Contract2Controller;
+
 use App\Http\Controllers\RentalPaymentReportController;
 use App\Http\Controllers\ReportGuaranteeController;
 use App\Http\Controllers\ReportRentalController;
@@ -66,14 +68,14 @@ Route::middleware(['isLogin'])->group(function () {
     Route::get('/rental/history/{id}', [RentalController::class, 'history'])->name('rental.history');
 
     //Route Contract สัญญา
-    Route::get('/contract',[Con2Controller::class,'index'])->name('contract');
-    Route::post('/contract/update',[Con2Controller::class,'update'])->name('contract.update');
-    Route::get('/out_contract',[Con2Controller::class,'out_index'])->name('out_contract');
-    Route::post('/out_contract/update',[Con2Controller::class,'out_update'])->name('out.update');
-    Route::get('/room/contract',[Con2Controller::class,'test'])->name('contract.room');
-    Route::post('/room/contract/search',[Con2Controller::class,'search'])->name('contract.search');
-    Route::get('/contract/list',[Con2Controller::class,'list_contracct'])->name('contract.list');
-    Route::post('/list/search',[Con2Controller::class,'list_search'])->name('list.search');
+    Route::get('/contract',[ContractController::class,'index'])->name('contract');
+    Route::post('/contract/update',[ContractController::class,'update'])->name('contract.update');
+    Route::get('/out_contract',[ContractController::class,'out_index'])->name('out_contract');
+    Route::post('/out_contract/update',[ContractController::class,'out_update'])->name('out.update');
+    Route::get('/room/contract',[ContractController::class,'test'])->name('contract.room');
+    Route::post('/room/contract/search',[ContractController::class,'search'])->name('contract.search');
+    Route::get('/contract/list',[ContractController::class,'list_contracct'])->name('contract.list');
+    Route::post('/list/search',[ContractController::class,'list_search'])->name('list.search');
 
     //Route ReportRoom รายงานสรุปห้องเช่า
     Route::get('/report/room',[ReportRoomController::class,'index'])->name('report.room');
