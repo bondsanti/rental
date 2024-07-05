@@ -298,8 +298,5 @@ class ContractController extends Controller
         );
     }
 
-    public function test()  {
 
-        dd('ok');
-    }
 }

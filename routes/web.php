@@ -72,7 +72,7 @@ Route::middleware(['isLogin'])->group(function () {
     Route::post('/contract/update',[ContractController::class,'update'])->name('contract.update');
     Route::get('/out_contract',[ContractController::class,'out_index'])->name('out_contract');
     Route::post('/out_contract/update',[ContractController::class,'out_update'])->name('out.update');
-    Route::get('/room/contract',[ContractController::class,'test'])->name('contract.room');
+    Route::get('/room/contract',[ContractController::class,'room_con'])->name('contract.room');
     Route::post('/room/contract/search',[ContractController::class,'search'])->name('contract.search');
     Route::get('/contract/list',[ContractController::class,'list_contracct'])->name('contract.list');
     Route::post('/list/search',[ContractController::class,'list_search'])->name('list.search');
