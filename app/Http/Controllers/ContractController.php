@@ -23,9 +23,9 @@ class ContractController extends Controller
         $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
-        $Lease_code = DB::table('Lease_codes')
-            ->join('projects', 'Lease_codes.pid', '=', 'projects.pid')
-            ->select('Lease_codes.*', 'projects.Project_Name', 'projects.rent')
+        $Lease_code = DB::table('lease_codes')
+            ->join('projects', 'lease_codes.pid', '=', 'projects.pid')
+            ->select('lease_codes.*', 'projects.Project_Name', 'projects.rent')
             ->where('rent', '=', 1)
             ->orderBy('projects.Project_Name', 'ASC')
             ->get();
