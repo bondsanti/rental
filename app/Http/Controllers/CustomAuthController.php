@@ -41,7 +41,7 @@ class CustomAuthController extends Controller
 
             if ($user_hr->active != 0 or $user_hr->resign_date == null) {
 
-                $role_user = Role_user::where('user_id', $user_hr->id)->orwhere('active', 1)->first();
+                $role_user = Role_user::where('user_id', $user_hr->user_id)->orwhere('active', 1)->first();
                 //dd($role_user);
                 if (!$role_user) {
 
@@ -58,7 +58,7 @@ class CustomAuthController extends Controller
                             return redirect('/change-password');
                         }
 
-                        $request->session()->put('loginId', $user_hr->id);
+                        $request->session()->put('loginId', $user_hr->user_id);
                         $request->session()->put('code', $user_hr->code);
 
                         DB::table('vbeyond_report.log_login')->insert([
