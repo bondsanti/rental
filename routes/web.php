@@ -8,9 +8,9 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\RentalPaymentReportController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportGuaranteeController;
 use App\Http\Controllers\ReportRentalController;
-use App\http\controllers\ReportRoomController;
 use App\Http\Controllers\StatHistoryController;
 use App\Http\Controllers\SummaryBookingController;
 use Illuminate\Support\Facades\Route;
@@ -78,12 +78,13 @@ Route::middleware(['isLogin'])->group(function () {
     Route::post('/list/search',[ContractController::class,'list_search'])->name('list.search');
 
     //Route ReportRoom รายงานสรุปห้องเช่า
-    Route::get('/report/room',[ReportRoomController::class,'index'])->name('report.room');
-    Route::get('/report/rental',[ReportRoomController::class,'report_rental'])->name('report.rental');
-    Route::post('/report/rental/serach',[ReportRoomController::class,'report_search'])->name('report.search');
-    Route::get('/report/rental/AvailableRoom',[ReportRoomController::class,'avaliableRoom'])->name('report.availble');
-    Route::get('/report/rental/Asset',[ReportRoomController::class,'listRoom'])->name('report.asset');
-    Route::post('/report/rental/asset/search',[ReportRoomController::class,'asset_search'])->name('report.asset.search');
+
+    Route::get('/report/room',[ReportController::class,'index'])->name('report.room');
+    Route::get('/report/rental',[ReportController::class,'report_rental'])->name('report.rental');
+    Route::post('/report/rental/serach',[ReportController::class,'report_search'])->name('report.search');
+    Route::get('/report/rental/AvailableRoom',[ReportController::class,'avaliableRoom'])->name('report.availble');
+    Route::get('/report/rental/Asset',[ReportController::class,'listRoom'])->name('report.asset');
+    Route::post('/report/rental/asset/search',[ReportController::class,'asset_search'])->name('report.asset.search');
 
     // Report Payment
     Route::get('/report/payment',[RentalPaymentReportController::class,'index'])->name('report.payment');
