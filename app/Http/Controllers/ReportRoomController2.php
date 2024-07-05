@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
-class ReportRoomController extends Controller
+class ReportRoomController2 extends Controller
 {
     public function index()
     {
         $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-//aaa
+
         $reports = DB::table(DB::raw("
         (
             SELECT Project_Name, COUNT(*) AS total,
