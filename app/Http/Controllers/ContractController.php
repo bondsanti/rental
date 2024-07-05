@@ -22,7 +22,7 @@ class ContractController extends Controller
     {
         $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
-        dd($isRole);
+
         $Lease_code = DB::table('Lease_codes')
             ->join('projects', 'Lease_codes.pid', '=', 'projects.pid')
             ->select('Lease_codes.*', 'projects.Project_Name', 'projects.rent')
@@ -114,6 +114,7 @@ class ContractController extends Controller
     {
         $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
+        dd($isRole);
         $projects = Project::where('rent', 1)
             ->orderBy('Project_Name', 'asc')
             ->get();
