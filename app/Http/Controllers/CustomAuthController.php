@@ -17,7 +17,8 @@ class CustomAuthController extends Controller
 {
     public function login()
     {
-        return view('auth.login');
+        //return view('auth.login');
+        return redirect('https://vbnext.vbeyond.co.th/main');
     }
     public function loginUser(Request $request)
     {
