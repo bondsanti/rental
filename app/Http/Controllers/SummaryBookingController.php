@@ -26,7 +26,7 @@ class SummaryBookingController extends Controller
 
     public function search(Request $request){
         $monthly = $request->monthly;
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
         $where = "DATE_FORMAT('{$request->monthly}', '%Y%m') = DATE_FORMAT(contract_startdate, '%Y%m')";
         $results = DB::table('customers')

@@ -121,7 +121,8 @@ class ReportController extends Controller
 
     public function report_search(Request $request)
     {
-        $dataLoginUser = User::with('role_position:id,name')->where('id', Session::get('loginId'))->first();
+        $dataLoginUser = User::where('user_id', Session::get('loginId'))->first();
+
         $isRole = Role_user::where('user_id', Session::get('loginId'))->first();
 
         $date1 = request()->get('date1');
