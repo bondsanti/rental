@@ -2266,16 +2266,16 @@ class RentalController extends Controller
                     $toEmail = ['sakeerin.k@vbeyond.co.th'];
                     $toCC = ['santi.c@vbeyond.co.th'];
                     $toBCC = ['noreply@vbeyond.co.th'];
-                    // Mail::send(
-                    //     'rental.rent.mail',
-                    //     ['Link' => $url, 'roomNo' => $request->roomNo, 'project' => $request->projectName, 'owner' => $request->owner, 'monthY' => $monthY, 'subJect' => $subJect],
-                    //     function (Message $message) use ($toEmail, $toCC, $toBCC) {
-                    //         $message->to($toEmail)
-                    //             ->cc($toCC)
-                    //             ->bcc($toBCC)
-                    //             ->subject('สลิปรอการอนุมัติ');
-                    //     }
-                    // );
+                    Mail::send(
+                        'rental.rent.mail',
+                        ['Link' => $url, 'roomNo' => $request->roomNo, 'project' => $request->projectName, 'owner' => $request->owner, 'monthY' => $monthY, 'subJect' => $subJect],
+                        function (Message $message) use ($toEmail, $toCC, $toBCC) {
+                            $message->to($toEmail)
+                                ->cc($toCC)
+                                ->bcc($toBCC)
+                                ->subject('สลิปรอการอนุมัติ');
+                        }
+                    );
 
                     // update status approve
                     $payment->{"status_approve{$i}"} = 0;

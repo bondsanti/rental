@@ -42,7 +42,7 @@ class ContractController extends Controller
     }
     public function update(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
         if ($request->lease_agr_code == '' || $request->sub_lease_code == '' || $request->insurance_code == '' || $request->agent_contract_code == '') {
             Alert::error('Error', 'มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้ง');
             return redirect()->back();
