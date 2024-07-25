@@ -2262,7 +2262,7 @@ class RentalController extends Controller
                     $file->move('uploads/image_slip/', $filename);
                     $payment->{"slip{$i}"} = $filename;
                     ###note
-                    $url = "https://vbrental/rental/rent/".$request->roomId;
+                    $url = "https://vbrental.vbeyond.co.th/rental/rent/".$request->roomId;
                     $toEmail = ['sakeerin.k@vbeyond.co.th'];
                     $toCC = ['santi.c@vbeyond.co.th'];
                     $toBCC = ['noreply@vbeyond.co.th'];
