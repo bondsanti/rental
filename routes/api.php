@@ -50,7 +50,8 @@ Route::delete('/room/deleteImageRoom/{id}/{rid}',[RoomController::class,'deleteI
 Route::get('/dashboard/compareRentRoom',[MainController::class,'compareRentRoom'])->name('dashboard.compareRentRoom');
 Route::get('/dashboard/getContractRent',[MainController::class,'getContractRent'])->name('dashboard.getContractRent');
 
-Route::get('/project-rent',[ApiController::class,'getStatus'])->name('getStatus');
-Route::get('/status-rent',[ApiController::class,'getStatusRoom'])->name('getStatusRoom');
-Route::post('/search-rental',[ApiController::class,'searchRental'])->name('searchRental');
-
+Route::middleware(['checkTokenApi'])->group(function () {
+    Route::get('/project-rent',[ApiController::class,'getStatus'])->name('getStatus');
+    Route::get('/status-rent',[ApiController::class,'getStatusRoom'])->name('getStatusRoom');
+    Route::post('/search-rental',[ApiController::class,'searchRental'])->name('searchRental');
+});
