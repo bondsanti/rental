@@ -18,7 +18,8 @@ class CustomAuthController extends Controller
     public function login()
     {
         //return view('auth.login');
-        return redirect('https://vbnext.vbeyond.co.th/main');
+        $url_redirect=env('APP_VBNEXT');
+        return redirect($url_redirect);
     }
     public function loginUser(Request $request)
     {
